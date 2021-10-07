@@ -188,13 +188,19 @@ class AccidentAddDetails extends Component {
 
   handleSubmit = (values, actions) => {
     const { productId } = this.props.match.params
-    const { accidentDetails, declineStatus } = this.state
+    const { accidentDetails, declineStatus, fulQuoteResp } = this.state
+    let total_idv = fulQuoteResp && fulQuoteResp.PolicyLobList.length > 0 ? Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].SumInsured) : 0
+    
     if(declineStatus == "Decline") {
       swal('Insurance Policy cannot be offered')
       return false
     }
     const formData = new FormData();
     let encryption = new Encryption();
+    let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
     this.props.loadingStart();
     let policy_start_date = moment(values.pol_start_date).format('yyyy-MM-DD HH:mm:ss')
     let policy_end_date = moment(values.pol_end_date).format('yyyy-MM-DD HH:mm:ss')
@@ -219,27 +225,36 @@ class AccidentAddDetails extends Component {
     else if (values.disability == 1) {
       swal('Insurance Policy cannot be offered')
     }
-    axios
-      .post(`ipa/policy-details`, formData)
-      .then(res => {
-        let decryptResp = JSON.parse(encryption.decrypt(res.data));
-        console.log('decryptResp-----', decryptResp)
+    if (user_data && total_idv) {
+      if ((total_idv > 5000000) && user_data.user_type == "POSP") {
+        swal("Quote cannot proceed with IDV greater than 5000000")
         this.props.loadingStop();
-        if (decryptResp.error == false) {
-          this.props.history.push(`/AccidentAdditionalDetails/${productId}`);
-        } else {
-          actions.setSubmitting(false)
-          if (decryptResp.error == true) {
-            swal(decryptResp.msg)
-          }
-        }
-      })
-      .catch(err => {
-        this.props.loadingStop();
-        actions.setSubmitting(false)
-        let decryptErr = JSON.parse(encryption.decrypt(err.data));
-        console.log('decryptErr-----', decryptErr)
-      });
+        return false
+      }
+      else {
+        axios
+          .post(`ipa/policy-details`, formData)
+          .then(res => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            console.log('decryptResp-----', decryptResp)
+            this.props.loadingStop();
+            if (decryptResp.error == false) {
+              this.props.history.push(`/AccidentAdditionalDetails/${productId}`);
+            } else {
+              actions.setSubmitting(false)
+              if (decryptResp.error == true) {
+                swal(decryptResp.msg)
+              }
+            }
+          })
+          .catch(err => {
+            this.props.loadingStop();
+            actions.setSubmitting(false)
+            let decryptErr = JSON.parse(encryption.decrypt(err.data));
+            console.log('decryptErr-----', decryptErr)
+          });
+      }
+    }
 
   }
 
@@ -277,6 +292,7 @@ class AccidentAddDetails extends Component {
       first_name: accidentDetails ? accidentDetails.first_name : "",
       last_name: accidentDetails ? accidentDetails.last_name : "",
       date_of_birth: accidentDetails && accidentDetails.dob ? new Date(accidentDetails.dob) : "",
+      age: accidentDetails && accidentDetails.dob ? Math.floor(moment().diff(accidentDetails.dob, 'years', true) ) : "",
       occupation_id: accidentDetails && accidentDetails.ipainfo && accidentDetails.ipainfo.occupation ? accidentDetails.ipainfo.occupation.id : "",
       gender: accidentDetails ? accidentDetails.gender : ""
     });
@@ -334,7 +350,6 @@ class AccidentAddDetails extends Component {
                       validationSchema={vehicleRegistrationValidation}
                     >
                       {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                        console.log('values------------------',values)
 
                         return (
                           <Form>
@@ -487,34 +502,30 @@ class AccidentAddDetails extends Component {
                             </Row>
 
                             <Row>
-                              <Col sm={6} md={4} lg={5}>
-                                <FormGroup>
-                                  <DatePicker
-                                    name="date_of_birth"
-                                    dateFormat="dd MMM yyyy"
-                                    placeholderText="DOB"
-                                    peekPreviousMonth
-                                    peekPreviousYear
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    disabled={true}
-                                    dropdownMode="select"
-                                    // maxDate={new Date(maxDobAdult)}
-                                    // minDate={new Date(minDobAdult)}
-                                    className="datePckr"
-                                    selected={values.date_of_birth}
-                                    onChange={(val) => {
-                                      setFieldTouched("date_of_birth");
-                                      setFieldValue("date_of_birth", val);
-                                    }}
-                                  />
-                                  {errors.date_of_birth &&
-                                    touched.date_of_birth ? (
-                                      <span className="errorMsg">
-                                        {errors.date_of_birth}
-                                      </span>
-                                    ) : null}
-                                </FormGroup>
+                              <Col sm={12} md={4} lg={5}>
+                                  <FormGroup className="m-b-25">
+                                  <div className="insurerName">
+                                      <Field
+                                          name='age'
+                                          type="number"
+                                          placeholder='Age'
+                                          autoComplete="off"
+                                          onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                          onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                          value = {values.age}
+                                          disabled = {true}
+                                          maxLength="10"            
+                                          onChange = {(e) => {
+                                              let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                              setFieldValue('date_of_birth',dob)
+                                              setFieldValue('age',e.target.value)
+                                          }}                                                                                                 
+                                      />
+                                      {errors.age && touched.age ? (
+                                          <span className="errorMsg">{errors.age}</span>
+                                      ) : null}  
+                                  </div>
+                                  </FormGroup>
                               </Col>
                               <Col sm={6} md={4} lg={4}>
                                 <FormGroup>

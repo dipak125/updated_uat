@@ -93,6 +93,7 @@ class AgentCashDeposit extends Component {
                         this.setState({
                             account_number: account_number
                         })
+                        this.fetchACD();
                         swal(res.data.msg, {
                             icon: "success",
                         })
@@ -165,8 +166,7 @@ class AgentCashDeposit extends Component {
     render() {
         const { agentData, toggleACD, account_number, balanceAmount, showError } = this.state;
         {
-            console.log("showError =>", showError)
-            console.log("account_number =>", account_number)
+            console.log('tettetette', agentData);
         }
         const formValues = {
             agreement_code: agentData.agreement_code,
@@ -174,7 +174,6 @@ class AgentCashDeposit extends Component {
             user_name: agentData.intermediary_name,
             credit_date: agentData.credit_date
         }
-        console.log("formValues", formValues);
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null;
 
         return (
@@ -301,7 +300,7 @@ class AgentCashDeposit extends Component {
                                                                             <Col sm={12} md={6} lg={5}>
                                                                                 &nbsp;
                                                                             </Col>
-                                                                            {(agentData.account_number === '' ? <Col sm={12} md={3} lg={2}>
+                                                                            {(agentData.account_number === '' ? <Col sm={12} md={4} lg={4}>
                                                                                 <Button className={`proceedBtn`} type="submit" >
                                                                                     Create ACD
                                                                                 </Button>
@@ -334,7 +333,7 @@ class AgentCashDeposit extends Component {
                                                                                             type="text"
                                                                                             className="premiumslid"
                                                                                             value={agentData.account_number ? agentData.account_number : account_number}
-                                                                                            readonly
+                                                                                            readOnly
                                                                                         />
                                                                                     </div>
                                                                                 </FormGroup>

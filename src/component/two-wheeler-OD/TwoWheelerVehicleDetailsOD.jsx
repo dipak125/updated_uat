@@ -59,6 +59,7 @@ const initialValue = {
     previous_policy_no: "",
     valid_previous_policy: "1",
     no_of_claim: "",
+    active_policy_tenure: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
     registration_date: Yup.string().required('RegistrationRequired')
@@ -272,7 +273,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 if (this.parent.previous_is_claim == '0' && this.parent.previous_policy_name == '1' && (!value || value == '1')
-                && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 ) {
+                && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.valid_previous_policy == '1' ) {
                     return false;
                 }
                 return true;
@@ -284,7 +285,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
                 return "PleaseEPCB"
             },
             function (value) {
-                if (this.parent.previous_is_claim == '1' && !value && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 ) {
+                if (this.parent.previous_is_claim == '1' && !value && Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 ) {
                     return false;
                 }
                 return true;
@@ -303,7 +304,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         function (value) {
             const ageObj = new PersonAge();
             if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
-            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 0 && this.parent.valid_previous_policy == '1' && !value) {   
+            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && this.parent.valid_previous_policy == '1' && !value) {   
                 return false;    
             }
             return true;
@@ -350,7 +351,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
     ) }),
 
-
+    active_policy_tenure: Yup.string().required('SPTenure'),
     active_policy_name: Yup.string()
         .required("PleaseSPT")
         .test(
@@ -660,16 +661,26 @@ class TwoWheelerVehicleDetailsOD extends Component {
         const { motorInsurance, changeFlag } = this.state
 	    let policy_type = 16
 
-        if(values.valid_previous_policy == "0" && (values.policy_type_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
-            swal({
-                text: "Kindly connect with nearest branch for Policy Issuance",
-                icon: "error",
-              });
-            actions.setSubmitting(false)
-            return false;
+        // if(values.valid_previous_policy == "0" && (values.policy_type_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
+        //     swal({
+        //         text: "Kindly connect with nearest branch for Policy Issuance",
+        //         icon: "error",
+        //       });
+        //     actions.setSubmitting(false)
+        //     return false;
+        // }
+        let newPolStartDate = ""
+        if(values.valid_previous_policy == '1'){
+            if(values.previous_policy_name == '2'){
+                newPolStartDate = addDays(new Date(), 1)
+            }
+            else{
+                newPolStartDate = values.previous_start_date && Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 0 ? addDays(new Date(), 1) : addDays(new Date(values.previous_end_date), 1)
+            }         
         }
-        let newPolStartDate = values.previous_start_date ? prevEndDate(values.previous_start_date) : ""
-        newPolStartDate = newPolStartDate ? addDays(new Date(newPolStartDate), 1) : addDays(new Date(), 1)
+        else {
+            newPolStartDate = addDays(new Date(), 1)
+        }
         let newPolEndDate = newPolStartDate ? prevEndDate(newPolStartDate) : ""
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
         // if(vehicleAge < 6 || vehicleAge > 60) {
@@ -683,7 +694,8 @@ class TwoWheelerVehicleDetailsOD extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
+        let previousClaimBonus = values.previous_claim_bonus && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ? values.previous_claim_bonus : '1' 
+        if((values.policy_type_id == '2' && values.valid_previous_policy == '1') || (values.policy_type_id == '3' && values.lapse_duration == '1' && values.valid_previous_policy == '1') ) {
             post_data = {
                 'policy_holder_id': localStorage.getItem("policyHolder_id"),
                 'menumaster_id': 3,
@@ -696,7 +708,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 'previous_city': values.previous_city,
                 'previous_policy_no': values.previous_policy_no,
                 'previous_is_claim':values.previous_is_claim ? values.previous_is_claim : '0' ,
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                'previous_claim_bonus': previousClaimBonus,
                 'previous_claim_for': 1,        
                 'vehicleAge': vehicleAge,
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
@@ -736,6 +748,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
                 'previous_is_claim': 0,
+                'valid_previous_policy': values.valid_previous_policy,
                 'page_name': `VehicleDetailsOD/${productId}`
             }
         }
@@ -966,30 +979,31 @@ class TwoWheelerVehicleDetailsOD extends Component {
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = {}
 
-        if(( motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '1') ||
-                motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '2' ) {
+        if(( (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '1') ||
+                motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '2' ) && motorInsurance.valid_previous_policy == 1 ) {
             newInitialValues = Object.assign(initialValue, {
                 registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
                 location_id: motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
-                previous_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
-                previous_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
-                previous_policy_name: previousPolicy && previousPolicy[0] && previousPolicy[0].name ? previousPolicy[0].name : "",
-                insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
+                previous_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
+                previous_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
+                previous_policy_name: previousPolicy && previousPolicy[1] && previousPolicy[1].name ? previousPolicy[1].name : "",
+                insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany && previousPolicy[1].insurancecompany.Id ? previousPolicy[1].insurancecompany.Id : "",
 
-                previous_city: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "",
-                previous_is_claim: previousPolicy && previousPolicy[0] && (previousPolicy[0].is_claim == 0 || previousPolicy[0].is_claim == 1) ? previousPolicy[0].is_claim : "",
-                previous_claim_bonus: previousPolicy && previousPolicy[0] && ncbArr[previousPolicy[0].claim_bonus] && previousPolicy[0].claim_bonus != 2 ? Math.floor(previousPolicy[0].claim_bonus) : "",
-                previous_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
-
-                active_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
-                active_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
+                previous_city: previousPolicy && previousPolicy[1] && previousPolicy[1].address ? previousPolicy[1].address : "",
+                previous_is_claim: previousPolicy && previousPolicy[1] && (previousPolicy[1].is_claim == 0 || previousPolicy[1].is_claim == 1) ? previousPolicy[1].is_claim : "",
+                previous_claim_bonus: previousPolicy && previousPolicy[1] && ncbArr[previousPolicy[1].claim_bonus] && previousPolicy[1].claim_bonus != 2 ? Math.floor(previousPolicy[1].claim_bonus) : "",
+                previous_policy_no: previousPolicy && previousPolicy[1] && previousPolicy[1].policy_no ? previousPolicy[1].policy_no : "",
+                no_of_claim: previousPolicy && previousPolicy[1] && previousPolicy[1].previouspoliciesclaims ? previousPolicy[1].previouspoliciesclaims.length : "",
+                
+                active_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
+                active_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
                 active_policy_name: '2',
-                active_insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany && previousPolicy[1].insurancecompany.Id ? previousPolicy[1].insurancecompany.Id : "",
-                active_policy_address: previousPolicy && previousPolicy[1] && previousPolicy[1].address ? previousPolicy[1].address : "test",
-                active_policy_no: previousPolicy && previousPolicy[1] && previousPolicy[1].policy_no ? previousPolicy[1].policy_no : "",
-                active_policy_tenure: previousPolicy && previousPolicy[1] && previousPolicy[1].active_policy_tenure ? previousPolicy[1].active_policy_tenure : "",
-                valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "1",
-                no_of_claim: previousPolicy && previousPolicy[0] && previousPolicy[0].previouspoliciesclaims ? previousPolicy[0].previouspoliciesclaims.length : "",
+                active_insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
+                active_policy_address: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "test",
+                active_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
+                active_policy_tenure: previousPolicy && previousPolicy[0] && previousPolicy[0].active_policy_tenure ? previousPolicy[0].active_policy_tenure : "",
+                valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",
+                
                 lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
                 policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
                 claim_array: this.initClaimDetailsList()
@@ -1000,7 +1014,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
                 location_id: motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
                 previous_policy_name: "1",            
-                valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "0",
+                valid_previous_policy: motorInsurance && (motorInsurance.valid_previous_policy == 0 || motorInsurance.valid_previous_policy == 1) ? motorInsurance.valid_previous_policy : "",
                 active_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
                 active_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
                 active_policy_name: '2',
@@ -1048,6 +1062,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                 validationSchema={vehicleRegistrationValidation}
                                             >
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
+
                                                     return (
                                                         <Form>
                                                             <Row>
@@ -1183,10 +1198,14 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                             className="datePckr inputfs12"
                                                                                             selected={values.active_start_date}
                                                                                             onChange={(val) => {
-                                                                                                setFieldTouched('active_start_date')
+                                                                                            setFieldTouched('active_start_date')
                                                                                             setFieldValue("active_end_date", fourwheelerODEndDate(val,values.active_policy_tenure));
-                                                                                                setFieldValue('active_start_date', val);
-                                                                                            }}
+                                                                                            setFieldValue('active_start_date', val);
+                                                                                            if(values.previous_policy_name == '2') {
+                                                                                                setFieldValue("previous_end_date", fourwheelerODEndDate(val,values.active_policy_tenure));
+                                                                                                setFieldValue('previous_start_date', val);
+                                                                                            }
+                                                                                        }}
                                                                                         />
                                                                                         {errors.active_start_date && touched.active_start_date ? (
                                                                                             <span className="errorMsg">{phrases[errors.active_start_date]}</span>
@@ -1225,6 +1244,12 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                 component="select"
                                                                                                 autoComplete="off"
                                                                                                 className="formGrp"
+                                                                                                onChange={(e) => {
+                                                                                                    setFieldValue('active_insurance_company_id', e.target.value);
+                                                                                                    if(values.previous_policy_name == '2') {
+                                                                                                        setFieldValue('insurance_company_id', e.target.value);
+                                                                                                    }
+                                                                                                }}
                                                                                             >
                                                                                                 <option value="">{phrases['SelectActiveInsurer']}</option>
                                                                                                 {insurerList.map((insurer, qIndex) => (
@@ -1248,6 +1273,12 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                 maxLength="28"
                                                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                                onChange={(e) => {
+                                                                                                    setFieldValue('active_policy_no', e.target.value);
+                                                                                                    if(values.previous_policy_name == '2') {
+                                                                                                        setFieldValue('previous_policy_no', e.target.value);
+                                                                                                    }
+                                                                                                }}
 
                                                                                         />
                                                                                         {errors.active_policy_no && touched.active_policy_no ? (
@@ -1356,6 +1387,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                 dropdownMode="select"
                                                                                                 className="datePckr inputfs12"
                                                                                                 selected={values.previous_start_date}
+                                                                                                disabled={values.previous_policy_name == '2' ? true : false}
                                                                                                 onChange={(val) => {
                                                                                                     setFieldTouched('previous_start_date')
                                                                                                     setFieldTouched('previous_end_date')
@@ -1379,6 +1411,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                 dropdownMode="select"
                                                                                                 className="datePckr inputfs12"
                                                                                                 selected={values.previous_end_date}
+                                                                                                disabled={ true }
                                                                                                 onChange={(val) => {
                                                                                                     setFieldTouched('previous_end_date');
                                                                                                     setFieldValue('previous_end_date', val);
@@ -1398,7 +1431,23 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                     autoComplete="off"
                                                                                                     className="formGrp inputfs12"
                                                                                                     value = {values.previous_policy_name}
-                                                                                                    // disabled={true}
+                                                                                                    onChange = {(e) => {
+                                                                                                        setFieldValue('previous_policy_name', e.target.value)
+                                                                                                        if(e.target.value == '2') {
+                                                                                                            setFieldValue('previous_end_date', values.active_end_date)
+                                                                                                            setFieldValue('previous_start_date', values.active_start_date)
+                                                                                                            setFieldValue('insurance_company_id', values.active_insurance_company_id)
+                                                                                                            setFieldValue('previous_policy_no', values.active_policy_no)
+                                                                                                            // setFieldValue('previous_city', values.active_policy_address)
+                                                                                                        }
+                                                                                                        else {
+                                                                                                            setFieldValue('previous_end_date', "")
+                                                                                                            setFieldValue('previous_start_date', "")
+                                                                                                            setFieldValue('insurance_company_id', "")
+                                                                                                            setFieldValue('previous_policy_no', "")
+                                                                                                            // setFieldValue('previous_city', "")
+                                                                                                        }
+                                                                                                    }}
                                                                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                                                 >
                                                                                                     <option value="">{phrases['SPT']}</option>
@@ -1478,7 +1527,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                     </Row>
 
                                                                                     <Row>&nbsp;</Row>
-                                                                                    { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 0 ?
+                                                                                    { values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
                                                                                     <Fragment>
                                                                                     <Row>
                                                                                         <Col sm={12}>

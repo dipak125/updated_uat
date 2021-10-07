@@ -259,6 +259,18 @@ class TwoWheelerOtherComprehensive extends Component {
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+
+                    if(res.data.UnderwritingResult.MessageList != undefined)
+                    {
+                        var error_messages = res.data.UnderwritingResult.MessageList;
+                        for(var x in error_messages)
+                        {
+                            if(error_messages[x].Code == 'SBIG-PA-UW-U1030') // Decline vehicle
+                            {
+                                swal(error_messages[x].Message);
+                            }
+                        }
+                    }
                 }
                 else {
                     this.setState({

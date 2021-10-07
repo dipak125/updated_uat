@@ -33,6 +33,7 @@ import TwoWheelerAdditionalDetails from '../two-wheeler/TwoWheelerAdditionalDeta
 import UnderMaintenance from '../UnderMaintenance';
 
 
+
 const componentLoader = () => {
     return (
         <div style={{ height: "540px" }}>
@@ -799,6 +800,10 @@ const NewEndorsement = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../DIY-Endorsement/NewEndorsement.jsx"),
     loading: () => loadingContent
 });
+const ViewEndorsement = Loadable({
+    loader: () => import("../DIY-Endorsement/ViewStatus.jsx"),
+    loading: () => loadingContent
+})
 
 
 //========================PCV TP================================================
@@ -1103,6 +1108,7 @@ class Routes extends Component {
 
                         {/************ DIY Endorsement ******************/}
                         <PrivateRoute exact path="/NewEndorsement" component={NewEndorsement} />
+                        <PrivateRoute exact path="/ViewEndorsement" component={ViewEndorsement} />
 
                         {/************ PCV - TP ******************/}
                         <PrivateRoute exact path="/Registration_PCV_TP/:productId" component={RegistrationPCVTP} />

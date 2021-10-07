@@ -139,16 +139,6 @@ class SelectDuration extends Component {
         let encryption = new Encryption();
         let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
 
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
-        if (user_data) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-            if((serverResponse.SumInsured > 500000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 500000")
-                this.props.loadingStop();
-                return false
-            }
-        }
-
         const post_data = {
             'policy_holder_id':policy_holder_id,
             'start_date':serverResponse.EffectiveDate,
@@ -162,17 +152,35 @@ class SelectDuration extends Component {
         console.log("post_data---------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
-        this.props.loadingStart();
-        axios
-        .post(`ksb/duration-premium`, formData)
-        .then(res => { 
-            this.props.loadingStop();
-            this.props.history.push(`/Address_KSB/${productId}`);
-        })
-        .catch(err => {
-          this.props.loadingStop();
-        });     
-
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data) {
+            let total_sum_array = serverResponse && serverResponse.PolicyLobList[0] && serverResponse.PolicyLobList[0].PolicyRiskList ? serverResponse.PolicyLobList[0].PolicyRiskList : []
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+            let max_sumInsured = 0
+            total_sum_array && total_sum_array.map((allValues,index) => {
+                allValues && allValues.PolicyCoverageList.map((value,subIndex) => {
+                    if((value.SumInsured > 100000) && user_data.user_type == "POSP" &&  value.ProductElementCode == "HO_BEN" ) {
+                        swal("Quote cannot proceed with Hospital Daily Cash greater than 100000")
+                        max_sumInsured++ ;
+                    }
+                })         
+            })
+            if(max_sumInsured > 0) {
+                return false 
+            }
+            else {
+                this.props.loadingStart();
+                axios
+                .post(`ksb/duration-premium`, formData)
+                .then(res => { 
+                    this.props.loadingStop();
+                    this.props.history.push(`/Address_KSB/${productId}`);
+                })
+                .catch(err => {
+                  this.props.loadingStop();
+                });     
+            }       
+        }
     }
 
 

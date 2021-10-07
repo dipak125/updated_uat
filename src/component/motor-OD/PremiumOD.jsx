@@ -87,9 +87,14 @@ class PremiumOD extends Component {
     }
 
     handleSubmit = (values) => {    
-        const { refNumber , policyHolder} = this.state
+        const { refNumber , policyHolder,activePolicy,request_data} = this.state
         const { productId } = this.props.match.params
-        paymentGateways(values, policyHolder, refNumber, productId)
+        if(Math.floor(moment(activePolicy.end_date).diff(request_data.end_date, 'days', true)) >= 0 ){
+            paymentGateways(values, policyHolder, refNumber, productId)
+        }
+        else {
+            swal("Kindly connect with nearest branch for Policy Issuance")
+        }      
     }
 
     fetchData = () => {
@@ -105,7 +110,8 @@ class PremiumOD extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[0] : {};
+                let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[1] : {};
+                let activePolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[0] : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
@@ -113,7 +119,7 @@ class PremiumOD extends Component {
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
                 this.setState({
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster, step_completed, bcMaster, paymentgateway,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,activePolicy,request_data,menumaster, step_completed, bcMaster, paymentgateway,
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
@@ -226,7 +232,8 @@ class PremiumOD extends Component {
                     dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
                     let previousPolicyName = previousPolicy ? previousPolicy.name : ""
 
-                    if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {                
+                    // if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {   
+                    if(dateDiff > 0 || policy_type_id == "3" || (motorInsurance && motorInsurance.valid_previous_policy == 0 ) ) {               
                         const formData1 = new FormData();
                         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                         formData1.append('policy_ref_no',policyHolder_id)
@@ -598,10 +605,11 @@ sendPaymentLink = () => {
 
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                                    <FormGroup>{phrases['Age']}:</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.dob}</FormGroup>
+                                                                                                    {/* <FormGroup>{memberdetails.dob}</FormGroup> */}
+                                                                                                    <FormGroup>{ memberdetails && memberdetails.dob ? Math.floor(moment().diff(memberdetails.dob, 'years', true) ) : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
                                                                                             <Row>
@@ -656,10 +664,11 @@ sendPaymentLink = () => {
 
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                            <FormGroup>{phrases['Age']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.dob}</FormGroup>
+                                                                                            {/* <FormGroup>{nomineedetails.dob}</FormGroup> */}
+                                                                                            <FormGroup>{ nomineedetails && nomineedetails.dob ? Math.floor(moment().diff(nomineedetails.dob, 'years', true) ) : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 

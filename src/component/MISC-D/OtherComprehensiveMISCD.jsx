@@ -77,7 +77,7 @@ const ComprehensiveValidation = Yup.object().shape({
         .min(5, function () {
             return "ChasisMin"
         })
-        .max(20, function () {
+        .max(25, function () {
             return "ChasisMax"
         }),
 
@@ -304,7 +304,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 }).min(5, function () {
                     return "ChasisMin"
                 })
-                .max(20, function () {
+                .max(25, function () {
                     return "ChasisMax"
                 })
         })
@@ -830,7 +830,8 @@ class OtherComprehensiveMISCD extends Component {
 
                 if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
                     let PolicyArray = res.data.data.PolicyObject.PolicyLobList
-                    let ncbDiscount = (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let ncbDiscount = (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? 
+                        res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_TotalPremium - res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     this.setState({
                         fulQuoteResp: res.data.data.PolicyObject,
                         PolicyArray: PolicyArray,
@@ -1590,7 +1591,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                     <Collapsible trigger={phrases['DefaultCovered']} open={true}>
                                                                         <div className="listrghtsideTrigr">
                                                                             {policyCoverageList}
-                                                                            {/* {ncbStr} */}
+                                                                            {ncbStr}
                                                                             {policyCoveragIMT}
                                                                         </div>
                                                                     </Collapsible>
@@ -1723,7 +1724,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                         value={values.chasis_no.toUpperCase()}
-                                                                                        maxLength="20"
+                                                                                        maxLength="25"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('chasis_no')
                                                                                             setFieldValue('chasis_no', e.target.value)
@@ -2602,7 +2603,7 @@ class OtherComprehensiveMISCD extends Component {
                             </thead>
                             <tbody>
                                 {premiumBreakup}
-                                {/* {ncbBreakup} */}
+                                {ncbBreakup}
                                 {premiumBreakupIMT}
 
                                 <tr>

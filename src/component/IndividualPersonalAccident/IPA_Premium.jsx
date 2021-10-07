@@ -133,6 +133,7 @@ class IPA_Premium extends Component {
       .get(`ipa/details/${policyHolder_refNo}`)
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data));
+        console.log("decryptResp ----------- ", decryptResp)
         let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
         let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
         let ipaInfo = decryptResp.data && decryptResp.data.policyHolder && decryptResp.data.policyHolder.ipainfo ? decryptResp.data.policyHolder.ipainfo : null;
@@ -293,10 +294,12 @@ class IPA_Premium extends Component {
 
                   <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>Date Of Birth:</FormGroup>
+                      <FormGroup>Age:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{moment(member.DateOfBirth).format("DD-MM-YYYY")}</FormGroup>
+                      {/* <FormGroup>{moment(member.DateOfBirth).format("DD-MM-YYYY")}</FormGroup> */}
+                      <FormGroup>{ member && member.DateOfBirth ? Math.floor(moment().diff(member.DateOfBirth, 'years', true) ) : null}</FormGroup>
+                      
                     </Col>
                   </Row>
 
@@ -333,10 +336,11 @@ class IPA_Premium extends Component {
   
                   <Row>
                       <Col sm={12} md={6}>
-                          <FormGroup>Date Of Birth:</FormGroup>
+                          <FormGroup>Age:</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
-                          <FormGroup>{ nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
+                          {/* <FormGroup>{ nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup> */}
+                          <FormGroup>{ nomineeDetails && nomineeDetails.dob ? Math.floor(moment().diff(nomineeDetails.dob, 'years', true) ) : null}</FormGroup>
                       </Col>
                   </Row>
   

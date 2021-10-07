@@ -83,7 +83,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "ChasisMin"
     })
-    .max(20, function() {
+    .max(25, function() {
         return "ChasisMax"
     }),
 
@@ -673,11 +673,12 @@ class OtherComprehensiveOD extends Component {
                 }
                 else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.data.messages) {
+                    for (const x in res.data.messages) {
                         validationErrors.push(res.data.messages[x].message)
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
+                        error: {"message": 0},
                         validation_error: validationErrors,
                         serverResponse: []
                     });
@@ -779,7 +780,9 @@ class OtherComprehensiveOD extends Component {
         }
         else return false;
 
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        if(values.chasis_no.slice(values.chasis_no.length-5)===values.chasis_no_last_part)
+        {
+            formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('/four-wh-stal/update-insured-value', formData).then(res => {
             this.props.loadingStop();
@@ -793,6 +796,10 @@ class OtherComprehensiveOD extends Component {
             // handle error
             this.props.loadingStop();
         })
+        }
+        else{
+            swal("chasis no mismatch")
+        }
     }
 
     onRowSelect = (value, isSelect, setFieldTouched, setFieldValue, values) => {
@@ -1392,7 +1399,7 @@ class OtherComprehensiveOD extends Component {
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                             value= {values.chasis_no.toUpperCase()}
-                                                            maxLength="20"
+                                                            maxLength="25"
                                                             onChange = {(e) => {
                                                                 setFieldTouched('chasis_no')
                                                                 setFieldValue('chasis_no', e.target.value)                       

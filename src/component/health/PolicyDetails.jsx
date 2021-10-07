@@ -32,6 +32,11 @@ const genderArr = {
   F: "Female",
 };
 
+const nomineeGenderArr = {
+  m: "Male",
+  f: "Female",
+};
+
 const relationArr = {
 1:"Self",
 2:"Spouse",
@@ -63,6 +68,7 @@ class PolicyDetails extends Component {
     error1: [],
     show: false,
     refNumber: "",
+    nomineedetails: [],
     paymentStatus: [],
     serverResponse: false,
     paymentgateway: [],
@@ -104,6 +110,7 @@ class PolicyDetails extends Component {
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
+          nomineedetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],
           bcMaster,  menumaster, request_data,paymentgateway
 
         });
@@ -163,6 +170,7 @@ class PolicyDetails extends Component {
           familyMember: res.data.data.policyHolder.request_data.family_members,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
+          nomineedetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],
           bcMaster,request_data,menumaster,paymentgateway
         });
         this.getAccessToken(
@@ -271,7 +279,7 @@ class PolicyDetails extends Component {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, 
-      paymentgateway, menumaster, request_data } = this.state;
+      paymentgateway, menumaster, request_data, nomineedetails } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     const items =
@@ -294,10 +302,10 @@ class PolicyDetails extends Component {
 
                   <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>Date Of Birth:</FormGroup>
+                      <FormGroup>Age:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.DateOfBirth}</FormGroup>
+                      <FormGroup>{ member && member.DateOfBirth ? Math.floor(moment().diff(member.DateOfBirth, 'years', true) ) : null}</FormGroup>
                     </Col>
                   </Row>
 
@@ -330,6 +338,90 @@ class PolicyDetails extends Component {
             );
           })
         : null;
+
+        const nominee = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee.map((member, qIndex) => {
+          return (
+            <div>
+            <Row>
+              <Col sm={12} md={12}>
+                <h6><strong>Nominee</strong></h6>
+                <Row>
+                  <Col sm={12} md={6}>
+                    <FormGroup>Name:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                    <FormGroup>{member.first_name +" "+member.last_name}</FormGroup>
+                  </Col>
+                </Row>
+  
+                <Row>
+                  <Col sm={12} md={6}>
+                        <FormGroup>Age:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                    <FormGroup>{ member && member.dob ? Math.floor(moment().diff(member.dob, 'years', true) ) : null}</FormGroup>
+                  </Col>
+                </Row>
+  
+                <Row>
+                  <Col sm={12} md={6}>
+                    <FormGroup>Relation With Proposer:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                    <FormGroup>
+                    { relationArr[member.relation_with] }
+                    </FormGroup>
+                  </Col>
+                </Row>
+  
+                <Row>
+                  <Col sm={12} md={6}>
+                    <FormGroup>Gender</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                    <FormGroup>{nomineeGenderArr[member.gender]}</FormGroup>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+            <Row>
+              <p></p>
+            </Row>
+            </div>
+          );
+        })
+        :null
+  
+        const appointee = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee.map((member, qIndex) => {
+          return (
+            <Row>
+              <Col sm={12} md={12}>
+                <h6><strong>Appointee </strong></h6>
+                <Row>
+                  <Col sm={12} md={6}>
+                    <FormGroup>Name:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                    <FormGroup>{member.appointee_name}</FormGroup>
+                  </Col>
+                </Row>
+  
+                <Row>
+                  <Col sm={12} md={6}>
+                    <FormGroup>Relation With Nominee:</FormGroup>
+                  </Col>
+                  <Col sm={12} md={6}>
+                    <FormGroup>
+                    { relationArr[member.appointee_relation_with] }
+                    </FormGroup>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          );
+        })
+      :null
+
 
     const errMsg =
       error && error.message ? (
@@ -476,6 +568,15 @@ class PolicyDetails extends Component {
                                             </Collapsible>
                                           </div>
 
+                                          <div className="rghtsideTrigr">
+                                            <Collapsible trigger=" Nominee Details">
+                                              <div className="listrghtsideTrigr">{nominee}</div>
+                                              {nomineedetails && nomineedetails.is_appointee == '1'  ? 
+                                              <div className="listrghtsideTrigr">{appointee}</div> 
+                                              : null}         
+                                            </Collapsible>
+                                          </div>
+
                                           <div className="rghtsideTrigr m-b-40">
                                             <Collapsible trigger=" Contact information">
                                               <div className="listrghtsideTrigr">
@@ -506,6 +607,7 @@ class PolicyDetails extends Component {
                                               </div>
                                             </Collapsible>
                                           </div>
+
                                           {serverResponse ?
                                           <Row>
                                               <Col sm={12} md={6}>

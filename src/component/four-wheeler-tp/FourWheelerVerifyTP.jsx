@@ -106,7 +106,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "ChasisMin"
     })
-    .max(20, function() {
+    .max(25, function() {
         return "ChasisMax"
     }),
 
@@ -476,9 +476,11 @@ class FourWheelerVerifyTP extends Component {
             }
         }
         // console.log('post_data',post_data)
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('four-wh-tp/previous-vehicle-details', formData).then(res => {
+        if(values.chasis_no.slice(values.chasis_no.length-5)===values.chasis_no_last_part)
+        {
+            formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+            this.props.loadingStart();
+            axios.post('four-wh-tp/previous-vehicle-details', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
             // console.log('decryptResp-----', decryptResp)
@@ -496,6 +498,11 @@ class FourWheelerVerifyTP extends Component {
             let decryptErr = JSON.parse(encryption.decrypt(err.data));
             console.log('decryptErr-----', decryptErr)
         })
+        }
+        else
+        {
+            swal("Chassis no mismatch")
+        }
     }
 
 
@@ -743,7 +750,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.chasis_no.toUpperCase()}
-                                                    maxLength="20"
+                                                    maxLength="25"
                                                     onChange = {(e) => {
                                                         setFieldTouched('chasis_no')
                                                         setFieldValue('chasis_no', e.target.value)                       

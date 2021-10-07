@@ -49,7 +49,9 @@ const initialValue = {
     stateName: "",
     pinDataArr: [],
     pincode_id: "",
-    org_level: ""
+    org_level: "",
+    age: "",
+    nominee_age: ""
 }
 
 const ownerValidation = Yup.object().shape({
@@ -110,6 +112,40 @@ const ownerValidation = Yup.object().shape({
                     return true;
             }),
         otherwise: Yup.date().nullable()
+    }),
+
+    age: Yup.mixed().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.mixed().required('RequiredField')
+            .test(
+                "18YearsChecking",
+                function() {
+                    return "AgeRange"
+                },
+                function (value) {
+                    if (value) {
+                        return value <= 100 && value >= 18;
+                    }
+                    return true;
+            }),
+        otherwise: Yup.mixed().nullable()
+    }),
+    nominee_age: Yup.mixed().when(['policy_for'], {
+        is: policy_for => policy_for == '1', 
+        then: Yup.mixed().required('RequiredField')
+        .test(
+            "18YearsChecking",
+            function() {
+                return "NomineeMinAge"
+            },
+            function (value) {
+                if (value) {
+                    return value <= 100 && value >= 0;
+                }
+                return true;
+        }),
+
+        otherwise: Yup.mixed().nullable()
     }),
 
     /*pancard: Yup.string().when(['policy_for'], {
@@ -810,6 +846,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
             gender:  policyHolder && policyHolder.gender ? policyHolder.gender : "",
             dob: policyHolder && policyHolder.dob ? new Date(policyHolder.dob) : "",
+            age: policyHolder && policyHolder.dob ? Math.floor(moment().diff(policyHolder.dob, 'years', true) ) : "",
             pancard: policyHolder && policyHolder.pancard ? policyHolder.pancard : "",
             pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
@@ -821,6 +858,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
+            nominee_age: nomineeDetails && nomineeDetails.dob ? Math.floor(moment().diff(nomineeDetails.dob, 'years', true) ) : "",
             gstn_no: policyHolder && policyHolder.gstn_no ? policyHolder.gstn_no : "",
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
             email:  policyHolder && policyHolder.email_id ? policyHolder.email_id : "",
@@ -869,7 +907,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                             console.log("values-------- ", values)
+
                         return (
                         <Form>
                         <Row>
@@ -1085,32 +1123,57 @@ class TwoWheelerAdditionalDetailsOD extends Component {
 
                                 <Row>
                                     {motorInsurance && motorInsurance.policy_for == '1' ?
+                                    // <Col sm={12} md={4} lg={4}>
+                                    //     <FormGroup>
+                                    //     <DatePicker
+                                    //         name="dob"
+                                    //         dateFormat="dd MMM yyyy"
+                                    //         placeholderText={phrases['DOB']}
+                                    //         autoComplete="off"
+                                    //         peekPreviousMonth
+                                    //         peekPreviousYear
+                                    //         showMonthDropdown
+                                    //         showYearDropdown
+                                    //         dropdownMode="select"
+                                    //         maxDate={new Date(maxDobAdult)}
+                                    //         minDate={new Date(minDobAdult)}
+                                    //         className="datePckr"
+                                    //         selected={values.dob}
+                                    //         onChange={(val) => {
+                                    //             setFieldTouched('dob');
+                                    //             setFieldValue('dob', val);
+                                    //             }}
+                                    //     />
+                                    //     {errors.dob && touched.dob ? (
+                                    //         <span className="errorMsg">{phrases[errors.dob]}</span>
+                                    //     ) : null}  
+                                    //     </FormGroup>
+                                    // </Col> 
                                     <Col sm={12} md={4} lg={4}>
-                                        <FormGroup>
-                                        <DatePicker
-                                            name="dob"
-                                            dateFormat="dd MMM yyyy"
-                                            placeholderText={phrases['DOB']}
-                                            autoComplete="off"
-                                            peekPreviousMonth
-                                            peekPreviousYear
-                                            showMonthDropdown
-                                            showYearDropdown
-                                            dropdownMode="select"
-                                            maxDate={new Date(maxDobAdult)}
-                                            minDate={new Date(minDobAdult)}
-                                            className="datePckr"
-                                            selected={values.dob}
-                                            onChange={(val) => {
-                                                setFieldTouched('dob');
-                                                setFieldValue('dob', val);
-                                                }}
-                                        />
-                                        {errors.dob && touched.dob ? (
-                                            <span className="errorMsg">{phrases[errors.dob]}</span>
-                                        ) : null}  
+                                        <FormGroup className="m-b-25">
+                                        <div className="insurerName">
+                                            <Field
+                                                name='age'
+                                                type="number"
+                                                placeholder={phrases['Age']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.age}
+                                                maxLength="10"            
+                                                onChange = {(e) => {
+                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                    setFieldValue('dob',dob)
+                                                    setFieldValue('age',e.target.value)
+                                                }}                                                                                                 
+                                            />
+                                            {errors.age && touched.age ? (
+                                                <span className="errorMsg">{phrases[errors.age]}</span>
+                                            ) : null}  
+                                        </div>
                                         </FormGroup>
-                                    </Col> : null }
+                                    </Col>
+                                    : null }
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                             <div className="insurerName">
@@ -1399,7 +1462,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                 </Row>
 
                                 <Row>                                    
-                                <Col sm={12} md={4} lg={4}>
+                                    {/* <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
                                             name="nominee_dob"
@@ -1425,6 +1488,30 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                             <span className="errorMsg">{phrases[errors.nominee_dob]}</span>
                                         ) : null}  
                                         </FormGroup>
+                                    </Col> */}
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup className="m-b-25">
+                                        <div className="insurerName">
+                                            <Field
+                                                name='nominee_age'
+                                                type="number"
+                                                placeholder={phrases['Age']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.nominee_age}
+                                                maxLength="10"            
+                                                onChange = {(e) => {
+                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                    setFieldValue('nominee_dob',dob)
+                                                    setFieldValue('nominee_age',e.target.value)
+                                                }}                                                                                                 
+                                            />
+                                            {errors.nominee_age && touched.nominee_age ? (
+                                                <span className="errorMsg">{phrases[errors.nominee_age]}</span>
+                                            ) : null}  
+                                        </div>
+                                        </FormGroup>
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
@@ -1448,7 +1535,7 @@ class TwoWheelerAdditionalDetailsOD extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {appointeeFlag || is_appointee == '1' ? 
+                                {appointeeFlag || is_appointee == '1' || values.nominee_age<18 ? 
                                     <div>
                                         <div className="d-flex justify-content-left carloan">
                                             <h4> </h4>

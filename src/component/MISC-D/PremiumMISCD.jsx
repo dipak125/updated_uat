@@ -382,11 +382,11 @@ class PremiumMISCD extends Component {
 				<div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-			<aside className="left-sidebar">
-			 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-			 <SideNav />
-			</div>
-			</aside>
+                        <aside className="left-sidebar">
+                        <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                        <SideNav />
+                        </div>
+                        </aside>
 
 
                             { step_completed >= '4' && vehicleDetails.vehicletype_id == '11' ?
@@ -637,10 +637,11 @@ class PremiumMISCD extends Component {
                                                                                             {motorInsurance.policy_for == '1' ?
                                                                                                 <Row>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                                        <FormGroup>{phrases['Age']}:</FormGroup>
                                                                                                     </Col>
                                                                                                     <Col sm={12} md={6}>
-                                                                                                        <FormGroup>{ memberdetails ? moment(memberdetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
+                                                                                                        {/* <FormGroup>{ memberdetails ? moment(memberdetails.dob).format("DD-MM-YYYY") : null}</FormGroup> */}
+                                                                                                        <FormGroup>{ memberdetails && memberdetails.dob ? Math.floor(moment().diff(memberdetails.dob, 'years', true) ) : null}</FormGroup>
                                                                                                     </Col>
                                                                                                 </Row> :
                                                                                                  <Row>
@@ -709,10 +710,11 @@ class PremiumMISCD extends Component {
 
                                                                                     <Row>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{phrases['DateOfBirth']}:</FormGroup>
+                                                                                            <FormGroup>{phrases['Age']}:</FormGroup>
                                                                                         </Col>
                                                                                         <Col sm={12} md={6}>
-                                                                                            <FormGroup>{ nomineedetails ? moment(nomineedetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
+                                                                                            {/* <FormGroup>{ nomineedetails ? moment(nomineedetails.dob).format("DD-MM-YYYY") : null}</FormGroup> */}
+                                                                                            <FormGroup>{ nomineedetails && nomineedetails.dob ? Math.floor(moment().diff(nomineedetails.dob, 'years', true) ) : null}</FormGroup>
                                                                                         </Col>
                                                                                     </Row>
 

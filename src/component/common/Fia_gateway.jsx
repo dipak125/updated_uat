@@ -170,7 +170,8 @@ class Fia_gateway extends Component {
                 this.props.history.push(`/ThankYou/${res.data.data.PolicyNo}?access_id=${this.state.policyHolder_refNo}`);
             }
             else {
-                this.paymentRefund(policyHolder_refNo, res.data.msg)
+                // this.paymentRefund(policyHolder_refNo, res.data.msg)
+                swal("Something went wrong")
             }
             this.props.loadingStop();
 
@@ -182,24 +183,24 @@ class Fia_gateway extends Component {
 
     }
 
-    paymentRefund = ( policyHolder_refNo, error) => {
-        // var amount = request_data && request_data.net_premium ? request_data.net_premium : ""
-        // var quote_id = request_data && request_data.quote_id ? request_data.quote_id : ""
-        const formData = new FormData();    
-        formData.append('policy_ref_no', policyHolder_refNo)
+    // paymentRefund = ( policyHolder_refNo, error) => {
+    //     // var amount = request_data && request_data.net_premium ? request_data.net_premium : ""
+    //     // var quote_id = request_data && request_data.quote_id ? request_data.quote_id : ""
+    //     const formData = new FormData();    
+    //     formData.append('policy_ref_no', policyHolder_refNo)
         
-        axios.post('payment/sahipay-refund', formData).then(res => {
-            if(res.data.error === false) {
-                swal(error+". "+res.data.msg+" Please retry payment")
-            }
-            this.props.loadingStop();
-        })
-        .catch(err => {
-            // handle error
-            this.props.loadingStop();
-        })
+    //     axios.post('payment/sahipay-refund', formData).then(res => {
+    //         if(res.data.error === false) {
+    //             swal(error+". "+res.data.msg+" Please retry payment")
+    //         }
+    //         this.props.loadingStop();
+    //     })
+    //     .catch(err => {
+    //         // handle error
+    //         this.props.loadingStop();
+    //     })
 
-    }
+    // }
 
     fetchData = () => {
         const { productId } = this.props.match.params

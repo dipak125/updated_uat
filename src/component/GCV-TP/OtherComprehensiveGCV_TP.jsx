@@ -76,7 +76,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "ChasisMin"
     })
-    .max(20, function() {
+    .max(25, function() {
         return "ChasisMax"
     }),
 
@@ -1417,7 +1417,7 @@ class OtherComprehensiveGCV extends Component {
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 value= {values.chasis_no.toUpperCase()}
-                                                maxLength="20"
+                                                maxLength="25"
                                                 onChange = {(e) => {
                                                     setFieldTouched('chasis_no')
                                                     setFieldValue('chasis_no', e.target.value)                       

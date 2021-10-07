@@ -79,37 +79,31 @@ const validateNominee = Yup.object().shape({
             return true;
         }
     ),
+    dob: Yup.mixed().required( function() {
+        return "Please enter Age"
+        }).test(
+            "3monthsChecking",
+            function() {
+                return "Age should be minium 3 months"
+            },
+            function (value) {
+                let year=new Date().getFullYear()-new Date(value).getFullYear();
+                let month=new Date().getMonth()-new Date(value).getMonth();
+                if (value) {
+                   if(year<1 && month<3)
+                   {
+                       return false;
+                   }
+                   
+                }
+                return true;
+            }
+    ),
+
     relation_with: Yup.string().required(function() {
         return "Please select relation"
     }),
-    // appointee_dob:Yup.date().notRequired("Please enter DOB").max(maxDob, function() {
-    //     return "Date should not be future date"
-    //     }).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Appointee age should be more than 18 years"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (value) {
-    //                 const age_Obj = new PersonAge();
-    //                 return age_Obj.whatIsMyAge(value) >= 18;
-    //             }
-    //             return true;
-    //         }
-    //     ).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Please enter Appointee date of birth"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
-    //                 return ageObj.whatIsMyAge(value) >= 18;    
-    //             }
-    //             return true;
-    //         }
-    //     ),
+  
     appointee_name:Yup.string(function() {
             return "Please enter appointee name"
         }).notRequired(function() {
@@ -287,6 +281,7 @@ class NomineeDetails extends Component {
             last_name: NomineeDetails ? NomineeDetails.last_name : "",
             gender: NomineeDetails ? NomineeDetails.gender : "",
             dob: NomineeDetails && NomineeDetails.dob ? new Date(NomineeDetails.dob) : "",
+            age: NomineeDetails && NomineeDetails.dob ? Math.floor(moment().diff(NomineeDetails.dob, 'years', true) ) : "",
             relation_with: NomineeDetails ? NomineeDetails.relation_with : "",
             // appointee_dob: NomineeDetails && NomineeDetails.appointee_dob ? new Date(NomineeDetails.appointee_dob) : "",
             appointee_relation_with: NomineeDetails && NomineeDetails.appointee_relation_with ? NomineeDetails.appointee_relation_with : "",
@@ -301,16 +296,13 @@ class NomineeDetails extends Component {
 				 <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-						
-						
-                           <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
 
-							
-							
+                        <aside className="left-sidebar">
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                        </aside>
+	
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox argnominee3">
                                 <h4 className="text-center mt-3 mb-3">Arogya Sanjeevani Policy</h4>
                                 <section className="brand">
@@ -397,29 +389,52 @@ class NomineeDetails extends Component {
 
                                                 <Row className="m-b-45">
                                                     <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <DatePicker
-                                                                name="dob"
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText="DOB"
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
-                                                                dropdownMode="select"
-                                                                maxDate={new Date(maxDobNominee)}
-                                                                minDate={new Date(minDobNominee)}
-                                                                className="datePckr"
-                                                                onChange={(value) => {
-                                                                    setFieldTouched("dob");
-                                                                    setFieldValue("dob", value);
-                                                                    this.ageCheck(value)
-                                                                    }}
-                                                                selected={values.dob}
+                                                        <FormGroup className="m-b-25">
+                                                        <div className="insurerName">
+                                                            {/* <Field
+                                                                name='age'
+                                                                type="number"
+                                                                placeholder='Age'
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.age}
+                                                                maxLength="10"            
+                                                                onChange = {(e) => {
+                                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                                    setFieldValue('dob',dob)
+                                                                    setFieldValue('age',e.target.value)
+                                                                }}                                                                                                 
                                                             />
-                                                            {errors.dob && touched.dob ? (
-                                                                <span className="errorMsg">{errors.dob}</span>
-                                                            ) : null}
+                                                            {errors.age && touched.age ? (
+                                                                <span className="errorMsg">{errors.age}</span>
+                                                            ) : null}   */}
+                                                            <DatePicker
+                                                            name= "dob"
+                                                            dateFormat="dd MMM yyyy"
+                                                            placeholderText="Date of birth"
+                                                            peekPreviousMonth
+                                                            peekPreviousYear
+                                                            showMonthDropdown
+                                                            showYearDropdown
+                                                            dropdownMode="select"
+                                                            // maxDate={new Date(maxDobAdult)}
+                                                            // minDate={new Date(minDobAdult)}
+                                                            className="datePckr"
+                                                            selected={values.dob}
+                                                            onChange={(val) => {                                        
+                                                                setFieldTouched("dob");
+                                                                setFieldValue("dob", val);
+                                                            }}
+                                                        />
+                                                        
+
+                                                            {
+                                                                errors.dob && touched.dob ?                 
+                                                                <span className="error-message">{errors.dob}</span>:''
+                                                            }
+                                                           
+                                                        </div>
                                                         </FormGroup>
                                                     </Col>
 
@@ -474,28 +489,6 @@ class NomineeDetails extends Component {
                                                                     ) : null}
                                                                     
                                                                 </div>
-                                                                {/* <DatePicker
-                                                                    name="appointee_dob"
-                                                                    minDate={new Date()}
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="DOB"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    maxDate={new Date()}
-                                                                    minDate={new Date(1/1/1900)}
-                                                                    className="datePckr"
-                                                                    onChange={(value) => {
-                                                                        setFieldTouched("appointee_dob");
-                                                                        setFieldValue("appointee_dob", value);
-                                                                        }}
-                                                                    selected={values.appointee_dob}
-                                                                />
-                                                                {errors.appointee_dob ? (
-                                                                    <span className="errorMsg">{errors.appointee_dob}</span>
-                                                                ) : null} */}
                                                             </FormGroup>
                                                         </Col>
 

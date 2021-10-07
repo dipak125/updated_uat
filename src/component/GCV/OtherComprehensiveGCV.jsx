@@ -85,7 +85,7 @@ const ComprehensiveValidation = Yup.object().shape({
         .min(5, function () {
             return "ChasisMin"
         })
-        .max(20, function () {
+        .max(25, function () {
             return "ChasisMax"
         }),
 
@@ -355,7 +355,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 }).min(5, function () {
                     return "ChassisNoMin"
                 })
-                .max(20, function () {
+                .max(25, function () {
                     return "ChassisNoMax"
                 })
         })
@@ -887,9 +887,6 @@ class OtherComprehensiveGCV extends Component {
                         res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_TotalPremium - res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     let policyCoverage = res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
                     let IsGeographicalExtension = res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
-
-
-                    console.log(ncbDiscount+'----------NCB')
 
                     // if(IsGeographicalExtension == '1') {
                     //     let geoArrOD = {}
@@ -1623,7 +1620,6 @@ class OtherComprehensiveGCV extends Component {
 
         productCount = 1
         ncbCount = 1
-        // console.log('ncbDiscount_breakup', ncbDiscount);
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1832,7 +1828,7 @@ class OtherComprehensiveGCV extends Component {
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                         value={values.chasis_no.toUpperCase()}
-                                                                                        maxLength="20"
+                                                                                        maxLength="25"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('chasis_no')
                                                                                             setFieldValue('chasis_no', e.target.value)

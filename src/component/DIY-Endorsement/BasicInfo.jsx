@@ -13,68 +13,74 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { SearchField } from 'react-bootstrap-table';
+import { assertCompletionStatement } from '@babel/types';
 
 
 const initialValues = {
-
+    makeEndorsement: [],
+    email_id: "",
+    mobile_no: "",
+    product_category: "",
+    product: "",
+    policy_no: "",
+    endorsement_type: "",
+    endorsement_sub_type: ""
 
 }
 
-const vehicleRegistrationValidation = Yup.object().shape({
-    pol_start_date: Yup.date().required("Please select both policy start date & time").nullable(),
-    pol_end_date: Yup.date().required("Please select both policy end date & time").nullable(),
-    house_building_name: Yup.string()
-      .test(
-        "buildingNameCheck",
-        function() {
-            return "Please enter building name"
-        },
-        function (value) {
-            if (this.parent.house_flat_no || value) {
-               
-                return true
-            }
-            return false;
-    }) .matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid building name only')
-        .matches(/^([a-zA-Z0-9.,-\/]+\s)*[\/a-zA-Z0-9.,-/]+$/, 'The field should have only one space in between words').nullable(),
+const endorsementValidation = Yup.object().shape({
 
-    house_flat_no: Yup.string()
-      .test(
-        "buildingNameCheck",
-        function() {
-            return "Please enter flat number"
-        },
-        function (value) {
-            if (this.parent.house_building_name || value) {
-               
-                return true
-            }
-            return false;
-    }).matches(/^[\/a-zA-Z0-9.,-]*$/, 'Please enter a valid flat number only').nullable(),
+    makeEndorsement: Yup.array().of(
+        Yup.object().shape({
+            New_values: Yup.string().required('This field is required'),
+            Old_values: Yup.string().required('This field is required')            
+        })
+    ),
 
-    area_name: Yup.string()
-      .required("Please enter area name")
-      .matches(/^[a-zA-Z0-9]+([\s]?[\/a-zA-Z0-9.,-])*$/, function () {
-        return "Please enter valid area name";
-      }).matches(/^(?![0-9]*$)+([\s]?[\/a-zA-Z0-9.,-])+$/, 'Please enter a valid area name only')
-        .matches(/^([a-zA-Z0-9.,-\/]+\s)*[\/a-zA-Z0-9.,-]+$/, 'The field should have only one space in between words').nullable(),
-    pincode: Yup.string()
-      .required("Pincode is required")
-      .matches(/^[0-9]{6}$/, function () {
-        return "Please enter valid 6 digit pin code";
-      })
-      .nullable(),
-    pincode_id: Yup.string().required("Please select locality").nullable(),
-    business_type: Yup.string().required("Please select type of business").nullable(),
-    plan_id: Yup.string().required("Please select a plan").nullable()
+    additionalEndorsement: Yup.array().of(
+        Yup.object().shape({
+            add_endorsement_sub_type: Yup.string().required('This field is required'),
+            add_endorsement_type: Yup.string().required('This field is required'),
+            addEndorsementInitValues: Yup.array().of(
+                Yup.object().shape({
+                    add_endorsement_new_value: Yup.string().required('This field is required'),
+                    add_endorsement_old_value: Yup.string().required('This field is required')            
+                })
+            )
+        })
+    ),
+
+    email_id: Yup.string().required('This field is required'),
+    mobile_no: Yup.string().required('This field is required'),
+    product_category: Yup.string().required('This field is required'),
+    product: Yup.string().required('This field is required'),
+    policy_no: Yup.string().required('This field is required'),
+    endorsement_type: Yup.string().required('This field is required'),
+    endorsement_sub_type: Yup.string().required('This field is required'),
+
 })
 
 
 class BasicInfo extends Component {
+    check=0;
     state = {
         product_category_list: [],
         product_list: [],
-        request_receive_date: []
+        request_receive_date: [],
+        selectedFile:[],
+        endorsement_info_id:"",
+        endorsement_data_id:"",
+        product_endorsement_list:"",
+        endorsement_sub_type_list:"",
+        endorsementfields:{},
+        addEndorsementFields:[],
+        additionalEndorsement_sub_type_list:[],
+        endorsement_array:[],
+        type2_info_id:"",
+        count:0,
+        add_endorsement_received_date: []
+       
     }
    
     forwardNextPage=()=> {    
@@ -100,6 +106,7 @@ class BasicInfo extends Component {
                     let product_category_list = res.data.data.product_categories ? res.data.data.product_categories : []
                     this.setState({
                         product_category_list
+                        
                     })
                 }
                 this.props.loadingStop();
@@ -114,15 +121,16 @@ class BasicInfo extends Component {
 
     getProductList = (product_category_id) => {
         const formData = new FormData();
+        
         let encryption = new Encryption();
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";    
         if (user_data.user) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
         }
-
+        
         formData.append('product_category_id', product_category_id)
-        formData.append('user_id', user_data.master_user_id)
-
+        formData.append('user_id', user_data.bc_master_id)
+      
         if(user_data.login_type == 4) {
             if(user_data.bc_master_id == 5) {
                 formData.append('user_type', 'csc')
@@ -134,19 +142,20 @@ class BasicInfo extends Component {
         }
         else {
             formData.append('user_type', user_data.user_type)
-        }         
-
-        this.props.loadingStart();
+        }  
+           
+        this.props.loadingStart();      
         axios
             .post('dyi-endorsement/product-list', formData)
             .then(res => {
-                console.log("product_list ---------- ", res.data)
                 if(res.data.error == false) {
                     let product_list = res.data.data.products ? res.data.data.products : []
                     this.setState({
-                        product_list
+                        product_list,
+                        endorsement_info_id:res.data.data.endorsementinfo_id,
+                        endorsement_data_id:res.data.data.endrosment_data_id
                     })
-                }
+                }             
                 this.props.loadingStop();
             })
             .catch(err => {
@@ -154,57 +163,386 @@ class BasicInfo extends Component {
                     product_category_list: []
                 });
                 this.props.loadingStop();
-            });
+            });        
     }
 
-    initClaimDetailsList = () => {
+    getEndorsementSubtypeList=(product_endorsement_id)=>{
+        const formData=new FormData();
+        formData.append("endrosment_data_id",this.state.endorsement_data_id);
+        formData.append("endorsementinfo_id",this.state.endorsement_info_id)
+        formData.append("product_endorsement_id",product_endorsement_id);
+        formData.append("additional_index",0);
+        formData.append("type",1);
+        this.props.loadingStart();
+        axios
+        .post('dyi-endorsement/endorsement-value',formData)
+        .then(res=>{
+            this.setState({
+                ...this.state,
+                endorsement_sub_type_list:res.data.data.endorsement_field_value
+            })
+            this.props.loadingStop();
+        })
+        .catch(err=>{
+            this.props.loadingStop();
+        })
+    }
+
+    getEndorsmentList=(product_id)=>{
+        let formData=new FormData();
+        formData.append("endorsementinfo_id",this.state.endorsement_info_id);
+        formData.append("product_id",product_id);
+        this.props.loadingStart();
+        axios
+        .post(`dyi-endorsement/endorsement-type-list`,formData)
+        .then(res=>{
+            this.setState({
+                ...this.state,
+                product_endorsement_list:res.data.data.product_endorsement_list
+            })
+            this.props.loadingStop();
+        })
+        .catch(err=>{
+            this.props.loadingStop();
+        })  
+    }
+
+    getAddEndorsementFields=(field_id,values, errors, touched, setFieldTouched, setFieldValue, i)=>{
+        const formData=new FormData();
+        const {addEndorsementFields} = this.state
+        formData.append("endorsementinfo_id",this.state.type2_info_id);
+        formData.append("endrosment_data_id",this.state.endorsement_data_id);
+        formData.append("field_id",field_id);
+        formData.append("policy_number",values.policy_no);
+        this.props.loadingStart();
+        axios
+        .post('dyi-endorsement/fields',formData)
+        .then(res=>{
+            addEndorsementFields[i] = res.data.data.fields
+            // this.setState({
+            //     addEndorsementFields:res.data.data.fields
+            // })
+            // this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue)
+            this.initAddClaimDetailsList(values,setFieldTouched, setFieldValue, res.data.data.fields, i) 
+            this.props.loadingStop();
+           
+        })
+        .catch(err=>{
+            this.props.loadingStop();
+        })
+    }
+    getEndorsementFields=(field_id,values, setFieldTouched, setFieldValue)=>{
+        const formData=new FormData();
+        formData.append("endorsementinfo_id",this.state.endorsement_info_id);
+        formData.append("endrosment_data_id",this.state.endorsement_data_id);
+        formData.append("field_id",field_id);
+        formData.append("policy_number",values.policy_no);
+
+        this.props.loadingStart();
+        axios
+        .post('dyi-endorsement/fields',formData)
+        .then(res=>{
+            if(res.data.error == false) {
+                this.setState({
+                    ...this.state,
+                    endorsementfields:res.data.data.fields
+                })         
+                this.props.loadingStop();
+                this.initEndorsementUpdate(values,setFieldTouched, setFieldValue, res.data.data.fields)   
+            }
+            else {
+                this.props.loadingStop();
+            }
+            
+        })
+        .catch(err=>{
+            this.props.loadingStop();
+        })
+    }
+
+    makeAddEndorsementOldField=(values, errors, touched, setFieldTouched, setFieldValue,j)=>{
+        const arr=[];
+        const {addEndorsementFields} =this.state
+        addEndorsementFields && addEndorsementFields[j] && Object.keys(addEndorsementFields[j]).map((item,i)=>
+        arr.push(
+            <FormGroup key={`oldAdd${i}`}>
+                <Field
+                    name={`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`}
+                    type="text"
+                    autoComplete="off"
+                    placeholder={`Additional Old ${addEndorsementFields[j][item]}`}
+                    className="formGrp inputfs12"
+                    onChange={(e)=>{
+                        setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`,e.target.value)
+                    }}
+                >
+                </Field>
+                {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].addEndorsementInitValues && errors.additionalEndorsement[j].addEndorsementInitValues[i] && errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_old_value
+                && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].addEndorsementInitValues && touched.additionalEndorsement[j].addEndorsementInitValues[i] && touched.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_old_value ? (
+                    <span className="errorMsg">{errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_old_value}</span>
+                ) : null}
+            </FormGroup>
+        ) )      
+       return arr;            
+     }
+     
+     makeAddEndorsementNewField=(values, errors, touched, setFieldTouched, setFieldValue,j)=>{
+        const arr=[];
+        const {addEndorsementFields} =this.state
+        addEndorsementFields && addEndorsementFields[j] && Object.keys(addEndorsementFields[j]).map((item,i)=>
+        arr.push(
+            <FormGroup key={`newAdd${i}`}>
+                <Field
+                    name={`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`}
+                    type="text"
+                    autoComplete="off"
+                    placeholder={`Additional New ${addEndorsementFields[j][item]}`}
+                    className="formGrp inputfs12"
+                    onChange={(e)=>{                     
+                        setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,e.target.value)
+                    }}
+                >
+                </Field>
+                {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].addEndorsementInitValues && errors.additionalEndorsement[j].addEndorsementInitValues[i] && errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value 
+                && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].addEndorsementInitValues && touched.additionalEndorsement[j].addEndorsementInitValues[i] && touched.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value ? (
+                    <span className="errorMsg">{errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}</span>
+                ) : null}
+            </FormGroup>
+        )  )      
+       return arr;             
+     }
+
+
+     makeEndorsementOldField=(values, errors, touched, setFieldTouched, setFieldValue)=>{
+        const arr=[];
+        const {endorsementfields} =this.state
+        endorsementfields && Object.keys(endorsementfields).map((item,i)=>
+        arr.push(    
+             <FormGroup key={`old${i}`}>
+                 <Field
+                    name={`makeEndorsement[${i}].Old_values`}
+                    type="text"
+                    autoComplete="off"
+                    placeholder = {`Old ${endorsementfields[item]}`}
+                    className="formGrp inputfs12"
+                    onChange={(e)=>{
+                        setFieldValue(`makeEndorsement[${i}].Old_values`,e.target.value)
+                    }}                                             
+                >  
+                </Field>
+                {errors.makeEndorsement && errors.makeEndorsement[i] && errors.makeEndorsement[i].Old_values 
+                && touched.makeEndorsement && touched.makeEndorsement[i] && touched.makeEndorsement[i].Old_values ? (
+                    <span className="errorMsg">{errors.makeEndorsement[i].Old_values}</span>
+                ) : null}
+             </FormGroup>
+        ) )   
+       return arr;
+             
+     }
+
+    makeEndorsementNewField=(values, errors, touched, setFieldTouched, setFieldValue)=>{
+       const arr=[];
+       const {endorsementfields} =this.state
+       endorsementfields && Object.keys(endorsementfields).map((item,i)=>
+       arr.push( 
+            <FormGroup key={`new${i}`}>
+                 <Field
+                    name= {`makeEndorsement[${i}].New_values`}
+                    type="text"
+                    autoComplete="off"
+                    placeholder = {`New ${endorsementfields[item]}`}
+                    className="formGrp inputfs12"
+                        onChange={(e)=>{
+                            setFieldValue(`makeEndorsement[${i}].New_values`,e.target.value)
+                        }}                                             
+                >  
+                 </Field>
+                 {errors.makeEndorsement && errors.makeEndorsement[i] && errors.makeEndorsement[i].New_values 
+                 && touched.makeEndorsement && touched.makeEndorsement[i] && touched.makeEndorsement[i].New_values ? (
+                    <span className="errorMsg">{errors.makeEndorsement[i].New_values}</span>
+                ) : null}
+            </FormGroup>
+       )
+        )
+       
+      return arr;
+            
+    }
+
+    initEndorsementUpdate = async (values,setFieldTouched, setFieldValue ,endorsementfields ) => {
         let innicialClaimList = []
-        let endorsement_array = []
-        for (var i = 0; i < 2; i++) {
+
+        endorsementfields && Object.keys(endorsementfields).map((item,i)=>{
             innicialClaimList.push(
                 {
-                    endorsement_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_type ? endorsement_array[i].endorsement_type : "",
-                    endorsement_sub_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_sub_type ? endorsement_array[i].endorsement_sub_type : "",
-                    request_receive_date: endorsement_array && endorsement_array[i] && endorsement_array[i].request_receive_date ? endorsement_array[i].request_receive_date : "",
-                    old_value: endorsement_array && endorsement_array[i] && endorsement_array[i].old_value ? endorsement_array[i].old_value : "",
-                    new_value: endorsement_array && endorsement_array[i] && endorsement_array[i].new_value ? endorsement_array[i].new_value : "",
+                    // endorsement_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_type ? endorsement_array[i].endorsement_type : "",
+                    // endorsement_sub_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_sub_type ? endorsement_array[i].endorsement_sub_type : "",
+                    // request_receive_date: endorsement_array && endorsement_array[i] && endorsement_array[i].request_receive_date ? endorsement_array[i].request_receive_date : "",
+                    Old_values: "",
+                    New_values: "",
                 }
+                
             )
-        }
-
-        return innicialClaimList
-
+        })
+        setFieldValue("makeEndorsement",innicialClaimList)
     };
 
+    initAddClaimDetailsList = (values,setFieldTouched, setFieldValue ,endorsementfields, j ) => {
+        endorsementfields && Object.keys(endorsementfields).map((item,i)=>{
+            setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`,"")
+            setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,"")
+        })
+    };
 
-    handleClaims = (values, errors, touched, setFieldTouched, setFieldValue, loop) => {
+    onFileChange=(e)=>{
+        this.setState({
+            ...this.state,
+            selectedFile:e.target.files
+        }) 
+    }
+
+    upload=()=>{
+        const formData=new FormData();
+        formData.append("endorsementinfo_id",this.state.endorsement_info_id);
+        formData.append("endrosment_data_id",this.state.endorsement_data_id)
+        Object.keys(this.state.selectedFile).map((item,i)=>
+           {
+            formData.append(`attachment_file[${i}]`,this.state.selectedFile[item])
+           }
+        )
+        axios
+        .post('dyi-endorsement/document',formData)
+        .then(res=>{
+            swal(res.data.msg)
+        })
+        .catch(err=>{
+            swal(err.data.msg)
+        })
+    }
+    
+   getAddEndorsementSubTypeList=(product_endorsement_id,values, errors, touched, setFieldTouched, setFieldValue,i)=>{
+    const {additionalEndorsement_sub_type_list} = this.state
+    const formData=new FormData();
+    formData.append("endrosment_data_id",this.state.endorsement_data_id);
+    formData.append("endorsementinfo_id",this.state.endorsement_info_id)
+    formData.append("product_endorsement_id",product_endorsement_id);
+    formData.append("additional_index",i+1);
+    formData.append("type",2);
+    this.props.loadingStart();
+    axios
+    .post('dyi-endorsement/endorsement-value',formData)
+    .then(res=>{
+        additionalEndorsement_sub_type_list[i] = res.data.data.endorsement_field_value
+        this.setState({
+            // additionalEndorsement_sub_type_list:res.data.data.endorsement_field_value,
+            type2_info_id:res.data.data.new_endorsement_info
+
+        })
+       
+        this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue)
+        this.props.loadingStop();
+    })
+    .catch(err=>{
+        this.props.loadingStop();
+    
+    })
+   }
+
+   handleSubmit=(values,actions)=>{
+    const formData=new FormData();
+    formData.append("user_email",values.email_id)
+    formData.append("user_mobile",values.mobile_no)
+    formData.append("endorsementdata_id",this.state.endorsement_data_id)
+    formData.append("endorsementinfo_id",this.state.endorsement_info_id)
+    let newValues = []
+    let oldValues = []
+    values.makeEndorsement && values.makeEndorsement.length > 0 && values.makeEndorsement.map((item,i)=>{
+        newValues.push(item.New_values)
+        oldValues.push(item.Old_values)
+    } )
+    formData.append(`new_endrosment_values`,JSON.stringify(newValues))
+    formData.append(`old_endrosment_values`,JSON.stringify(oldValues))
+
+    
+    values.additionalEndorsement && values.additionalEndorsement.length > 0 && values.additionalEndorsement.map((item,i)=>{
+        let addNewValues = []
+        let addOldValues = []
+        item.addEndorsementInitValues && item.addEndorsementInitValues.length > 0 && item.addEndorsementInitValues.map((subItem,j)=>{
+            addNewValues.push(subItem.add_endorsement_new_value)
+            addOldValues.push(subItem.add_endorsement_old_value)
+        } )
+
+        formData.append(`new_additional_endrosment_values[${i}]`,JSON.stringify(addNewValues))
+        formData.append(`old_additional_endrosment_values[${i}]`,JSON.stringify(addOldValues))     
+    })
+   
+    this.props.loadingStart();
+    axios
+    .post("dyi-endorsement/create",formData)
+    .then(res=>{
+        if(res.data.error == false) {
+            swal({
+                title: res.data.msg,
+                text: "Serial number: "+res.data.data.sr_no,
+                icon: "success",
+                // buttons: true,
+                dangerMode: false,
+              })
+              .then((willDownload) => {
+                if (willDownload) {
+                    actions.setSubmitting(false)
+                    actions.resetForm(true)
+                    this.setState({product_category_list:[], addEndorsementFields:[], endorsementfields:[] })   
+                    this.props.history.push("/ViewEndorsement")               
+                }             
+              })
+            
+            this.props.loadingStop();
+        }
+        else{
+            swal(res.data.msg)
+            this.props.loadingStop();
+        }
+        
+    })
+    .catch((err)=>{
+        this.props.loadingStop()
+    })
+   
+}
+
+    endorsement = (values, errors, touched, setFieldTouched, setFieldValue, loop) => {
         let field_array = []
-        let request_receive_date = []
-console.log("jhgjkhgjhgjhgbnjhbg")
-        for (var i = 0; i < loop; i++) {
+        const {endorsementfields, endorsement_sub_type_list, product_endorsement_list} = this.state
+        let request_receive_date = []  
             field_array.push(
-                <FormGroup key = {i}>
+                <FormGroup key = {2}>
                     <Row className="row formSection">
                         <label className="col-md-3">Endorsement Type:</label>
                         <div className="col-md-4">
                             
                             <div className="formSection">
                                 <Field
-                                    name= {`endorsement_array[${i}].endorsement_type`}
+                                    name= "endorsement_type"
                                     component="select"
                                     autoComplete="off"
                                     className="formGrp inputfs12"
-                                    // value = {values.endorsement_type}                                             
+                                     value = {values.endorsement_type} 
+                                     onChange={(e)=>{
+                                         this.getEndorsementSubtypeList(e.target.value)
+                                         setFieldValue("endorsement_type",e.target.value)
+                                         setFieldTouched("endorsement_type")
+                                     }} 
+                                                                      
                                 >  
                                     <option value="">List Of Endorsement Type </option>
-                                    <option value="1">Health</option>
-                                    <option value="2">Individual Personal Accident </option>
-                                    <option value="3">Loan Insurance</option>
-                                    <option value="4">Longterm Home</option>
+                                    {product_endorsement_list && product_endorsement_list.map(data=>                            
+                                        <option value={data.id} key= {data.id}>{data.endorsement_type_name}</option>   
+                                    )}
                                     
                                 </Field>
-                                {errors.endorsement_array && errors.endorsement_array[i] && errors.endorsement_array[i].endorsement_type ? (
-                                    <span className="errorMsg">{errors.endorsement_array[i].endorsement_type}</span>
+                                {errors.endorsement_type && touched.endorsement_type ? (
+                                    <span className="errorMsg">{errors.endorsement_type}</span>
                                 ) : null}
                             </div>
                         </div>
@@ -216,21 +554,28 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                             
                             <div className="formSection">
                                 <Field
-                                    name= {`endorsement_array[${i}].endorsement_sub_type`} 
+                                    name= "endorsement_sub_type" 
                                     component="select"
                                     autoComplete="off"
                                     className="formGrp inputfs12"
-                                    // value = {values.endorsement_sub_type}                                             
+                                     value = {values.endorsement_sub_type}  
+                                     onChange={(e)=>{
+                                       
+                                        this.getEndorsementFields(e.target.value,values, setFieldTouched, setFieldValue);    
+                                         
+                                        setFieldValue("endorsement_sub_type",e.target.value);
+                                        setFieldTouched("endorsement_sub_type")
+                                     }} 
+                                                                           
                                 >  
                                     <option value="">List Of Endorsement Sub Type </option>
-                                    <option value="1">Health</option>
-                                    <option value="2">Individual Personal Accident </option>
-                                    <option value="3">Loan Insurance</option>
-                                    <option value="4">Longterm Home</option>
+                                    {endorsement_sub_type_list && endorsement_sub_type_list.map(data=>
+                                        <option value={data.id} key= {data.id}>{data.Sub_Type}</option>
+                                    )}
                                     
                                 </Field>
-                                {errors.endorsement_array && errors.endorsement_array[i] && errors.endorsement_array[i].endorsement_sub_type ? (
-                                    <span className="errorMsg">{errors.endorsement_array[i].endorsement_sub_type}</span>
+                                {errors.endorsement_sub_type && touched.endorsement_sub_type ? (
+                                    <span className="errorMsg">{errors.endorsement_sub_type}</span>
                                 ) : null}
                             </div>
                         </div>
@@ -241,7 +586,7 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                         <div className="col-md-4">                                            
                             <div className="formSection">                         
                                 <DatePicker
-                                    name= {`endorsement_array[${i}].request_receive_date`}
+                                    name= "endorsement_received_date"
                                     dateFormat="dd MMM yyyy"
                                     placeholderText="Request Receive Date"
                                     peekPreviousMonth
@@ -252,78 +597,185 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                                     // maxDate={new Date(maxDobAdult)}
                                     // minDate={new Date(minDobAdult)}
                                     className="datePckr"
-                                    selected={values.endorsement_array[i].request_receive_date}
-                                    onChange={(val) => {
-                                        console.log("i --------------- ",i)
-                                        setFieldTouched(`endorsement_array[${i}].request_receive_date`);
-                                        setFieldValue(`endorsement_array[${i}].request_receive_date`, val);
-                                        }}
+                                    disabled = {true}
+                                    selected = {new Date()}
+                                    // selected={values.endorsement_received_date}
+                                    onChange={(val) => {                                        
+                                        setFieldTouched("endorsement_received_date");
+                                        setFieldValue("endorsement_received_date", val);
+                                    }}
                                 />
-                                {errors.endorsement_array && errors.endorsement_array[i] && errors.endorsement_array[i].request_receive_date ? (
-                                    <span className="errorMsg">{errors.endorsement_array[i].request_receive_date}</span>
+                                {errors.endorsement_received_date ? (
+                                    <span className="errorMsg">{errors.endorsement_received_date}</span>
                                 ) : null}
                             </div>
                         </div>
                     </Row>
-
+                    {endorsementfields && Object.keys(endorsementfields).length > 0 ?
                     <Row className="row formSection">
                         <label className="col-md-3">Old Value:</label>
                         <div className="col-md-4">
-                            {console.log("i 2 --------------- ", i)}
+                           
                             <div className="formSection">
-                                <Field
-                                    name=  {`endorsement_array[${i}].old_value`}
-                                    type="text"
-                                    autoComplete="off"
-                                    placeholder = "Old Value"
-                                    className="formGrp inputfs12"
-                                    // value = {values.old_value}                                             
-                                >  
-                                </Field>
-                                {errors.endorsement_array && errors.endorsement_array[i] && errors.endorsement_array[i].old_value ? (
-                                    <span className="errorMsg">{errors.endorsement_array[i].old_value}</span>
-                                ) : null}
+                            {this.makeEndorsementOldField(values, errors, touched, setFieldTouched, setFieldValue)}
                             </div>
                         </div>
-                    </Row>
-
+                    </Row> : null }
+                    
+                    {endorsementfields && Object.keys(endorsementfields).length > 0 ?
                     <Row className="row formSection">
                         <label className="col-md-3">New Value:</label>
-                        <div className="col-md-4">
-                            
+                        <div className="col-md-4">     
                             <div className="formSection">
-                                <Field
-                                    name= {`endorsement_array[${i}].new_value`}
-                                    type="text"
-                                    autoComplete="off"
-                                    placeholder = "New Value"
-                                    className="formGrp inputfs12"
-                                    // value = {values.new_value}                                            
-                                >  
-                                </Field>
-                                {errors.endorsement_array && errors.endorsement_array[i] && errors.endorsement_array[i].new_value ? (
-                                    <span className="errorMsg">{errors.endorsement_array[i].new_value}</span>
-                                ) : null}
+                                {this.makeEndorsementNewField(values, errors, touched, setFieldTouched, setFieldValue)}                             
                             </div>
                         </div>
-                    </Row>
-
+                    </Row> : null }
                 </FormGroup>
             )
-        }
         return field_array
 
     }
 
 
+    additionalEndorsement = (values, errors, touched, setFieldTouched, setFieldValue) => {
+        const {addEndorsementFields,add_endorsement_received_date, count, product_endorsement_list, additionalEndorsement_sub_type_list} = this.state
+        let field_array = []
+        let request_receive_date = []
+        for(let i =0; i<count; i++){
+            field_array.push(
+                <FormGroup key = {i}>
+                    <Row className="row formSection">
+                        <label className="col-md-3">Endorsement Type:</label>
+                        <div className="col-md-4">
+                            
+                            <div className="formSection">
+                                <Field
+                                    name= {`additionalEndorsement[${i}]add_endorsement_type`}
+                                    component="select"
+                                    autoComplete="off"
+                                    className="formGrp inputfs12"
+                                    //  value = {values.add_endorsement_type} 
+                                     onChange={(e)=>{         
+                                        setFieldValue(`additionalEndorsement[${i}]add_endorsement_type`,e.target.value)
+                                         this.getAddEndorsementSubTypeList(e.target.value,values, errors, touched, setFieldTouched, setFieldValue, i)                             
+                                     }} 
+                                                                      
+                                >  
+                                    <option value="">List Of Endorsement Type </option>
+                                    { product_endorsement_list && product_endorsement_list.map(data=>
+                                        <option value={data.id} key= {data.id}>{data.endorsement_type_name}</option>      
+                                    )}               
+                                </Field>
+                                {errors.additionalEndorsement && errors.additionalEndorsement[i] && errors.additionalEndorsement[i].add_endorsement_type 
+                                && touched.additionalEndorsement && touched.additionalEndorsement[i] && touched.additionalEndorsement[i].add_endorsement_type? (
+                                    <span className="errorMsg">{errors.additionalEndorsement[i].add_endorsement_type}</span>
+                                ) : null}
+                            </div>
+                        </div>
+                    </Row>              
+
+                    <Row className="row formSection">
+                        <label className="col-md-3">Endorsement Sub type:</label>
+                        <div className="col-md-4">
+                            
+                            <div className="formSection">
+                                <Field
+                                    name= {`additionalEndorsement[${i}]add_endorsement_sub_type`}
+                                    component="select"
+                                    autoComplete="off"
+                                    className="formGrp inputfs12"
+                                    //  value = {values.endorsement_sub_type}  
+                                     onChange={(e)=>{
+                                        setFieldValue(`additionalEndorsement[${i}]add_endorsement_sub_type`,e.target.value)
+                                        this.getAddEndorsementFields(e.target.value,values, errors, touched, setFieldTouched, setFieldValue, i);
+                                     }}                                                                  
+                                >  
+                                    <option value="">List Of Endorsement Sub Type </option>                                           
+                                    {additionalEndorsement_sub_type_list && additionalEndorsement_sub_type_list[i] && additionalEndorsement_sub_type_list[i].map(data=>
+                                        <option value={data.id} key= {data.id}>{data.Sub_Type}</option>
+                                    )}
+                                </Field>
+                                {errors.additionalEndorsement && errors.additionalEndorsement[i] && errors.additionalEndorsement[i].add_endorsement_sub_type
+                                && touched.additionalEndorsement && touched.additionalEndorsement[i] && touched.additionalEndorsement[i].add_endorsement_sub_type ? (
+                                    <span className="errorMsg">{errors.additionalEndorsement[i].add_endorsement_sub_type}</span>
+                                ) : null}
+                            </div>
+                        </div>
+                    </Row>
+
+                    <Row className="row formSection">
+                        <label className="col-md-3">Request Receive Date:</label>
+                        <div className="col-md-4">                                            
+                            <div className="formSection">                         
+                                <DatePicker
+                                    name= {`additionalEndorsement[${i}]add_endorsement_received_date`}
+                                    dateFormat="dd MMM yyyy"
+                                    placeholderText="Request Receive Date"
+                                    peekPreviousMonth
+                                    peekPreviousYear
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    // maxDate={new Date(maxDobAdult)}
+                                    // minDate={new Date(minDobAdult)}
+                                    className="datePckr"
+                                    disabled = {true}
+                                    selected = {new Date()}
+                                    // selected={add_endorsement_received_date[i]}
+                                    onChange={(val) => {  
+                                        add_endorsement_received_date[i]=val
+                                        setFieldTouched(`additionalEndorsement[${i}]add_endorsement_received_date`);
+                                        setFieldValue(`additionalEndorsement[${i}]add_endorsement_received_date`, val);
+                                        }}
+                                />
+                                {errors.additionalEndorsement && errors.additionalEndorsement[i] && errors.additionalEndorsement[i].add_endorsement_received_date 
+                                && touched.additionalEndorsement && touched.additionalEndorsement[i] && touched.additionalEndorsement[i].add_endorsement_received_date? (
+                                    <span className="errorMsg">{errors.additionalEndorsement[i].add_endorsement_received_date}</span>
+                                ) : null}
+                            </div>
+                        </div>
+                    </Row>
+
+                    {addEndorsementFields && addEndorsementFields[i] && Object.keys(addEndorsementFields[i]).length > 0 ?
+                    <Row className="row formSection">
+                        <label className="col-md-3">Old Value:</label>
+                        <div className="col-md-4">
+                           
+                            <div className="formSection">
+                            {this.makeAddEndorsementOldField(values, errors, touched, setFieldTouched, setFieldValue,i)}                    
+                            </div>
+                        </div>
+                    </Row> : null }
+
+                    {addEndorsementFields && addEndorsementFields[i] && Object.keys(addEndorsementFields[i]).length > 0 ?
+                    <Row className="row formSection">
+                        <label className="col-md-3">New Value:</label>
+                        <div className="col-md-4">
+                            
+                            <div className="formSection">
+                                {this.makeAddEndorsementNewField(values, errors, touched, setFieldTouched, setFieldValue,i)}
+                            </div>
+                        </div>
+                    </Row> : null }
+
+                </FormGroup>
+            )
+        }
+        return field_array;
+    }
+
+
     componentDidMount(){
-        this.getProductCategoryList()
+        this.getProductCategoryList();
+       
     }
 
     render() {
-        const { product_category_list, product_list} = this.state
+        const { product_category_list, product_list,count} = this.state
         const newInitialValues = Object.assign(initialValues,{
-            endorsement_array: this.initClaimDetailsList(),
+            makeEndorsement: [],
+            additionalEndorsement: []
         }
         )
 
@@ -333,11 +785,13 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                     <section className="brand">
                         <div className="boxpd">
                             <Formik initialValues={newInitialValues} 
-                        //    onSubmit={ }
-                            // validationSchema={vehicleRegistrationValidation}
+                            onSubmit={this.handleSubmit }
+                             validationSchema={endorsementValidation}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                console.log("values ---------- ", values)
+                                // console.log("values ---------- ", values)
+                                // console.log("error=======",errors)
+                                
                             return (
                                 <Form>    
                                 <div className="brandhead"> 
@@ -347,7 +801,7 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                                             
                                             <div className="formSection">
                                                 <Field
-                                                    name='email_id'
+                                                     name='email_id'
                                                     type="text"
                                                     autoComplete="off"
                                                     placeholder = "Email Address"
@@ -396,11 +850,12 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                                                     value = {values.product_category}        
                                                     onChange = {(e) => {
                                                         this.getProductList(e.target.value)
+                                                        setFieldValue("product_category",e.target.value)
                                                     }}                                      
                                                 >  
                                                     <option value="">Select product category</option>
                                                     {product_category_list && product_category_list.map((resource, rindex) => 
-                                                    <option value = {resource.id}> {resource.category_name}</option>
+                                                    <option value = {resource.id} key= {resource.id}> {resource.category_name}</option>
                                                     )}
                                                    
                                                    
@@ -422,11 +877,16 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                                                     component="select"
                                                     autoComplete="off"
                                                     className="formGrp inputfs12"
-                                                    value = {values.product}                                                                                       
+                                                    value = {values.product}  
+                                                    onChange={(e)=>{
+                                                        this.getEndorsmentList(e.target.value)
+                                                        setFieldValue("product",e.target.value)
+                                                    }}                                                                                     
                                                 >  
+                                                
                                                     <option value="">Select product </option>
                                                     {product_list && product_list.map((resource, rindex) => 
-                                                    <option value = {resource.id}> {resource.product_name}</option>
+                                                    <option value = {resource.id} key= {resource.id}> {resource.product_name}</option>
                                                     )}
                                                    
                                                 </Field>
@@ -457,25 +917,43 @@ console.log("jhgjkhgjhgjhgbnjhbg")
                                             </div>
                                         </div>
                                     </Row>
-
-                                    {this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue, 1)}
+                                    {this.endorsement(values, errors, touched, setFieldTouched, setFieldValue)}
+                                    
 
                                     <Row className="row formSection">
                                         <label className="col-md-3">Add another endorsement:</label>
                                         <div className="col-md-4">                                
-                                        <Button type="button" onClick = {this.handleClaims.bind(this, values, errors, touched, setFieldTouched, setFieldValue, 2)}>
+                                       {<Button type="button" onClick = {()=> {
+                                                let newCount = count+1
+                                                this.setState({count:newCount})
+                                                setFieldValue("newCount", newCount)
+                                            }               
+                                        } 
+                                        >
                                            +
-                                        </Button>
+                                        </Button>}
+
                                         </div>
                                     </Row>
-
+                                    {/* {this.state.endorsement_array} */}
+                                    {values.newCount > 0 ?
+                                        this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue) : null
+                                    }
+                                    
                                     <Row className="row formSection">
                                         <label className="col-md-3">Attach Documents:</label>
                                         <div className="col-md-4">
                                             
-                                            +
+                                            <input type="file" multiple name="file" onChange={(e)=> this.onFileChange(e)}/>
                                         </div>
+                                        <Button type="button" onClick={()=>this.upload()}>Upload</Button>
                                     </Row>
+                                    <Button className={`proceedBtn`} type="submit">
+                                        Submit
+                                    </Button>
+                                    {/* <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
+                                    {isSubmitting ? "Wait...." : "CREATE"}
+                                    </Button> */}
                                     
                                 </div>                                           
                                 

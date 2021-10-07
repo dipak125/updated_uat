@@ -45,7 +45,9 @@ const initialValue = {
     eia_no: "",
     stateName: "",
     pinDataArr: [],
-    pincode_id: ""
+    pincode_id: "",
+    age: "",
+    nominee_age: ""
 }
 
 const ownerValidation = Yup.object().shape({
@@ -79,6 +81,35 @@ const ownerValidation = Yup.object().shape({
             return true;
         }
     ),
+
+    age: Yup.mixed().required('RequiredField')
+    .test(
+        "18YearsChecking",
+        function() {
+            return "AgeRange"
+        },
+        function (value) {
+            if (value) {
+                return value <= 100 && value >= 18;
+            }
+            return true;
+        }
+    ),
+
+    nominee_age: Yup.mixed().required('RequiredField')
+    .test(
+        "18YearsChecking",
+        function() {
+            return "NomineeMinAge"
+        },
+        function (value) {
+            if (value) {
+                return value < 100 && value >= 0;
+            }
+            return true;
+        }
+    ),
+
     pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required("EnterPan").test(
@@ -629,6 +660,7 @@ console.log('post_data', post_data);
             first_name: policyHolder && policyHolder.first_name ? policyHolder.first_name : "",
             gender:  policyHolder && policyHolder.gender ? policyHolder.gender : "",
             dob: policyHolder && policyHolder.dob ? new Date(policyHolder.dob) : "",
+            age: policyHolder && policyHolder.dob ? Math.floor(moment().diff(policyHolder.dob, 'years', true) ) : "",
             pancard: policyHolder && policyHolder.pancard ? policyHolder.pancard : "",
             pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
@@ -640,6 +672,7 @@ console.log('post_data', post_data);
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
             nominee_dob: nomineeDetails && nomineeDetails.dob ? new Date(nomineeDetails.dob) : "",
+            nominee_age: nomineeDetails && nomineeDetails.dob ? Math.floor(moment().diff(nomineeDetails.dob, 'years', true) ) : "",
             pa_flag : motorInsurance ? motorInsurance.pa_flag : 0,
             
             phone: policyHolder && policyHolder.mobile ? policyHolder.mobile : "",
@@ -687,11 +720,7 @@ console.log('post_data', post_data);
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                             let value = values.nominee_first_name;
-
-                            //  value = value.replace(/[^A-Za-z]/ig, '')
-                            //  values.nominee_first_name = value;
-                            
+console.log("errors ------------------ ", errors)
                         return (
                         <Form>
                         <Row>
@@ -854,7 +883,7 @@ console.log('post_data', post_data);
                                 </Row>
 
                                 <Row>
-                                    <Col sm={12} md={4} lg={4}>
+                                    {/* <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
                                             name="dob"
@@ -877,6 +906,30 @@ console.log('post_data', post_data);
                                         {errors.dob && touched.dob ? (
                                             <span className="errorMsg">{phrases[errors.dob]}</span>
                                         ) : null}  
+                                        </FormGroup>
+                                    </Col> */}
+                                    <Col sm={12} md={4} lg={4}>
+                                        <FormGroup className="m-b-25">
+                                        <div className="insurerName">
+                                            <Field
+                                                name='age'
+                                                type="number"
+                                                placeholder={phrases['Age']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.age}
+                                                maxLength="10"            
+                                                onChange = {(e) => {
+                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                    setFieldValue('dob',dob)
+                                                    setFieldValue('age',e.target.value)
+                                                }}                                                                                                 
+                                            />
+                                            {errors.age && touched.age ? (
+                                                <span className="errorMsg">{phrases[errors.age]}</span>
+                                            ) : null}  
+                                        </div>
                                         </FormGroup>
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
@@ -1104,7 +1157,7 @@ console.log('post_data', post_data);
                                 </Row>
 
                                 <Row>
-                                    <Col sm={12} md={4} lg={4}>
+                                    {/* <Col sm={12} md={4} lg={4}>
                                         <FormGroup>
                                         <DatePicker
                                             name="nominee_dob"
@@ -1128,6 +1181,30 @@ console.log('post_data', post_data);
                                         {errors.nominee_dob && touched.nominee_dob ? (
                                             <span className="errorMsg">{phrases[errors.nominee_dob]}</span>
                                         ) : null}  
+                                        </FormGroup>
+                                    </Col> */}
+                                     <Col sm={12} md={4} lg={4}>
+                                        <FormGroup className="m-b-25">
+                                        <div className="insurerName">
+                                            <Field
+                                                name='nominee_age'
+                                                type="number"
+                                                placeholder={phrases['Age']}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.nominee_age}
+                                                maxLength="10"            
+                                                onChange = {(e) => {
+                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                    setFieldValue('nominee_dob',dob)
+                                                    setFieldValue('nominee_age',e.target.value)
+                                                }}                                                                                                 
+                                            />
+                                            {errors.nominee_age && touched.nominee_age ? (
+                                                <span className="errorMsg">{phrases[errors.nominee_age]}</span>
+                                            ) : null}  
+                                        </div>
                                         </FormGroup>
                                     </Col>
                                     <Col sm={12} md={4} lg={4}>
@@ -1153,7 +1230,7 @@ console.log('post_data', post_data);
                                     </Col>
                                 </Row>
 
-                                {appointeeFlag || is_appointee == '1' ? 
+                                {appointeeFlag || is_appointee == '1' ||(values.nominee_age<18 )? 
                                     <div>
                                         <div className="d-flex justify-content-left carloan">
                                             <h4> </h4>

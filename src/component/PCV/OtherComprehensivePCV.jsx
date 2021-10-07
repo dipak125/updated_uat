@@ -77,7 +77,7 @@ const ComprehensiveValidation = Yup.object().shape({
         .min(5, function () {
             return "ChasisMin"
         })
-        .max(20, function () {
+        .max(25, function () {
             return "ChasisMax"
         }),
 
@@ -304,7 +304,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 }).min(5, function () {
                     return "ChasisMin"
                 })
-                .max(20, function () {
+                .max(25, function () {
                     return "ChasisMax"
                 })
         })
@@ -808,7 +808,7 @@ class OtherComprehensivePCV extends Component {
         this.props.loadingStart();
         axios.post('pcv/full-quote', formData)
             .then(res => {
-                console.log("fullQuote=======>>>",res.data)
+                console.log("fullQuote=======>>>",res.data.PolicyObject)
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let PolicyArray = res.data.PolicyObject.PolicyLobList
                     let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
@@ -877,6 +877,7 @@ class OtherComprehensivePCV extends Component {
 
 
     handleSubmit = (values) => {
+        console.log("error is coming")
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
@@ -1562,7 +1563,8 @@ class OtherComprehensivePCV extends Component {
                                             onSubmit={serverResponse && serverResponse != "" ? (serverResponse.message ? this.fullQuote : this.handleSubmit) : this.fullQuote}
                                             validationSchema={ComprehensiveValidation}>
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                // console.log("values----------------- ", values)
+                                                // console.log("value----------------- ", values)
+                                                console.log("server ===",serverResponse)
                                                 return (
                                                     <Form>
                                                         <Row>
@@ -1704,7 +1706,7 @@ class OtherComprehensivePCV extends Component {
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                         value={values.chasis_no.toUpperCase()}
-                                                                                        maxLength="20"
+                                                                                        maxLength="25"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('chasis_no')
                                                                                             setFieldValue('chasis_no', e.target.value)

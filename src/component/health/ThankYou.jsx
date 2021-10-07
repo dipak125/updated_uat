@@ -182,7 +182,7 @@ class ThankYouPage extends Component {
             sessionStorage.removeItem('display_looking_for');
             sessionStorage.removeItem('display_dob');
             
-            this.getCustomerMsg()
+            // this.getCustomerMsg()
             this.setState({
                 vehicletype       
             })

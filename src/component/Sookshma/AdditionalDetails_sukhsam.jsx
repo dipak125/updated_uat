@@ -32,6 +32,7 @@ const initialValue = {
     last_name:"",
     gender:"",
     date_of_birth: "",
+    age: "",
     pan_no:"",
     pincode:"",
     is_carloan:"",
@@ -69,7 +70,9 @@ const vehicleRegistrationValidation = Yup.object().shape({
         .matches(/^[A-Za-z]+$/, function() {
             return "Please enter valid last name"
         }).nullable(),
-    date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
+    // date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
+    age: Yup.mixed().required("Please enter age").nullable(),
+
     email_id: Yup.string().email().required('Email is required').min(8, function() {
         return "Email must be minimum 8 characters"
     })
@@ -641,7 +644,8 @@ class AdditionalDetails_sukhsam extends Component {
       first_name:this.props.first_name,
       last_name:this.props.last_name,
       salutation_id:this.props.salutation_id,
-      date_of_birth:this.props.date_of_birth != null?new Date(this.props.date_of_birth):this.props.date_of_birth,
+      date_of_birth:this.props.date_of_birth != null ? new Date(this.props.date_of_birth):this.props.date_of_birth,
+      age: this.props.date_of_birth != null ? Math.floor(moment().diff(this.props.date_of_birth, 'years', true) ) : "",
       email_id:this.props.email_id,
       mobile:this.props.mobile,
       gender:this.props.gender,
@@ -791,52 +795,51 @@ class AdditionalDetails_sukhsam extends Component {
                                             </Col> 
 
                                             <Col sm={12} md={4} lg={4}>
-                                                <FormGroup>
-                                                <DatePicker
-                                                    name="date_of_birth"
-                                                    dateFormat="dd MMM yyyy"
-                                                    placeholderText="DOB"
-                                                    peekPreviousMonth
-                                                    peekPreviousYear
-                                                    showMonthDropdown
-                                                    showYearDropdown
-                                                    dropdownMode="select"
-                                                    maxDate={new Date(maxDobAdult)}
-                                                    minDate={new Date(minDobAdult)}
-                                                    className="datePckr"
-                                                    selected={values.date_of_birth}
-                                                    onChange={(val) => {
-                                                        setFieldTouched('date_of_birth');
-                                                        setFieldValue('date_of_birth', val);
-                                                        }}
-                                                />
-                                                {errors.date_of_birth && touched.date_of_birth ? (
-                                                    <span className="errorMsg">{errors.date_of_birth}</span>
-                                                ) : null}  
+                                                <FormGroup className="m-b-25">
+                                                <div className="insurerName">
+                                                    <Field
+                                                        name='age'
+                                                        type="number"
+                                                        placeholder='Age'
+                                                        autoComplete="off"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        value = {values.age}
+                                                        maxLength="10"            
+                                                        onChange = {(e) => {
+                                                            let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                            setFieldValue('date_of_birth',dob)
+                                                            setFieldValue('age',e.target.value)
+                                                        }}                                                                                                 
+                                                    />
+                                                    {errors.age && touched.age ? (
+                                                        <span className="errorMsg">{errors.age}</span>
+                                                    ) : null}  
+                                                </div>
                                                 </FormGroup>
                                             </Col>
-        
-                                                <Col sm={12} md={4} lg={4}>
-                                                    <FormGroup>
-                                                        <div className="insurerName">
-                                                        <Field
-                                                            name='gstn_no'
-                                                            type="text"
-                                                            placeholder= "GSTIN"
-                                                            autoComplete="off"
-                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                            value = {values.gstn_no} 
-                                                            onChange= {(e)=> 
-                                                                setFieldValue('gstn_no', e.target.value.toUpperCase())
-                                                                }                                                                                             
-                                                        />
-                                                            {errors.gstn_no && touched.gstn_no ? (
-                                                        <span className="errorMsg">{errors.gstn_no}</span>
-                                                        ) : null} 
-                                                        </div>
-                                                    </FormGroup>
-                                                </Col> 
+    
+                                            <Col sm={12} md={4} lg={4}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                    <Field
+                                                        name='gstn_no'
+                                                        type="text"
+                                                        placeholder= "GSTIN"
+                                                        autoComplete="off"
+                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                        value = {values.gstn_no} 
+                                                        onChange= {(e)=> 
+                                                            setFieldValue('gstn_no', e.target.value.toUpperCase())
+                                                            }                                                                                             
+                                                    />
+                                                        {errors.gstn_no && touched.gstn_no ? (
+                                                    <span className="errorMsg">{errors.gstn_no}</span>
+                                                    ) : null} 
+                                                    </div>
+                                                </FormGroup>
+                                            </Col> 
                                         </Row>
 
                                         <Row>

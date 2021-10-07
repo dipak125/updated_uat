@@ -35,7 +35,8 @@ const initialValues = {
     whatsapp_const_decl: "0",
     auto_renewal: "0",
     language_id: "",
-    ksb_phyformat: "1"
+    ksb_phyformat: "1",
+    age: ""
 }
 
 const validateNominee = Yup.object().shape({
@@ -83,37 +84,25 @@ const validateNominee = Yup.object().shape({
             return true;
         }
     ),
+    // age: Yup.mixed().required( function() {
+    //     return "Please enter Age"
+    //     }).test(
+    //         "3monthsChecking",
+    //         function() {
+    //             return "Age should be minium 3 months"
+    //         },
+    //         function (value) {
+    //             if (value) {
+    //                 return value < 111 && value >=3;
+    //             }
+    //             return true;
+    //         }
+    // ),
+
     relation_with: Yup.string().required(function() {
         return "Please select relation"
     }),
-    // appointee_dob:Yup.date().notRequired("Please enter DOB").max(maxDob, function() {
-    //     return "Date should not be future date"
-    //     }).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Appointee age should be more than 18 years"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (value) {
-    //                 const age_Obj = new PersonAge();
-    //                 return age_Obj.whatIsMyAge(value) >= 18;
-    //             }
-    //             return true;
-    //         }
-    //     ).test(
-    //         "18YearsChecking",
-    //         function() {
-    //             return "Please enter Appointee date of birth"
-    //         },
-    //         function (value) {
-    //             const ageObj = new PersonAge();
-    //             if (ageObj.whatIsMyAge(this.parent.dob) < 18) {   
-    //                 return ageObj.whatIsMyAge(value) >= 18;    
-    //             }
-    //             return true;
-    //         }
-    //     ),
+  
     appointee_name:Yup.string(function() {
             return "Please enter appointee name"
         }).notRequired(function() {
@@ -204,14 +193,17 @@ class NomineeDetails extends Component {
     }
 
     handleSubmit = (values, actions) => {
+        console.log("values====",values)
         const {productId} = this.props.match.params
         const formData = new FormData(); 
         let formArr = []
-
+        console.log("values====",values)
         for (const key in values) {
+           
             if (values.hasOwnProperty(key)) {
               if(key == "dob" ){
                 formArr[key] = moment(values[key]).format("YYYY-MM-DD")
+                console.log("values===1",moment(values[key]).format("YYYY-MM-DD"))
               }
               else {
                 formArr[key] = values[key]
@@ -241,6 +233,7 @@ class NomineeDetails extends Component {
             console.log("decrypt - Resp---- ", res.data)
             this.props.loadingStop();
             this.props.history.push(`/PolicyDetails_KSB/${productId}`);
+            
         })
         .catch(err => {
             console.log("decrypt - Err---- ", err.data)
@@ -318,6 +311,7 @@ class NomineeDetails extends Component {
             last_name: NomineeDetails ? NomineeDetails.last_name : "",
             gender: NomineeDetails ? NomineeDetails.gender : "",
             dob: NomineeDetails && NomineeDetails.dob ? new Date(NomineeDetails.dob) : "",
+            age: NomineeDetails && NomineeDetails.dob ? Math.floor(moment().diff(NomineeDetails.dob, 'years', true) ) : "",
             relation_with: NomineeDetails ? NomineeDetails.relation_with : "",
             // appointee_dob: NomineeDetails && NomineeDetails.appointee_dob ? new Date(NomineeDetails.appointee_dob) : "",
             appointee_relation_with: NomineeDetails && NomineeDetails.appointee_relation_with ? NomineeDetails.appointee_relation_with : "",
@@ -340,12 +334,11 @@ class NomineeDetails extends Component {
                         <div className="row">
 						
                             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                            <SideNav />
+                            </div>
+                            </aside>
+                                                        
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox healthnominee2">
                                 <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
                                 <section className="brand">
@@ -432,29 +425,49 @@ class NomineeDetails extends Component {
 
                                                 <Row className="m-b-45">
                                                     <Col sm={12} md={4} lg={4}>
-                                                        <FormGroup>
-                                                            <DatePicker
-                                                                name="dob"
-                                                                dateFormat="dd MMM yyyy"
-                                                                placeholderText="DOB"
-                                                                peekPreviousMonth
-                                                                peekPreviousYear
-                                                                showMonthDropdown
-                                                                showYearDropdown
-                                                                dropdownMode="select"
-                                                                maxDate={new Date(maxDobNominee)}
-                                                                minDate={new Date(minDobNominee)}
-                                                                className="datePckr"
-                                                                onChange={(value) => {
-                                                                    setFieldTouched("dob");
-                                                                    setFieldValue("dob", value);
-                                                                    this.ageCheck(value)
-                                                                    }}
-                                                                selected={values.dob}
+                                                        <FormGroup className="m-b-25">
+                                                        <div className="insurerName">
+                                                            {/* <Field
+                                                                name='age'
+                                                                type="number"
+                                                                placeholder='Age'
+                                                                autoComplete="off"
+                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                value = {values.age}
+                                                                maxLength="10"            
+                                                                onChange = {(e) => {
+                                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                                    setFieldValue('dob',dob)
+                                                                    setFieldValue('age',e.target.value)
+                                                                }}                                                                                                 
                                                             />
-                                                            {errors.dob && touched.dob ? (
-                                                                <span className="errorMsg">{errors.dob}</span>
-                                                            ) : null}
+                                                            {errors.age && touched.age ? (
+                                                                <span className="errorMsg">{errors.age}</span>
+                                                            ) : null}*/}  
+
+                                                                 <DatePicker
+                                                                    name= "dob"
+                                                                    dateFormat="dd MMM yyyy"
+                                                                    placeholderText="Date of birth"
+                                                                    peekPreviousMonth
+                                                                    peekPreviousYear
+                                                                    showMonthDropdown
+                                                                    showYearDropdown
+                                                                    dropdownMode="select"
+                                                                    // maxDate={new Date(maxDobAdult)}
+                                                                    // minDate={new Date(minDobAdult)}
+                                                                    className="datePckr"
+                                                                    selected={values.dob}
+                                                                    onChange={(val) => {                                        
+                                                                        setFieldTouched("dob");
+                                                                        setFieldValue("dob", val);
+                                                                    }}
+                                                                />
+                                                                {errors.dob ? (
+                                                                    <span className="errorMsg">{errors.dob}</span>
+                                                                ) : null}
+                                                        </div> 
                                                         </FormGroup>
                                                     </Col>
 

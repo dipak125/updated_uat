@@ -20,6 +20,7 @@ import {
     compareStartEndYear
   } from "../../shared/validationFunctions";
 import {  validRegistrationNumber } from "../../shared/validationFunctions";
+import {  userTypes } from "../../shared/staticValues";
 
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -166,7 +167,7 @@ const ComprehensiveValidation = Yup.object().shape({
         .min(5, function() {
             return "ChasisMin"
         })
-        .max(20, function() {
+        .max(25, function() {
             return "ChasisMax"
         }),
 
@@ -569,11 +570,12 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                 }
                 else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.data.messages) {
+                    for (const x in res.data.messages) {
                         validationErrors.push(res.data.messages[x].message)
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
+                        error: {"message": 0},
                         validation_error: validationErrors,
                         serverResponse: []
                     });
@@ -613,6 +615,10 @@ class TwoWheelerOtherComprehensiveOD extends Component {
 
         const formData = new FormData();
         let encryption = new Encryption();
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
         let post_data = {}
 
         post_data = {
@@ -635,35 +641,39 @@ class TwoWheelerOtherComprehensiveOD extends Component {
 
         console.log('post_data', post_data)
 
-        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        
         if (user_data && total_idv) {
-            user_data = JSON.parse(encryption.decrypt(user_data.user));
-
-            if((total_idv> 500000) && user_data.user_type == "POSP"  ) {
-                swal("Quote cannot proceed with IDV greater than 500000")
-                this.props.loadingStop();
+            if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
+                swal("This cover is mandated by IRDAI, it is compulsory for Owner-Driver to possess a PA cover of minimum Rs 15 Lacs, except in certain conditions. By not choosing this cover, you confirm that you hold an existing PA cover or you do not possess a valid driving license.")
                 return false
             }
-        }
-        else return false;
-
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        this.props.loadingStart();
-        axios.post('two-wh-stal/insured-value', formData).then(res => {
-            this.props.loadingStop();
-            let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp---', decryptResp)
-            if (decryptResp.error == false) {
-                this.props.history.push(`/two_wheeler_additional_detailsOD/${productId}`);
+            else {
+                if ((total_idv > 5000000) && user_data.user_type == "POSP") {
+                    swal("Quote cannot proceed with IDV greater than 5000000")
+                    this.props.loadingStop();
+                    return false
+                }
+                else {
+                    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                    this.props.loadingStart();
+                    axios.post('two-wh-stal/insured-value', formData).then(res => {
+                        this.props.loadingStop();
+                        let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                        console.log('decryptResp---', decryptResp)
+                        if (decryptResp.error == false) {
+                            this.props.history.push(`/two_wheeler_additional_detailsOD/${productId}`);
+                        }
+            
+                    })
+                    .catch(err => {
+                        // handle error
+                        this.props.loadingStop();
+                        let decryptResp = JSON.parse(encryption.decrypt(err.data));
+                        console.log('decrypterr---', decryptResp)
+                    })
+                }
             }
-
-        })
-            .catch(err => {
-                // handle error
-                this.props.loadingStop();
-                let decryptResp = JSON.parse(encryption.decrypt(err.data));
-            console.log('decrypterr---', decryptResp)
-            })
+        }    
     }
 
     onRowSelect = (value, isSelect, setFieldTouched, setFieldValue,values) => {
@@ -856,6 +866,10 @@ class TwoWheelerOtherComprehensiveOD extends Component {
             step_completed, vehicleDetails, selectFlag, sliderVal, moreCoverage, ncbDiscount, add_more_coverage_request_array} = this.state
         const { productId } = this.props.match.params
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        if (user_data.user) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+        }
         let newInnitialArray = {}
         // let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
@@ -1186,7 +1200,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                 value= {values.chasis_no.toUpperCase()}
-                                                                                maxLength="20"
+                                                                                maxLength="25"
                                                                                 onChange = {(e) => {
                                                                                     setFieldTouched('chasis_no')
                                                                                     setFieldValue('chasis_no', e.target.value)                       
@@ -1270,10 +1284,11 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                             name={coverage.code}
                                                                             value={coverage.code}
                                                                             className="user-self"
-                                                                            // checked={values.roadsideAssistance ? true : false}
+                                                                            disabled={(userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
-                                                                                    swal(phrases.SwalIRDAI)
+                                                                                    swal(phrases.SwalIRDAI,
+                                                                                        {button: phrases.OK})
                                                                                 }
                                                                                 this.onRowSelect(e.target.value, e.target.checked, setFieldTouched, setFieldValue,values)         
                                                                             }

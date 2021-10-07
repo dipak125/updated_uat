@@ -277,6 +277,19 @@ class TwoWheelerOtherComprehensive extends Component {
                     });
                 }
                 else {
+
+                    if(res.data.code == 'validation failed' && res.data.messages)
+                    {
+                        var error_messages = res.data.messages;
+                        for(var x in error_messages)
+                        {
+                            if(error_messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
+                            {
+                                swal(error_messages[x].message);
+                            }
+                        }
+                    }
+                    
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         error: res.data,
@@ -503,7 +516,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let covList = motorInsurance && motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage.split(",") : ""
         let newInnitialArray = {}
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
-        let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : '0'
+        let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let Geographical_flag = add_more_coverage && add_more_coverage[add_more_coverage.indexOf("geographical_extension")] ? '1' : '0'
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -557,7 +570,7 @@ class TwoWheelerOtherComprehensive extends Component {
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
                     <div>
-                        <Row>
+                        <Row key = {bIndex+'b'}>
                             <Col sm={12} md={6}>
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
@@ -568,7 +581,7 @@ class TwoWheelerOtherComprehensive extends Component {
                     </div>     
             )) :
             <div>
-                <Row>
+                <Row key = {qIndex+'a'}>
                     <Col sm={12} md={6}>
                     <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
                     </Col>
@@ -582,7 +595,7 @@ class TwoWheelerOtherComprehensive extends Component {
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-                        <tr>
+                        <tr key = {bIndex}>
                             <td>{Coverage[benefit.ProductElementCode]}:</td>
                             <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
                         </tr>  
@@ -617,12 +630,7 @@ class TwoWheelerOtherComprehensive extends Component {
 						 <SideNav />
 						</div>
 						</aside>
-								
-								 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-									<SideNav />
-             					 </div>*/}
-                           							
-							
+				
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox fwhTp">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 { step_completed >= '2' && vehicleDetails.vehicletype_id == '6' ?
@@ -638,7 +646,8 @@ class TwoWheelerOtherComprehensive extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+{console.log("values ---------------- ", values)}
+{console.log("errors ---------------- ", errors)}
                                             return (
                                                 <Form>
                                                     <Row>
@@ -708,7 +717,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                                     <option value="100000">100000</option>  
                                                                         
                                                                                 </Field>
-                                                                                {errors.PA_Cover ? (
+                                                                                {errors.PA_Cover && touched.PA_Cover? (
                                                                                     <span className="errorMsg">{phrases[errors.PA_Cover]}</span>
                                                                                 ) : null}
                                                                             </div>
@@ -735,7 +744,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             <span className="checkmark mL-0"></span>
                                                                             <span className="error-message"></span>
                                                                         </label> : null))}
-                                                                        {errors.geographical_extension_length ? (
+                                                                        {errors.geographical_extension_length  && touched.geographical_extension_length ? (
                                                                                 <span className="errorMsg">{errors.geographical_extension_length}</span>
                                                                         ) : null} 
                                                                     </Col>
