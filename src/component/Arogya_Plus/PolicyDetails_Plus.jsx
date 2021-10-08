@@ -293,10 +293,10 @@ class PolicyDetails_Plus extends Component {
 
                   <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>Age:</FormGroup>
+                      <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{ member && member.DateOfBirth ? Math.floor(moment().diff(member.DateOfBirth, 'years', true) ) : null}</FormGroup>
+                      <FormGroup>{member.DateOfBirth ? moment(member.DateOfBirth).format("DD-MM-YYYY") : null}</FormGroup>
                     </Col>
                   </Row>
 
@@ -345,10 +345,10 @@ class PolicyDetails_Plus extends Component {
 
             <Row>
               <Col sm={12} md={6}>
-                        <FormGroup>Age:</FormGroup>
+                <FormGroup>Date Of Birth:</FormGroup>
               </Col>
               <Col sm={12} md={6}>
-                    <FormGroup>{ nomineeDetails && nomineeDetails.dob ? Math.floor(moment().diff(nomineeDetails.dob, 'years', true) ) : null}</FormGroup>
+                <FormGroup>{nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
               </Col>
             </Row>
 

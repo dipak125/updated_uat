@@ -586,7 +586,6 @@ class Address extends Component {
 				fname: resource.first_name ? resource.first_name:'',
 				lname: resource.last_name ? resource.last_name:'',
 				dob: resource.dob,
-                age: resource.dob ? Math.floor(moment().diff(resource.dob, 'years', true) ) : "",
                 gender: resource.gender ?  resource.gender:'',
                 looking_for: resource.relation_with,
                 family_member_id: resource.id,
@@ -854,7 +853,7 @@ class Address extends Component {
                                                 render={arrayHelpers => (
                                                     <div>
                                             {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
-                                                    <div className="d-flex justify-content-left prsnlinfo" key = {index}>
+                                                    <div className="d-flex justify-content-left prsnlinfo">
                                                         <div className="W12">
                                                             {resource.relation_with}
                                                             <Field
@@ -905,26 +904,33 @@ class Address extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
-
-                                                        <Col sm={12} md={6} lg={2}>
-                                                            <FormGroup >
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name={`family_members.${index}.age`}
-                                                                    type="number"
-                                                                    placeholder={phrases['Age']}
-                                                                    autoComplete="off"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value = {values.age}
-                                                                    maxLength="10"     
-                                                                    disabled = {true}             
-                                                                    value = {values.family_members[index].age }                                                                                                              
+                                                        <Col sm={12} md={6} lg={3}>
+                                                            <FormGroup>
+                                                                <DatePicker
+                                                                    name={`family_members.${index}.dob`}
+                                                                    dateFormat="dd MMM yyyy"
+                                                                    placeholderText="DOB"
+                                                                    peekPreviousMonth
+                                                                    peekPreviousYear
+                                                                    showMonthDropdown
+                                                                    showYearDropdown
+                                                                    dropdownMode="select"
+                                                                    maxDate={new Date(maxDobAdult)}
+                                                                    minDate={new Date(minDobAdult)}
+                                                                    className="datePckr"
+                                                                    disabled = {true}
+                                                                    selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}
+                                                                    onChange={(val) => {
+                                                                        setFieldTouched(`family_members.${index}.dob`);
+                                                                        setFieldValue(`family_members.${index}.dob`, val);
+                                                                      }}
+                                                                      
+                                                                    //selected={moment(values.family_members[index].dob).format("dd MMM yyyy")}
+                                                                    
                                                                 />
                                                                 {errors.family_members && errors.family_members[index] && errors.family_members[index].dob ? (
                                                                     <span className="errorMsg">{errors.family_members[index].dob}</span>
                                                                 ) : null}  
-                                                            </div>
                                                             </FormGroup>
                                                         </Col>
                                                         <Col sm={12} md={6} lg={3}>

@@ -29,7 +29,6 @@ const initialFamilyDetails = {
 	fname: "",
 	lname: "",
 	dob: new Date(),
-    age: "",
     gender: "",	
     family_member_id:0,
     looking_for:''
@@ -618,7 +617,6 @@ console.log(formArr);
 				fname: resource.first_name ? resource.first_name:'',
 				lname: resource.last_name ? resource.last_name:'',
 				dob: resource.dob,
-                age: resource.dob ? Math.floor(moment().diff(resource.dob, 'years', true) ) : "",
                 gender: resource.gender ?  resource.gender:'',
                 looking_for: resource.relation_with,
                 family_member_id: resource.id,
@@ -719,13 +717,16 @@ console.log(formArr);
 				 <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
-											
+						
+						
                             <aside className="left-sidebar">
-                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-                            <SideNav />
-                            </div>
-                            </aside>
-
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+							
+							
+							
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox healthAddress">
                                 <h4 className="text-center mt-3 mb-3">KSB Retail Policy</h4>
                                 <section className="brand">
@@ -735,7 +736,7 @@ console.log(formArr);
                                     validationSchema={validateAddress}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => { 
-                                //  console.log("values.family_members ----------- ", values.family_members)
+                                        console.log("errors--------------- ", errors)                                   
                                     return (                  
                                     <Form>
                                         <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-15">
@@ -902,7 +903,7 @@ console.log(formArr);
                                                 render={arrayHelpers => (
                                                     <div>
                                             {familyMembers && familyMembers.length>0 && familyMembers.map((resource,index)=> 
-                                                    <div className="d-flex justify-content-left prsnlinfo" key = {index}>
+                                                    <div className="d-flex justify-content-left prsnlinfo">
                                                         <div className="W12">
                                                             {resource.relation_with}
                                                             <Field
@@ -953,26 +954,33 @@ console.log(formArr);
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
-
-                                                        <Col sm={12} md={6} lg={2}>
-                                                            <FormGroup >
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                    name={`family_members.${index}.age`}
-                                                                    type="number"
-                                                                    placeholder={phrases['Age']}
-                                                                    autoComplete="off"
-                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                    value = {values.age}
-                                                                    maxLength="10"     
-                                                                    disabled = {true}             
-                                                                    value = {values.family_members[index].age }                                                                                                              
+                                                        <Col sm={12} md={6} lg={3}>
+                                                            <FormGroup>
+                                                                <DatePicker
+                                                                    name={`family_members.${index}.dob`}
+                                                                    dateFormat="dd MMM yyyy"
+                                                                    placeholderText="DOB"
+                                                                    peekPreviousMonth
+                                                                    peekPreviousYear
+                                                                    showMonthDropdown
+                                                                    showYearDropdown
+                                                                    dropdownMode="select"
+                                                                    maxDate={new Date(maxDobAdult)}
+                                                                    minDate={new Date(minDobAdult)}
+                                                                    className="datePckr"
+                                                                    disabled = {true}
+                                                                    selected={values.family_members[index].dob ? new Date(values.family_members[index].dob):new Date()}
+                                                                    onChange={(val) => {
+                                                                        setFieldTouched(`family_members.${index}.dob`);
+                                                                        setFieldValue(`family_members.${index}.dob`, val);
+                                                                      }}
+                                                                      
+                                                                    //selected={moment(values.family_members[index].dob).format("dd MMM yyyy")}
+                                                                    
                                                                 />
-                                                                {errors.age && touched.age ? (
-                                                                    <span className="errorMsg">{phrases[errors.age]}</span>
+                                                                {errors.family_members && errors.family_members[index] && errors.family_members[index].dob ? (
+                                                                    <span className="errorMsg">{errors.family_members[index].dob}</span>
                                                                 ) : null}  
-                                                            </div>
                                                             </FormGroup>
                                                         </Col>
                                                         <Col sm={12} md={6} lg={3}>
@@ -995,6 +1003,13 @@ console.log(formArr);
                                                                 </div>
                                                             </FormGroup>
                                                         </Col>
+                                                        {/* <Col sm={12} md={3} lg={1}>
+                                                            <FormGroup>
+                                                                <div className="insurerName">
+                                                                {ksbinfo && ksbinfo.primary_insured == resource.relation_with ? 'PI' : 'No' }
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col> */}
                                                         </Row>   
                                                     </div>
                                                     )}                                                

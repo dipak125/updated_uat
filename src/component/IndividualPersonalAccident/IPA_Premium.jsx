@@ -294,12 +294,10 @@ class IPA_Premium extends Component {
 
                   <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>Age:</FormGroup>
+                      <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      {/* <FormGroup>{moment(member.DateOfBirth).format("DD-MM-YYYY")}</FormGroup> */}
-                      <FormGroup>{ member && member.DateOfBirth ? Math.floor(moment().diff(member.DateOfBirth, 'years', true) ) : null}</FormGroup>
-                      
+                      <FormGroup>{moment(member.DateOfBirth).format("DD-MM-YYYY")}</FormGroup>
                     </Col>
                   </Row>
 
@@ -336,11 +334,10 @@ class IPA_Premium extends Component {
   
                   <Row>
                       <Col sm={12} md={6}>
-                          <FormGroup>Age:</FormGroup>
+                          <FormGroup>Date Of Birth:</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
-                          {/* <FormGroup>{ nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup> */}
-                          <FormGroup>{ nomineeDetails && nomineeDetails.dob ? Math.floor(moment().diff(nomineeDetails.dob, 'years', true) ) : null}</FormGroup>
+                          <FormGroup>{ nomineeDetails ? moment(nomineeDetails.dob).format("DD-MM-YYYY") : null}</FormGroup>
                       </Col>
                   </Row>
   

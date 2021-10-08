@@ -287,10 +287,10 @@ sendPaymentLink = () => {
 
                   <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>Age:</FormGroup>
+                      <FormGroup>Date Of Birth:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{ member && member.dob ? Math.floor(moment().diff(member.dob, 'years', true) ) : null}</FormGroup>
+                      <FormGroup>{moment(member.dob).format("DD-MM-yyyy")}</FormGroup>
                     </Col>
                   </Row>
 
@@ -364,10 +364,10 @@ sendPaymentLink = () => {
 
               <Row>
                 <Col sm={12} md={6}>
-                	<FormGroup>Age:</FormGroup>
+                  <FormGroup>Date Of Birth:</FormGroup>
                 </Col>
                 <Col sm={12} md={6}>
-                    <FormGroup>{ member && member.dob ? Math.floor(moment().diff(member.dob, 'years', true) ) : null}</FormGroup>
+                  <FormGroup>{moment(member.dob).format('DD-MM-yyy')}</FormGroup>
                 </Col>
               </Row>
 

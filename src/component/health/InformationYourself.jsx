@@ -135,242 +135,231 @@ const validateFamilyMembers = Yup.object().shape({
 
     dob_0: Yup.string().when(['looking_for_0'], {
         is: looking_for_0 => looking_for_0 == 'self',
-        then: Yup.string().required('Self Age is required')
-      .test(
-          "18YearsChecking",
-          function() {
-            return "Age should be minimum 18 and maximum 55 years"
-        },
-        function (value) {
-            if (value) {
-                
-               let age=new Date().getFullYear()-new Date(value).getFullYear();
-              console.log("checking===",age)
-              return age < 55 && age >= 18 ;
-            }
-            return true;
-        }
-    ).nullable(),
+        then: Yup.string().required('Self DOB field is required')
+            .test(
+                "18YearsChecking",
+                function () {
+                    return "Age should be minimum 18 and maximum 45 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+                }
+            ).nullable(),
         othewise: Yup.string()
     }),
     dob_1: Yup.string().when(['looking_for_1'], {
         is: looking_for_1 => looking_for_1 == 'spouse',
-        then: Yup.string().required('Spouse Age is required')
-      .test(
-          "18YearsChecking",
-          function() {
-            return "Age should be minimum 18 and maximum 55 years"
-        },
-        function (value) {
-            if (value) {
-                let age=new Date().getFullYear()-new Date(value).getFullYear();
-                return age < 66 && age >= 18 ;
-            }
-            return true;
-        }
-    ).nullable(),
+        then: Yup.string().required('Spouse DOB field is required')
+            .test(
+                "18YearsChecking",
+                function () {
+                    return "Age should be minimum 18 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+                }
+            ),
         othewise: Yup.string()
     }),
-
-    
     dob_2: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
-        then: Yup.string().required('Child 1 Age is required').test(
+        then: Yup.string().required('Child 1 DOB field is required').test(
             "3monthsChecking",
-            function() {
-                return "child age minimum 3 months and maximum 25 years"
+            function () {
+                return "Age should be minimum 3 months and maximum 25 years"
             },
             function (value) {
-                let year=new Date().getFullYear()-new Date(value).getFullYear();
-                let month=new Date().getMonth()-new Date(value).getMonth();
-                if (year>25) {
-                    return false ;
-                }
-                if(year<1 && month<3)
-                {
-                    return false
+                if (value) {
+                    const ageObj = new PersonAge();
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
         ).test(
             "1yearAgeDiffChecking",
-            function() {
+            function () {
                 return "Self and child age difference should be 1 year"
             },
             function (value) {
-                console.log("parent",this.parent)
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = self_age- chlild_age  ;
-                   console.log("parent",ageDiff)
-                    if (ageDiff >= 1 ) {   
-                        return true;    
-                    }
-                    else{
+                if (typeof this.parent.dob_0 != 'undefined') {
+                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_0, 'years', true)));
+                    if (ageDiff <= 0) {
                         return false;
-                    }                    
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else{
+                else {
                     return true;
                 }
             }
         ).test(
             "1yearAgeDiffChecking",
-            function() {
+            function () {
                 return "Spouse and child age difference should be 1 year"
             },
             function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = self_age- chlild_age  ;
-                    if (ageDiff >= 1 ) {   
-                        return true;    
-                    }
-                    else{
+                if (typeof this.parent.dob_1 != 'undefined') {
+                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 0) {
                         return false;
-                    }                
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else{
+                else {
                     return true;
-                }   
+                }
             }
-        )
-        .test(
-            "1yearAgeDiffChecking",
-            function() {
+        ).test(
+            "greaterAgeDiffChecking",
+            function () {
                 return "Child age should be less than self"
             },
-            function (value) {              
-                let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                var ageDiff = self_age- chlild_age  ;
-                console.log("parent1",ageDiff)
-                if (ageDiff > 0 ){ 
-                    return true;    
+            function (value) {
+                if (typeof this.parent.dob_0 != 'undefined') {
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else return false;
+                else {
+                    return true;
+                }
             }
         )
-        .test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Child age should be less than spouse"
-            },
-            function (value) {              
-                let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                var ageDiff = self_age- chlild_age  ;
-                if (ageDiff > 0 ){ 
-                    return true;    
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Child age should be less than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff < 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else return false;
-            }
-        ), 
+            ),
+
         othewise: Yup.string()
     }),
     child1Gender: Yup.string().when(['looking_for_2'], {
         is: looking_for_2 => looking_for_2 == 'child1',
         then: Yup.string().required('Child 1 Gender field is required'),
-        otherwise: Yup.string()
+        othewise: Yup.string()
     }).nullable(),
 
     dob_3: Yup.string().when(['looking_for_3'], {
         is: looking_for_3 => looking_for_3 == 'child2',
-        then: Yup.string().required('Child 2 Age is required').test(
+        then: Yup.string().required('Child 2 DOB field is required').test(
             "3monthsChecking",
-            function() {
-                return "child age minimum 3 months and maximum 25 years"
+            function () {
+                return "Age should be minimum 3 months and maximum 25 years"
             },
             function (value) {
-                let year=new Date().getFullYear()-new Date(value).getFullYear();
-                let month=new Date().getMonth()-new Date(value).getMonth();
-                if (year>25) {
-                    return false ;
-                }
-                if(year<1 && month<3)
-                {
-                    return false
+                if (value) {
+                    const ageObj = new PersonAge();
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
         ).test(
             "1yearAgeDiffChecking",
-            function() {
+            function () {
                 return "Self and child age difference should be 1 year"
             },
             function (value) {
-                console.log("parent",this.parent)
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = self_age- chlild_age  ;
-                   console.log("parent",ageDiff)
-                    if (ageDiff >= 1 ) {   
-                        return true;    
-                    }
-                    else{
+                if (typeof this.parent.dob_0 != 'undefined') {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
                         return false;
-                    }                    
-                }
-                else{
+                    }
                     return true;
+                }
+                else {
+                    return true
                 }
             }
         ).test(
             "1yearAgeDiffChecking",
-            function() {
+            function () {
                 return "Spouse and child age difference should be 1 year"
             },
             function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = self_age- chlild_age  ;
-                    if (ageDiff >= 1 ) {   
-                        return true;    
-                    }
-                    else{
+                if (typeof this.parent.dob_1 != 'undefined') {
+                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 0) {
                         return false;
-                    }                
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else{
+                else {
                     return true;
-                }   
+                }
             }
-        )
-        .test(
-            "1yearAgeDiffChecking",
-            function() {
+        ).test(
+            "greaterAgeDiffChecking",
+            function () {
                 return "Child age should be less than self"
             },
-            function (value) {              
-                let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                var ageDiff = self_age- chlild_age  ;
-                console.log("parent1",ageDiff)
-                if (ageDiff > 0 ){ 
-                    return true;    
+            function (value) {
+                if (typeof this.parent.dob_0 != 'undefined') {
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else return false;
+                else {
+                    return true;
+                }
             }
         )
-        .test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Child age should be less than spouse"
-            },
-            function (value) {              
-                let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                var ageDiff = self_age- chlild_age  ;
-                if (ageDiff > 0 ){ 
-                    return true;    
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Child age should be less than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff < 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else return false;
-            }
-        ), 
+            ),
         othewise: Yup.string()
     }),
     child2Gender: Yup.string().when(['looking_for_3'], {
@@ -381,99 +370,94 @@ const validateFamilyMembers = Yup.object().shape({
 
     dob_4: Yup.string().when(['looking_for_4'], {
         is: looking_for_4 => looking_for_4 == 'child3',
-        then: Yup.string().required('Child 3 Age is required').test(
+        then: Yup.string().required('Child 3 DOB field is required').test(
             "3monthsChecking",
-            function() {
-                return "child age minimum 3 months and maximum 25 years"
+            function () {
+                return "Age should be minimum 3 months and maximum 25 years"
             },
             function (value) {
-                let year=new Date().getFullYear()-new Date(value).getFullYear();
-                let month=new Date().getMonth()-new Date(value).getMonth();
-                if (year>25) {
-                    return false ;
-                }
-                if(year<1 && month<3)
-                {
-                    return false
+                if (value) {
+                    const ageObj = new PersonAge();
+                    return ageObj.whatIsMyAge(value) < 26 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
         ).test(
             "1yearAgeDiffChecking",
-            function() {
+            function () {
                 return "Self and child age difference should be 1 year"
             },
             function (value) {
-                console.log("parent",this.parent)
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = self_age- chlild_age  ;
-                   console.log("parent",ageDiff)
-                    if (ageDiff >= 1 ) {   
-                        return true;    
-                    }
-                    else{
+                if (typeof this.parent.dob_0 != 'undefined') {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
                         return false;
-                    }                    
-                }
-                else{
+                    }
                     return true;
+                }
+                else {
+                    return true
                 }
             }
         ).test(
             "1yearAgeDiffChecking",
-            function() {
+            function () {
                 return "Spouse and child age difference should be 1 year"
             },
             function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = self_age- chlild_age  ;
-                    if (ageDiff >= 1 ) {   
-                        return true;    
-                    }
-                    else{
+                if (typeof this.parent.dob_1 != 'undefined') {
+                    var ageDiff = Math.floor(Math.abs(moment(value).diff(this.parent.dob_1, 'years', true)));
+                    if (ageDiff <= 0) {
                         return false;
-                    }                
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else{
+                else {
                     return true;
-                }   
+                }
             }
-        )
-        .test(
-            "1yearAgeDiffChecking",
-            function() {
+        ).test(
+            "greaterAgeDiffChecking",
+            function () {
                 return "Child age should be less than self"
             },
-            function (value) {              
-                let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                var ageDiff = self_age- chlild_age  ;
-                console.log("parent1",ageDiff)
-                if (ageDiff > 0 ){ 
-                    return true;    
+            function (value) {
+                if (typeof this.parent.dob_0 != 'undefined') {
+                    var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                    if (ageDiff < 0) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else return false;
+                else {
+                    return true;
+                }
             }
         )
-        .test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Child age should be less than spouse"
-            },
-            function (value) {              
-                let chlild_age=new Date().getFullYear()-new Date(value).getFullYear();
-                let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                var ageDiff = self_age- chlild_age  ;
-                if (ageDiff > 0 ){ 
-                    return true;    
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Child age should be less than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff < 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
                 }
-                else return false;
-            }
-        ), 
+            ),
         othewise: Yup.string()
     }),
     child3Gender: Yup.string().when(['looking_for_4'], {
@@ -485,414 +469,339 @@ const validateFamilyMembers = Yup.object().shape({
     dob_5: Yup.string().when(['looking_for_5'], {
         is: looking_for_5 => looking_for_5 == 'father',
         then: Yup.string().required('Father DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age should be minimum 18 years & max 55 years"
-            },
-            function (value) {
-                if (value) {
-                    let age=new Date().getFullYear()-new Date(value).getFullYear();
-                    if(age>=18 && age<=55)
-                    {
+            .test(
+                "18YearsChecking",
+                function () {
+                    return "Age should be minimum 18 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Self and father age difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Spouse and father difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Father age should be greater than self"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_0 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
                         return true;
                     }
-                    else return false
                 }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and father age difference should be 1 year"
-            },
-            function (value) {              
-                if(this.parent.dob_0)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and father difference should be 1 year"
-            },
-            function (value) { 
-                if(this.parent.dob1)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                     let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                    return true;
-            }
-        ).test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Father age should be greater than self"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+            )
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Father age should be greater than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
                     }
-                    else return false;      
-                }
-                else{
-                    return true;
-                }
-            }
-        )
-        .test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Father age should be greater than spouse"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+                    else {
+                        return true;
                     }
-                    else return false;       
                 }
-                else{
-                    return true;
-                }
-            }
-        ),
+            ),
         othewise: Yup.string()
     }),
 
     dob_6: Yup.string().when(['looking_for_6'], {
         is: looking_for_6 => looking_for_6 == 'mother',
         then: Yup.string().required('Mother DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age should be minimum 18 years & max 55 years"
-            },
-            function (value) {
-                if (value) {
-                    let age=new Date().getFullYear()-new Date(value).getFullYear();
-                    if(age>=18 && age<=55)
-                    {
+            .test(
+                "18YearsChecking",
+                function () {
+                    return "Age should be minimum 18 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Self and mother age difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Spouse and mother difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Mother age should be greater than self"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_0 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
                         return true;
                     }
-                    else return false
                 }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and mother age difference should be 1 year"
-            },
-            function (value) {              
-                if(this.parent.dob_0)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and mother difference should be 1 year"
-            },
-            function (value) { 
-                if(this.parent.dob1)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                     let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                    return true;
-            }
-        ).test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "mother age should be greater than self"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+            )
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Mother age should be greater than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
                     }
-                    else return false;      
-                }
-                else{
-                    return true;
-                }
-            }
-        )
-        .test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "mother age should be greater than spouse"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+                    else {
+                        return true;
                     }
-                    else return false;       
                 }
-                else{
-                    return true;
-                }
-            }
-        ),
+            ),
         othewise: Yup.string()
     }),
 
     dob_7: Yup.string().when(['looking_for_7'], {
         is: looking_for_7 => looking_for_7 == 'fatherInLaw',
         then: Yup.string().required('Father-In-Law DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age should be minimum 18 years & max 55 years"
-            },
-            function (value) {
-                if (value) {
-                    let age=new Date().getFullYear()-new Date(value).getFullYear();
-                    if(age>=18 && age<=55)
-                    {
+            .test(
+                "18YearsChecking",
+                function () {
+                    return "Age should be minimum 18 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Spouse and father-in-law age difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Self and father-in-law age difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Father-in-law age should be greater than self"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_0 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
                         return true;
                     }
-                    else return false
                 }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and Father-in-law age difference should be 1 year"
-            },
-            function (value) {              
-                if(this.parent.dob_0)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and Father-in-law difference should be 1 year"
-            },
-            function (value) { 
-                if(this.parent.dob1)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                     let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                    return true;
-            }
-        ).test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Father-in-law age should be greater than self"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+            )
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Father-in-law age should be greater than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
                     }
-                    else return false;      
-                }
-                else{
-                    return true;
-                }
-            }
-        )
-        .test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Father-in-law age should be greater than spouse"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+                    else {
+                        return true;
                     }
-                    else return false;       
                 }
-                else{
-                    return true;
-                }
-            }
-        ),
+            ),
         othewise: Yup.string()
     }),
-
     dob_8: Yup.string().when(['looking_for_8'], {
         is: looking_for_8 => looking_for_8 == 'motherInLaw',
         then: Yup.string().required('Mother-In-Law DOB field is required')
-        .test(
-            "18YearsChecking",
-            function() {
-                return "Age should be minimum 18 years & max 55 years"
-            },
-            function (value) {
-                if (value) {
-                    let age=new Date().getFullYear()-new Date(value).getFullYear();
-                    if(age>=18 && age<=55)
-                    {
+            .test(
+                "18YearsChecking",
+                function () {
+                    return "Age should be minimum 18 years"
+                },
+                function (value) {
+                    if (value) {
+                        const ageObj = new PersonAge();
+                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Spouse and mother-in-law age difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_1).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "1yearAgeDiffChecking",
+                function () {
+                    return "Self and mother-in-law age difference should be 1 year"
+                },
+                function (value) {
+                    var ageDiff = Math.floor(Math.abs(moment(this.parent.dob_0).diff(value, 'years', true)));
+                    if (ageDiff <= 0) {
+                        return false;
+                    }
+                    return true;
+                }
+            ).test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Mother-in-law age should be greater than self"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_0 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_0, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    }
+                    else {
                         return true;
                     }
-                    else return false
                 }
-                return true;
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Self and Mother-in-law age difference should be 1 year"
-            },
-            function (value) {              
-                if(this.parent.dob_0)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        ).test(
-            "1yearAgeDiffChecking",
-            function() {
-                return "Spouse and Mother-in-law difference should be 1 year"
-            },
-            function (value) { 
-                if(this.parent.dob1)
-                {
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                     let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                if (ageDiff >= 1 ){ 
-                    return true;    
-                }
-                else return false;
-                }
-                else
-                    return true;
-            }
-        ).test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Mother-in-law age should be greater than self"
-            },
-            function (value) {
-                if(typeof this.parent.dob_0 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_0).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+            )
+            .test(
+                "greaterAgeDiffChecking",
+                function () {
+                    return "Mother-in-law age should be greater than spouse"
+                },
+                function (value) {
+                    if (typeof this.parent.dob_1 != 'undefined') {
+                        var ageDiff = Math.floor(moment(value).diff(this.parent.dob_1, 'years', true));
+                        if (ageDiff > 0) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
                     }
-                    else return false;      
-                }
-                else{
-                    return true;
-                }
-            }
-        )
-        .test(
-            "greaterAgeDiffChecking",
-            function() {
-                return "Mother-in-law age should be greater than spouse"
-            },
-            function (value) {
-                if(typeof this.parent.dob_1 != 'undefined'){
-                    let parent_age=new Date().getFullYear()-new Date(value).getFullYear();
-                    let self_age=new Date().getFullYear()-new Date(this.parent.dob_1).getFullYear();             
-                    var ageDiff = parent_age-self_age  ;
-                    if (ageDiff > 0 ){ 
-                        return true;    
+                    else {
+                        return true;
                     }
-                    else return false;       
                 }
-                else{
-                    return true;
-                }
-            }
-        ),
+            ),
         othewise: Yup.string()
     }),
 
 
 })
 
+function checkSelfData(str) {
+    let error;
+    let looking_for = document.getelementsbyname("looking_for_1").value
+    return 'sssss'
+
+}
 
 const newInitialValues = {}
 
@@ -1341,34 +1250,25 @@ class InformationYourself extends Component {
             gender: gender ? gender : "",
             looking_for_0: display_looking_for_arr[0] ? display_looking_for_arr[0] : "",
             dob_0: display_dob_arr[0] ? new Date(display_dob_arr[0]) : "",
-            age_0: display_dob_arr[0] ? Math.floor(moment().diff(display_dob_arr[0], 'years', true) ) : "",
             looking_for_1: display_looking_for_arr[1] ? display_looking_for_arr[1] : "",
             dob_1: display_dob_arr[1] ? new Date(display_dob_arr[1]) : "",
-            age_1: display_dob_arr[1] ? Math.floor(moment().diff(display_dob_arr[1], 'years', true) ) : "",
             looking_for_2: display_looking_for_arr[2] ? display_looking_for_arr[2] : "",
             dob_2: display_dob_arr[2] ? new Date(display_dob_arr[2]) : "",
-            age_2: display_dob_arr[2] ? Math.floor(moment().diff(display_dob_arr[2], 'years', true) ) : "",
             child1Gender: display_gender_arr ? display_gender_arr[2] : "",
             looking_for_3: display_looking_for_arr[3] ? display_looking_for_arr[3] : "",
             dob_3: display_dob_arr[3] ? new Date(display_dob_arr[3]) : "",
-            age_3: display_dob_arr[3] ? Math.floor(moment().diff(display_dob_arr[3], 'years', true) ) : "",
             child2Gender: display_gender_arr ? display_gender_arr[3] : "",
             looking_for_4: display_looking_for_arr[4] ? display_looking_for_arr[4] : "",
             dob_4: display_dob_arr[4] ? new Date(display_dob_arr[4]) : "",
-            age_4: display_dob_arr[4] ? Math.floor(moment().diff(display_dob_arr[4], 'years', true) ) : "",
             child3Gender: display_gender_arr ? display_gender_arr[4] : "",
             looking_for_5: display_looking_for_arr[5] ? display_looking_for_arr[5] : "",
             dob_5: display_dob_arr[5] ? new Date(display_dob_arr[5]) : "",
-            age_5: display_dob_arr[5] ? Math.floor(moment().diff(display_dob_arr[5], 'years', true) ) : "",
             looking_for_6: display_looking_for_arr[6] ? display_looking_for_arr[6] : "",
             dob_6: display_dob_arr[6] ? new Date(display_dob_arr[6]) : "",
-            age_6: display_dob_arr[6] ? Math.floor(moment().diff(display_dob_arr[6], 'years', true) ) : "",
             looking_for_7: display_looking_for_arr[7] ? display_looking_for_arr[7] : "",
             dob_7: display_dob_arr[7] ? new Date(display_dob_arr[7]) : "",
-            age_7: display_dob_arr[7] ? Math.floor(moment().diff(display_dob_arr[7], 'years', true) ) : "",
             looking_for_8: display_looking_for_arr[8] ? display_looking_for_arr[8] : "",
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
-            age_8: display_dob_arr[8] ? Math.floor(moment().diff(display_dob_arr[8], 'years', true) ) : "",
             insureList: insureListPrev ? insureListPrev.toString() : (insureList ? insureList : ''),
             occupation_id: policyHolder ? policyHolder.occupation_id : "",
             occupation_description: (policyHolder && policyHolder.occupation_description != null) ? policyHolder.occupation_description : ""
@@ -1384,11 +1284,14 @@ class InformationYourself extends Component {
                         <div className="container-fluid">
                             <div className="row">
 
+
                                 <aside className="left-sidebar">
                                     <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                                         <SideNav />
                                     </div>
                                 </aside>
+
+
 
                                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox aragyaSanjibny">
                                     <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
@@ -1429,6 +1332,36 @@ class InformationYourself extends Component {
                                                                     ) : null}
                                                                 </div>
                                                             </div>
+
+                                                            {/* <div className="row formSection">
+                                            <label className="col-md-4">Occupation:</label>
+                                            <div className="col-md-4">
+                                            <Field
+                                                name="occupation_id"
+                                                component="select"
+                                                autoComplete="off"
+                                                className="formGrp"
+                                                onChange={(e) => {
+                                                    setFieldTouched("occupation_id");
+                                                    setFieldValue(
+                                                    "occupation_id",
+                                                    e.target.value
+                                                    );
+                                                    this.handleChange(e);
+                                                }}
+                                                >
+                                                <option value="">Occupation Type</option>
+                                                {occupationList && occupationList.length > 0 && occupationList.map((insurer, qIndex) => (
+                                                    <option key={qIndex} value={insurer.id} > {insurer.occupation} </option>
+                                                ))}
+                                                </Field>
+                                                {errors.occupation_id && touched.occupation_id ? (
+                                                <span className="errorMsg">
+                                                    {errors.occupation_id}
+                                                </span>
+                                                ) : null}
+                                            </div>
+                                        </div> */}
 
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">Occupation:</label>
@@ -1522,7 +1455,13 @@ class InformationYourself extends Component {
                                                             <h4 className="modal-title">Add Family Members to be Insured</h4>
                                                         </div>
                                                         <Modal.Body>
-                                                            
+                                                            {/* <Field type="hidden" className="form-control" className="check_input" name="check_input" value = {validateCheck}
+                                            validate={checkInputdata} 
+                                            /> 
+                                            {
+                                                errors.check_input && touched.check_input ?                 
+                                                <span className="error-message">{errors.check_input}</span>:''
+                                            }*/}
                                                             <div className="row dropinput">
                                                                 <div className="col-md-4">
                                                                     <label className="customCheckBox formGrp formGrp">Self
@@ -1561,69 +1500,45 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_0'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_0}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_0',dob)
-                                                                                setFieldValue('age_0',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup>
+                                                                        <DatePicker
+                                                                            name="dob_0"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobAdult)}
+                                                                            minDate={new Date(minDobAdult)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_0");
+                                                                                setFieldValue("dob_0", value);
+                                                                            }}
+                                                                            selected={values.dob_0}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_0 && touched.age_0 ?                 
-                                                                            <span className="error-message">{errors.age_0}</span>:''
-                                                                        }
-                                                                        {
-                                                                    
-                                                                            errors.looking_for_0 && touched.looking_for_0 ?                 
-                                                                            <span className="error-message">{errors.looking_for_0}</span>:''
-                                                                        }
+                                                                            {
+                                                                                errors.dob_0 && touched.dob_0 ?
+                                                                                    <span className="error-message">{errors.dob_0}</span> : ''
+                                                                            }
+
+                                                                            {
+                                                                                errors.looking_for_0 && touched.looking_for_0 ?
+                                                                                    <span className="error-message">{errors.looking_for_0}</span> : ''
+                                                                            }
                                                                         </label>
-                                                                     */}
 
-                                                                    <DatePicker
-                                                                    name= "dob_0"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_0}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_0");
-                                                                        setFieldValue("dob_0", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_0 && touched.dob_0 ?                 
-                                                                        <span className="error-message">{errors.dob_0}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_0 && touched.looking_for_0 ?                 
-                                                                        <span className="error-message">{errors.looking_for_0}</span>:''
-                                                                    }
-                                                                    </div>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
                                                             </div>
+
 
                                                             <div className="row dropinput">
                                                                 <div className="col-md-4">
@@ -1660,63 +1575,37 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_1'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_1}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_1',dob)
-                                                                                setFieldValue('age_1',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_1"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobAdult)}
+                                                                            minDate={new Date(minDobAdult)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_1");
+                                                                                setFieldValue("dob_1", value);
+                                                                            }}
+                                                                            selected={values.dob_1}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_1 && touched.age_1 ?                 
-                                                                            <span className="error-message">{errors.age_1}</span>:''
-                                                                        }              
-                                                                        </label> */}
-
-                                                                        <DatePicker
-                                                                        name= "dob_1"
-                                                                        dateFormat="dd MMM yyyy"
-                                                                        placeholderText="Date of birth"
-                                                                        peekPreviousMonth
-                                                                        peekPreviousYear
-                                                                        showMonthDropdown
-                                                                        showYearDropdown
-                                                                        dropdownMode="select"
-                                                                        // maxDate={new Date(maxDobAdult)}
-                                                                        // minDate={new Date(minDobAdult)}
-                                                                        className="datePckr"
-                                                                        selected={values.dob_1}
-                                                                        onChange={(val) => {                                        
-                                                                            setFieldTouched("dob_1");
-                                                                            setFieldValue("dob_1", val);
-                                                                        }}
-                                                                    />
-                                                                    
-
-                                                                        {
-                                                                            errors.dob_1 && touched.dob_1 ?                 
-                                                                            <span className="error-message">{errors.dob_1}</span>:''
-                                                                        }
-                                                                        {
-                                                                            errors.looking_for_1 && touched.looking_for_1 ?                 
-                                                                            <span className="error-message">{errors.looking_for_1}</span>:''
-                                                                        }
-                                                                    
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_1 && touched.dob_1 ?
+                                                                                    <span className="error-message">{errors.dob_1}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
                                                             </div>
 
                                                             <div className="row dropinput">
@@ -1754,82 +1643,56 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_2'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_2}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_2',dob)
-                                                                                setFieldValue('age_2',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_2"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobChild)}
+                                                                            minDate={new Date(minDobChild)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_2");
+                                                                                setFieldValue("dob_2", value);
+                                                                            }}
+                                                                            selected={values.dob_2}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_2 && touched.age_2 ?                 
-                                                                            <span className="error-message">{errors.age_2}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
-
-                                                                    <DatePicker
-                                                                    name= "dob_2"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_2}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_2");
-                                                                        setFieldValue("dob_2", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_2 && touched.dob_2 ?                 
-                                                                        <span className="error-message">{errors.dob_2}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_2 && touched.looking_for_2 ?                 
-                                                                        <span className="error-message">{errors.looking_for_2}</span>:''
-                                                                    }
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_2 && touched.dob_2 ?
+                                                                                    <span className="error-message">{errors.dob_2}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
 
                                                                 <div className="col-md-4 formSection">
-                                                                    <Field
-                                                                        name="child1Gender"
-                                                                        component="select"
-                                                                        autoComplete="off"
-                                                                        value={values.child1Gender}
-                                                                        className="formGrp"
-                                                                    >
-                                                                        <option value="">Select gender</option>
-                                                                        <option value="m">Male</option>
-                                                                        <option value="f">Female</option>
-                                                                    </Field>
-                                                                    
-                                                                    <label className="formGrp error">
+                                                                    <label className="formGrp">
+                                                                        <Field
+                                                                            name="child1Gender"
+                                                                            component="select"
+                                                                            autoComplete="off"
+                                                                            value={values.child1Gender}
+                                                                            className="formGrp"
+                                                                        >
+                                                                            <option value="">Select gender</option>
+                                                                            <option value="m">Male</option>
+                                                                            <option value="f">Female</option>
+                                                                        </Field>
+                                                                    </label>
                                                                     {
                                                                         errors.child1Gender && touched.child1Gender ?
-                                                                        <span className="error-message">{errors.child1Gender}</span> : ''
+                                                                            <span className="error-message">{errors.child1Gender}</span> : ''
                                                                     }
-                                                                    </label>
                                                                 </div>
                                                             </div>
 
@@ -1869,82 +1732,56 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_3'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_3}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_3',dob)
-                                                                                setFieldValue('age_3',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_3"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobChild)}
+                                                                            minDate={new Date(minDobChild)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_3");
+                                                                                setFieldValue("dob_3", value);
+                                                                            }}
+                                                                            selected={values.dob_3}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_3 && touched.age_3 ?                 
-                                                                            <span className="error-message">{errors.age_3}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
-
-                                                                    <DatePicker
-                                                                    name= "dob_3"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_3}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_3");
-                                                                        setFieldValue("dob_3", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_3 && touched.dob_3 ?                 
-                                                                        <span className="error-message">{errors.dob_3}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_3 && touched.looking_for_3 ?                 
-                                                                        <span className="error-message">{errors.looking_for_3}</span>:''
-                                                                    }
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_3 && touched.dob_3 ?
+                                                                                    <span className="error-message">{errors.dob_3}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
 
                                                                 <div className="col-md-4 formSection">
-                                                                    <Field
-                                                                        name="child2Gender"
-                                                                        component="select"
-                                                                        autoComplete="off"
-                                                                        value={values.child2Gender}
-                                                                        className="formGrp"
-                                                                    >
-                                                                        <option value="">Select gender</option>
-                                                                        <option value="m">Male</option>
-                                                                        <option value="f">Female</option>
-                                                                    </Field>
-                                                                    
-                                                                    <label className="formGrp error">
+                                                                    <label className="formGrp">
+                                                                        <Field
+                                                                            name="child2Gender"
+                                                                            component="select"
+                                                                            autoComplete="off"
+                                                                            value={values.child2Gender}
+                                                                            className="formGrp"
+                                                                        >
+                                                                            <option value="">Select gender</option>
+                                                                            <option value="m">Male</option>
+                                                                            <option value="f">Female</option>
+                                                                        </Field>
+                                                                    </label>
                                                                     {
                                                                         errors.child2Gender && touched.child2Gender ?
-                                                                        <span className="error-message">{errors.child2Gender}</span> : ''
+                                                                            <span className="error-message">{errors.child2Gender}</span> : ''
                                                                     }
-                                                                    </label>
                                                                 </div>
                                                             </div>
 
@@ -1983,81 +1820,56 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_4'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_4}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_4',dob)
-                                                                                setFieldValue('age_4',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_4"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobChild)}
+                                                                            minDate={new Date(minDobChild)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_4");
+                                                                                setFieldValue("dob_4", value);
+                                                                            }}
+                                                                            selected={values.dob_4}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_4 && touched.age_4 ?                 
-                                                                            <span className="error-message">{errors.age_4}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
-
-                                                                        <DatePicker
-                                                                        name= "dob_4"
-                                                                        dateFormat="dd MMM yyyy"
-                                                                        placeholderText="Date of birth"
-                                                                        peekPreviousMonth
-                                                                        peekPreviousYear
-                                                                        showMonthDropdown
-                                                                        showYearDropdown
-                                                                        dropdownMode="select"
-                                                                        // maxDate={new Date(maxDobAdult)}
-                                                                        // minDate={new Date(minDobAdult)}
-                                                                        className="datePckr"
-                                                                        selected={values.dob_4}
-                                                                        onChange={(val) => {                                        
-                                                                            setFieldTouched("dob_4");
-                                                                            setFieldValue("dob_4", val);
-                                                                        }}
-                                                                    />
-                                                                    
-
-                                                                        {
-                                                                            errors.dob_4 && touched.dob_4 ?                 
-                                                                            <span className="error-message">{errors.dob_4}</span>:''
-                                                                        }
-                                                                        {
-                                                                            errors.looking_for_4 && touched.looking_for_4 ?                 
-                                                                            <span className="error-message">{errors.looking_for_4}</span>:''
-                                                                        }
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_4 && touched.dob_4 ?
+                                                                                    <span className="error-message">{errors.dob_4}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
 
                                                                 <div className="col-md-4 formSection">
-                                                                    <Field
-                                                                        name="child3Gender"
-                                                                        component="select"
-                                                                        autoComplete="off"
-                                                                        value={values.child3Gender}
-                                                                        className="formGrp"
-                                                                    >
-                                                                        <option value="">Select gender</option>
-                                                                        <option value="m">Male</option>
-                                                                        <option value="f">Female</option>
-                                                                    </Field>
-                                                                    <label className="formGrp error">
+                                                                    <label className="formGrp">
+                                                                        <Field
+                                                                            name="child3Gender"
+                                                                            component="select"
+                                                                            autoComplete="off"
+                                                                            value={values.child3Gender}
+                                                                            className="formGrp"
+                                                                        >
+                                                                            <option value="">Select gender</option>
+                                                                            <option value="m">Male</option>
+                                                                            <option value="f">Female</option>
+                                                                        </Field>
+                                                                    </label>
                                                                     {
                                                                         errors.child3Gender && touched.child3Gender ?
-                                                                        <span className="error-message">{errors.child3Gender}</span> : ''
+                                                                            <span className="error-message">{errors.child3Gender}</span> : ''
                                                                     }
-                                                                    </label>
                                                                 </div>
                                                             </div>
 
@@ -2099,62 +1911,38 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_5'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_5}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_5',dob)
-                                                                                setFieldValue('age_5',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup>
+                                                                        <DatePicker
+                                                                            name="dob_5"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobAdult)}
+                                                                            minDate={new Date(minDobAdult)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_5");
+                                                                                setFieldValue("dob_5", value);
+                                                                            }}
+                                                                            selected={values.dob_5}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_5 && touched.age_5 ?                 
-                                                                            <span className="error-message">{errors.age_5}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
+                                                                            {
+                                                                                errors.dob_5 && touched.dob_5 ?
+                                                                                    <span className="error-message">{errors.dob_5}</span> : ''
+                                                                            }
+                                                                        </label>
 
-                                                                    <DatePicker
-                                                                    name= "dob_5"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_5}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_5");
-                                                                        setFieldValue("dob_5", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_5 && touched.dob_5 ?                 
-                                                                        <span className="error-message">{errors.dob_5}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_5 && touched.looking_for_5 ?                 
-                                                                        <span className="error-message">{errors.looking_for_5}</span>:''
-                                                                    }
-                                                                    </div>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
                                                             </div>
 
                                                             <div className="row dropinput">
@@ -2193,62 +1981,37 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_6'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_6}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_6',dob)
-                                                                                setFieldValue('age_6',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_6"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobAdult)}
+                                                                            minDate={new Date(minDobAdult)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_6");
+                                                                                setFieldValue("dob_6", value);
+                                                                            }}
+                                                                            selected={values.dob_6}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_6 && touched.age_6 ?                 
-                                                                            <span className="error-message">{errors.age_6}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
-
-                                                                    <DatePicker
-                                                                    name= "dob_6"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_6}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_6");
-                                                                        setFieldValue("dob_6", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_6 && touched.dob_6 ?                 
-                                                                        <span className="error-message">{errors.dob_6}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_6 && touched.looking_for_6 ?                 
-                                                                        <span className="error-message">{errors.looking_for_6}</span>:''
-                                                                    }
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_6 && touched.dob_6 ?
+                                                                                    <span className="error-message">{errors.dob_6}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
                                                             </div>
 
                                                             <div className="row dropinput">
@@ -2286,61 +2049,37 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_7'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_7}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_7',dob)
-                                                                                setFieldValue('age_7',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_7"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobAdult)}
+                                                                            minDate={new Date(minDobAdult)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_7");
+                                                                                setFieldValue("dob_7", value);
+                                                                            }}
+                                                                            selected={values.dob_7}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_7 && touched.age_7 ?                 
-                                                                            <span className="error-message">{errors.age_7}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
-                                                                    <DatePicker
-                                                                    name= "dob_7"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_7}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_7");
-                                                                        setFieldValue("dob_7", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_7 && touched.dob_7 ?                 
-                                                                        <span className="error-message">{errors.dob_7}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_7 && touched.looking_for_7 ?                 
-                                                                        <span className="error-message">{errors.looking_for_7}</span>:''
-                                                                    }
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_7 && touched.dob_7 ?
+                                                                                    <span className="error-message">{errors.dob_7}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
                                                             </div>
 
                                                             <div className="row dropinput m-b-45">
@@ -2378,61 +2117,37 @@ class InformationYourself extends Component {
                                                                     </label>
                                                                 </div>
 
-                                                                <div className="col-md-4" >
-                                                                    <FormGroup className="m-b-25">
-                                                                    <div className="insurerName">
-                                                                        {/* <Field
-                                                                            name='age_8'
-                                                                            type="number"
-                                                                            placeholder='Age'
-                                                                            autoComplete="off"
-                                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            value = {values.age_8}
-                                                                            maxLength="10"            
-                                                                            onChange = {(e) => {
-                                                                                let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                                                setFieldValue('dob_8',dob)
-                                                                                setFieldValue('age_8',e.target.value)
-                                                                            }}                                                                                                 
+                                                                <div className="col-md-4">
+                                                                    <FormGroup >
+                                                                        <DatePicker
+                                                                            name="dob_8"
+                                                                            dateFormat="dd MMM yyyy"
+                                                                            placeholderText="DOB"
+                                                                            peekPreviousMonth
+                                                                            peekPreviousYear
+                                                                            showMonthDropdown
+                                                                            showYearDropdown
+                                                                            maxDate={new Date(maxDobAdult)}
+                                                                            minDate={new Date(minDobAdult)}
+                                                                            className="datePckr"
+                                                                            dropdownMode="select"
+                                                                            onChange={(value, e) => {
+                                                                                if (e && typeof e.preventDefault === 'function') {
+                                                                                    e.preventDefault();
+                                                                                }
+                                                                                setFieldTouched("dob_8");
+                                                                                setFieldValue("dob_8", value);
+                                                                            }}
+                                                                            selected={values.dob_8}
                                                                         />
                                                                         <label className="formGrp error">
-                                                                        {
-                                                                            errors.age_8 && touched.age_8 ?                 
-                                                                            <span className="error-message">{errors.age_8}</span>:''
-                                                                        }                                                
-                                                                    </label> */}
-                                                                    <DatePicker
-                                                                    name= "dob_8"
-                                                                    dateFormat="dd MMM yyyy"
-                                                                    placeholderText="Date of birth"
-                                                                    peekPreviousMonth
-                                                                    peekPreviousYear
-                                                                    showMonthDropdown
-                                                                    showYearDropdown
-                                                                    dropdownMode="select"
-                                                                    // maxDate={new Date(maxDobAdult)}
-                                                                    // minDate={new Date(minDobAdult)}
-                                                                    className="datePckr"
-                                                                    selected={values.dob_8}
-                                                                    onChange={(val) => {                                        
-                                                                        setFieldTouched("dob_8");
-                                                                        setFieldValue("dob_8", val);
-                                                                    }}
-                                                                />
-                                                                
-
-                                                                    {
-                                                                        errors.dob_8 && touched.dob_8 ?                 
-                                                                        <span className="error-message">{errors.dob_8}</span>:''
-                                                                    }
-                                                                    {
-                                                                        errors.looking_for_8 && touched.looking_for_8 ?                 
-                                                                        <span className="error-message">{errors.looking_for_8}</span>:''
-                                                                    }
-                                                                    </div>
+                                                                            {
+                                                                                errors.dob_8 && touched.dob_8 ?
+                                                                                    <span className="error-message">{errors.dob_8}</span> : ''
+                                                                            }
+                                                                        </label>
                                                                     </FormGroup>
-                                                                </ div>
+                                                                </div>
                                                             </div>
                                                             {values.looking_for_2 || values.looking_for_3 || values.looking_for_4 ?
                                                                 <div className="row dropinput m-b-45">

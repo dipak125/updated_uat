@@ -133,8 +133,7 @@ const IPA__Validation = Yup.object().shape({
       return "Please enter valid last name";
     })
     .nullable(),
-  // nominee_dob: Yup.date().required("Please enter date of birth").nullable(),
-  nominee_age: Yup.mixed().required("Please enter age").nullable(),
+  nominee_dob: Yup.date().required("Please enter date of birth").nullable(),
   relation_with: Yup.string().required(function () {
     return "Please select relation";
   }),
@@ -633,7 +632,6 @@ class AccidentAdditionalDetails extends Component {
       first_name: accidentDetails ? accidentDetails.first_name : "",
       last_name: accidentDetails ? accidentDetails.last_name : "",
       date_of_birth: accidentDetails && accidentDetails.dob ? new Date(accidentDetails.dob) : "",
-      age: accidentDetails && accidentDetails.dob ? Math.floor(moment().diff(accidentDetails.dob, 'years', true) ) : "",
       mobile: accidentDetails ? accidentDetails.mobile : "",
       email_id: accidentDetails ? accidentDetails.email_id : "",
       proposer_gender: accidentDetails ? accidentDetails.gender : "",
@@ -647,8 +645,6 @@ class AccidentAdditionalDetails extends Component {
       nominee_first_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].first_name : "",
       nominee_last_name: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].last_name : "",
       nominee_dob: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? new Date(accidentDetails.request_data.nominee[0].dob) : null,
-      nominee_age: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? Math.floor(moment().diff(accidentDetails.request_data.nominee[0].dob, 'years', true) ) : null,
-
       relation_with: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].relation_with : "",
       nominee_gender: (accidentDetails && accidentDetails.request_data) && accidentDetails.request_data.nominee.length > 0 ? accidentDetails.request_data.nominee[0].gender : "",
       is_appointee: is_appointee,
@@ -669,16 +665,19 @@ class AccidentAdditionalDetails extends Component {
     return (
       <>
         <BaseComponent>
-		    <div className="page-wrapper">
+		 <div className="page-wrapper">
           <div className="container-fluid">
             <div className="row">
-
+			
+			
              <aside className="left-sidebar">
-            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-            <SideNav />
-            </div>
-            </aside>
-
+ <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+<SideNav />
+ </div>
+</aside>
+			  
+			  
+			  
               <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox cmdpol2">
                 <h4 className="text-center mt-3 mb-3">
                   SBI General Insurance Company Limited
@@ -785,30 +784,34 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row>
-                              <Col sm={12} md={4} lg={3}>
-                                  <FormGroup className="m-b-25">
-                                  <div className="insurerName">
-                                      <Field
-                                          name='age'
-                                          type="number"
-                                          placeholder='Age'
-                                          autoComplete="off"
-                                          onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                          onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                          value = {values.age}
-                                          disabled = {true}
-                                          maxLength="10"            
-                                          onChange = {(e) => {
-                                              let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                              setFieldValue('date_of_birth',dob)
-                                              setFieldValue('age',e.target.value)
-                                          }}                                                                                                 
-                                      />
-                                      {errors.age && touched.age ? (
-                                          <span className="errorMsg">{errors.age}</span>
-                                      ) : null}  
-                                  </div>
-                                  </FormGroup>
+                              <Col sm={6} md={4} lg={3}>
+                                <FormGroup>
+                                  <DatePicker
+                                    name="date_of_birth"
+                                    dateFormat="dd MMM yyyy"
+                                    placeholderText="DOB"
+                                    peekPreviousMonth
+                                    peekPreviousYear
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    disabled={true}
+                                    dropdownMode="select"
+                                    // maxDate={new Date(maxDobAdult)}
+                                    // minDate={new Date(minDobAdult)}
+                                    className="datePckr"
+                                    selected={values.date_of_birth}
+                                    onChange={(val) => {
+                                      setFieldTouched("date_of_birth");
+                                      setFieldValue("date_of_birth", val);
+                                    }}
+                                  />
+                                  {errors.date_of_birth &&
+                                    touched.date_of_birth ? (
+                                      <span className="errorMsg">
+                                        {errors.date_of_birth}
+                                      </span>
+                                    ) : null}
+                                </FormGroup>
                               </Col>
                               <Col sm={6} md={4} lg={3}>
                                 <FormGroup className="m-b-25">
@@ -1055,26 +1058,26 @@ class AccidentAdditionalDetails extends Component {
                                 </FormGroup>
                               </Col>
 							  
-							                <Col sm={12} md={4} lg={4}>
-                                  <FormGroup>
-                                      <div className="insurerName">
-                                      <Field
-                                          name='pancard'
-                                          type="text"
-                                          placeholder={phrases["PAN"]}
-                                          autoComplete="off"
-                                          onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                          onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                          value = {values.pancard.toUpperCase()} 
-                                          onChange= {(e)=> 
-                                              setFieldValue('pancard', e.target.value.toUpperCase())
-                                              }                                                                           
-                                      />
-                                      {errors.pancard && touched.pancard ? (
-                                      <span className="errorMsg">{errors.pancard}</span>
-                                      ) : null} 
-                                      </div>
-                                  </FormGroup>
+							  <Col sm={12} md={4} lg={4}>
+                                        <FormGroup>
+                                            <div className="insurerName">
+                                            <Field
+                                                name='pancard'
+                                                type="text"
+                                                placeholder={phrases["PAN"]}
+                                                autoComplete="off"
+                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                value = {values.pancard.toUpperCase()} 
+                                                onChange= {(e)=> 
+                                                    setFieldValue('pancard', e.target.value.toUpperCase())
+                                                    }                                                                           
+                                            />
+                                            {errors.pancard && touched.pancard ? (
+                                            <span className="errorMsg">{errors.pancard}</span>
+                                            ) : null} 
+                                            </div>
+                                        </FormGroup>
                                </Col>
 							  
                             </Row>
@@ -1164,31 +1167,36 @@ class AccidentAdditionalDetails extends Component {
                               </Col>
                             </Row>
                             <Row >
-                              <Col sm={12} md={4} lg={3}>
-                                  <FormGroup className="m-b-25">
-                                  <div className="insurerName">
-                                      <Field
-                                          name='nominee_age'
-                                          type="number"
-                                          placeholder='Age'
-                                          autoComplete="off"
-                                          onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                          onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                          value = {values.nominee_age}
-                                          maxLength="10"            
-                                          onChange = {(e) => {
-                                              let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                              setFieldValue('nominee_dob',dob)
-                                              setFieldValue('nominee_age',e.target.value)
-                                          }}                                                                                                 
-                                      />
-                                      {errors.nominee_age && touched.nominee_age ? (
-                                          <span className="errorMsg">{errors.nominee_age}</span>
-                                      ) : null}  
-                                  </div>
-                                  </FormGroup>
+                              <Col sm={6} md={4} lg={3}>
+                                <FormGroup>
+                                  <DatePicker
+                                    name="nominee_dob"
+                                    dateFormat="dd-MM-yyyy"
+                                    placeholderText="DOB"
+                                    peekPreviousMonth
+                                    peekPreviousYear
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    dropdownMode="select"
+                                    maxDate={new Date(maxDobNominee)}
+                                    minDate={new Date(minDobNominee)}
+                                    className="datePckr"
+                                    onChange={(value) => {
+                                      setFieldTouched("nominee_dob");
+                                      setFieldValue("nominee_dob", value);
+                                      this.ageCheck(value);
+                                      this.ageCheckValue(value)
+                                    }}
+                                    selected={values.nominee_dob}
+                                  />
+                                  {errors.nominee_dob && touched.nominee_dob ? (
+                                    <span className="errorMsg">
+                                      {errors.nominee_dob}
+                                    </span>
+                                  ) : null}
+                                </FormGroup>
                               </Col>
-                              {/* <Col sm={6} md={4} lg={3}>
+                              <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="insurerName">
                                     <Field
@@ -1202,7 +1210,7 @@ class AccidentAdditionalDetails extends Component {
 
                                   </div>
                                 </FormGroup>
-                              </Col> */}
+                              </Col>
                               <Col sm={6} md={4} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
@@ -1229,31 +1237,8 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col> 
-                              <Col sm={6} md={8} lg={3}>
-                                <FormGroup>
-                                  <div className="formSection">
-                                    <Field
-                                      name="nominee_gender"
-                                      placeholder="Nominee Gender"
-                                      component="select"
-                                      autoComplete="off"
-                                      className="formGrp"
-                                      value={values.nominee_gender}
-                                    >
-                                      <option value="">Select Nominee Gender</option>
-                                      <option value="m">Male</option>
-                                      <option value="f">Female</option>
-                                    </Field>
-                                    {errors.nominee_gender && touched.nominee_gender ? (
-                                      <span className="errorMsg">
-                                        {errors.nominee_gender}
-                                      </span>
-                                    ) : null}
-                                  </div>
-                                </FormGroup>
-                              </Col>
                             </Row>  
-                            {/* <Row className="m-b-45">
+                            <Row className="m-b-45">
                             <Col sm={6} md={8} lg={3}>
                                 <FormGroup>
                                   <div className="formSection">
@@ -1277,7 +1262,7 @@ class AccidentAdditionalDetails extends Component {
                                   </div>
                                 </FormGroup>
                               </Col>
-                            </Row> */}
+                            </Row>
                            
                             {appointeeFlag || is_appointee == "1" ? (
                               <div>

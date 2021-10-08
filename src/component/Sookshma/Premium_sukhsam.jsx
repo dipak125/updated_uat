@@ -500,11 +500,10 @@ class Premium_sukhsam extends Component {
                                                                                     <Col sm={12} md={6}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>Age:</FormGroup>
+                                                                                                <FormGroup>Date Of Birth:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
-                                                                                                {/* <FormGroup>{moment(new Date(this.props.date_of_birth)).format('LL')}</FormGroup> */}
-                                                                                                <FormGroup>{ this.props.date_of_birth ? Math.floor(moment().diff(this.props.date_of_birth, 'years', true) ) : null}</FormGroup>
+                                                                                                <FormGroup>{moment(new Date(this.props.date_of_birth)).format('LL')}</FormGroup>
                                                                                             </Col>
                                                                                         </Row>
 

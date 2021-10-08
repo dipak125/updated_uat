@@ -43,9 +43,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
   .matches(/^[A-Za-z]+$/, function() {
       return "Please enter valid last name"
   }).nullable(),
-  // date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
-  age: Yup.mixed().required("Please enter age").nullable(),
-
+  date_of_birth: Yup.date().required("Please enter date of birth").nullable(),
   email_id: Yup.string().email("Enter valid email").min(8, function() {
       return "Email must be minimum 8 characters"
   })
@@ -322,7 +320,6 @@ class AccidentSelectPlan extends Component {
       first_name: accidentDetails ? accidentDetails.first_name : "",
       last_name: accidentDetails ? accidentDetails.last_name : "",
       date_of_birth: accidentDetails && accidentDetails.dob ? new Date(accidentDetails.dob) : null,
-      age: accidentDetails && accidentDetails.dob ? Math.floor(moment().diff(accidentDetails.dob, 'years', true) ) : "",
       mobile: accidentDetails ? accidentDetails.mobile : "",
       email_id: accidentDetails ? accidentDetails.email_id : "",
       proposer_gender: accidentDetails ? accidentDetails.gender : "",
@@ -349,7 +346,8 @@ class AccidentSelectPlan extends Component {
               </span>
           ))        
     ): null;
-
+      
+console.log("bcInfo.agent_id------------ ", this.bcInfo().agent_id)
     return (
       <>
         <BaseComponent>
@@ -376,7 +374,7 @@ class AccidentSelectPlan extends Component {
                     validationSchema={vehicleRegistrationValidation}>
                       {({
                         values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched, }) => {
-
+                        // console.log('values',values)
                         return (
                           <Form>
                             <div className="brandhead">
@@ -508,68 +506,69 @@ class AccidentSelectPlan extends Component {
 
                                 <Row>
                                     <Col sm={12} md={4} lg={2}>
-                                        <FormGroup className="m-b-25">
-                                        <div className="insurerName">
-                                            <Field
-                                                name='age'
-                                                type="number"
-                                                placeholder='Age'
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.age}
-                                                maxLength="10"            
-                                                onChange = {(e) => {
-                                                    let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
-                                                    setFieldValue('date_of_birth',dob)
-                                                    setFieldValue('age',e.target.value)
-                                                }}                                                                                                 
+                                            <FormGroup>
+                                            <DatePicker
+                                                name="date_of_birth"
+                                                dateFormat="dd-MM-yyyy"
+                                                placeholderText="DOB"
+                                                peekPreviousMonth
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                maxDate={new Date(maxDobAdult)}
+                                                minDate={new Date(minDobAdult)}
+                                                className="datePckr"
+                                                selected={values.date_of_birth}
+                                                onChange={(val) => {
+                                                    setFieldTouched('date_of_birth');
+                                                    setFieldValue('date_of_birth', val);
+                                                    }}
                                             />
-                                            {errors.age && touched.age ? (
-                                                <span className="errorMsg">{errors.age}</span>
+                                            {errors.date_of_birth && touched.date_of_birth ? (
+                                                <span className="errorMsg">{errors.date_of_birth}</span>
                                             ) : null}  
-                                        </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={6} md={4} lg={3}>
-                                        <FormGroup className="m-b-25">
-                                            <div className="insurerName nmbract">
-                                                <span>+91</span>
-                                            <Field
-                                                name='mobile'
-                                                type="text"
-                                                placeholder="Mobile No. "
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.mobile}
-                                                maxLength="10" 
-                                                className="phoneinput pd-l-25"                                                                          
-                                            />
-                                            {errors.mobile && touched.mobile ? (
-                                            <span className="errorMsg msgpositn">{errors.mobile}</span>
-                                            ) : null}  
-                                            </div>
-                                        </FormGroup>
-                                    </Col>   
-                                    <Col sm={6} md={4} lg={3}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                            <Field
-                                                name='email_id'
-                                                type="email"
-                                                placeholder="Email "
-                                                autoComplete="off"
-                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value = {values.email_id}                                                                            
-                                            />
-                                            {errors.email_id && touched.email_id ? (
-                                            <span className="errorMsg">{errors.email_id}</span>
-                                            ) : null}  
-                                            </div>
-                                        </FormGroup>
-                                    </Col>                        
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={6} md={4} lg={3}>
+                                            <FormGroup className="m-b-25">
+                                                <div className="insurerName nmbract">
+                                                    <span>+91</span>
+                                                <Field
+                                                    name='mobile'
+                                                    type="text"
+                                                    placeholder="Mobile No. "
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.mobile}
+                                                    maxLength="10" 
+                                                    className="phoneinput pd-l-25"                                                                          
+                                                />
+                                                {errors.mobile && touched.mobile ? (
+                                                <span className="errorMsg msgpositn">{errors.mobile}</span>
+                                                ) : null}  
+                                                </div>
+                                            </FormGroup>
+                                        </Col>   
+                                        <Col sm={6} md={4} lg={3}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                <Field
+                                                    name='email_id'
+                                                    type="email"
+                                                    placeholder="Email "
+                                                    autoComplete="off"
+                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    value = {values.email_id}                                                                            
+                                                />
+                                                {errors.email_id && touched.email_id ? (
+                                                <span className="errorMsg">{errors.email_id}</span>
+                                                ) : null}  
+                                                </div>
+                                            </FormGroup>
+                                        </Col>                        
                                 </Row>
                                 <Row>
                                   <Col sm={6} md={4} lg={4}>

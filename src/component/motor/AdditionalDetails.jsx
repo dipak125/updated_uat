@@ -100,11 +100,11 @@ const ownerValidation = Yup.object().shape({
     .test(
         "18YearsChecking",
         function() {
-            return "NomineeMinAge"
+            return "Age shoule be minimum 3 month & maximum 100 years"
         },
         function (value) {
             if (value) {
-                return value < 100 && value >= 0;
+                return value <= 100 && value >0;
             }
             return true;
         }
@@ -1202,7 +1202,7 @@ console.log("errors ------------------ ", errors)
                                                 }}                                                                                                 
                                             />
                                             {errors.nominee_age && touched.nominee_age ? (
-                                                <span className="errorMsg">{phrases[errors.nominee_age]}</span>
+                                                <span className="errorMsg">{errors.nominee_age}</span>
                                             ) : null}  
                                         </div>
                                         </FormGroup>
@@ -1230,7 +1230,7 @@ console.log("errors ------------------ ", errors)
                                     </Col>
                                 </Row>
 
-                                {appointeeFlag || is_appointee == '1' ||(values.nominee_age<18 )? 
+                                {appointeeFlag || is_appointee == '1' ||(values.nominee_age<18 && values.nominee_age>0)? 
                                     <div>
                                         <div className="d-flex justify-content-left carloan">
                                             <h4> </h4>
