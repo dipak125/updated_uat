@@ -481,8 +481,10 @@ class AdditionalDetailsGCV extends Component {
     };
     
     ageCheck = (value) => {
+        console.log("age==",value)
         const ageObj = new PersonAge();
         let age = ageObj.whatIsMyAge(value)
+        console.log("age==",age)
         if(age < 18){
             this.setState({
                 appointeeFlag: true,
@@ -601,6 +603,8 @@ class AdditionalDetailsGCV extends Component {
 			'create_eia_account': create_eia_account,
 			'tpaInsurance': values['tpaInsurance'],
         }
+        console.log("appointee name===>",this.state.is_appointee,values.appointee_name)
+        console.log("appointee status===>",motorInsurance.policy_for)
         if(motorInsurance.policy_for == '1'){
             post_data['dob'] = moment(values['dob']).format("YYYY-MM-DD")
             post_data['gender']= values['gender']
@@ -623,6 +627,7 @@ class AdditionalDetailsGCV extends Component {
         }
             
         console.log('post_data', post_data);
+        console.log("is_appinte==",this.state.is_appointee)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
@@ -671,7 +676,9 @@ class AdditionalDetailsGCV extends Component {
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
             
-                 console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
+                 console.log('is_appointee===>', nomineeDetails ? nomineeDetails.is_appointee : "efg")
+                 console.log('is_appointee===>', nomineeDetails ) 
+                
                 //  return false;
                  this.setState({
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
@@ -1506,7 +1513,10 @@ class AdditionalDetailsGCV extends Component {
                                                 value = {values.nominee_age}
                                                 maxLength="10"            
                                                 onChange = {(e) => {
+                                                    
+
                                                     let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                    this.ageCheck(dob)
                                                     setFieldValue('nominee_dob',dob)
                                                     setFieldValue('nominee_age',e.target.value)
                                                 }}                                                                                                 
@@ -1541,7 +1551,7 @@ class AdditionalDetailsGCV extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {appointeeFlag || is_appointee == '1' || (values.nominee_age<18 && values.nominee_age>0)? 
+                                {appointeeFlag || is_appointee == '1' ? 
                                     <div>
                                         <div className="d-flex justify-content-left carloan">
                                             <h4> </h4>

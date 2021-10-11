@@ -1037,26 +1037,35 @@ class OtherComprehensiveGCV extends Component {
                 }
                 else {
                     console.log("--post Data-- ", post_data)
-                    formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-                    this.props.loadingStart();
-                    axios.post('gcv/update-insured-value', formData).then(res => {
-                        this.props.loadingStop();
-                        let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                        console.log("decrypt--fetchData-- ", decryptResp)
-                        if (decryptResp.error == false) {
-                            this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
-                        }
-                        else {
-                            swal(decryptResp.msg)
-                        }
-            
-                    })
-                    .catch(err => {
-                        // handle error
-                        let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                        console.log("decryptErr--fetchData-- ", decryptResp)
-                        this.props.loadingStop();
-                    })
+                    if(values.chasis_no.slice(values.chasis_no.length-5)===values.chasis_no_last_part)
+                    {
+                        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+                        this.props.loadingStart();
+                        axios.post('gcv/update-insured-value', formData).then(res => {
+                            this.props.loadingStop();
+                            let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                            console.log("decrypt--fetchData-- ", decryptResp)
+                            if (decryptResp.error == false) {
+                                this.props.history.push(`/AdditionalDetails_GCV/${productId}`);
+                            }
+                            else {
+                                swal(decryptResp.msg)
+                            }
+                
+                        })
+                        .catch(err => {
+                            // handle error
+                            let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                            console.log("decryptErr--fetchData-- ", decryptResp)
+                            this.props.loadingStop();
+                        })
+                    }
+                    else
+                    {
+
+                        swal("Chasis no mismatch")
+                    }
+                   
                 }
             }         
         }

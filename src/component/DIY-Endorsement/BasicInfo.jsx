@@ -25,7 +25,10 @@ const initialValues = {
     product: "",
     policy_no: "",
     endorsement_type: "",
-    endorsement_sub_type: ""
+    endorsement_sub_type: "",
+    Old_values: "",
+    Document_List: [],
+    upload_count: 0
 
 }
 
@@ -34,7 +37,7 @@ const endorsementValidation = Yup.object().shape({
     makeEndorsement: Yup.array().of(
         Yup.object().shape({
             New_values: Yup.string().required('This field is required'),
-            Old_values: Yup.string().required('This field is required')            
+            // Old_values: Yup.string().required('This field is required')            
         })
     ),
 
@@ -45,7 +48,7 @@ const endorsementValidation = Yup.object().shape({
             addEndorsementInitValues: Yup.array().of(
                 Yup.object().shape({
                     add_endorsement_new_value: Yup.string().required('This field is required'),
-                    add_endorsement_old_value: Yup.string().required('This field is required')            
+                    // add_endorsement_old_value: Yup.string().required('This field is required')            
                 })
             )
         })
@@ -59,6 +62,35 @@ const endorsementValidation = Yup.object().shape({
     endorsement_type: Yup.string().required('This field is required'),
     endorsement_sub_type: Yup.string().required('This field is required'),
 
+    fileData: Yup.array().of(
+        Yup.object().shape({
+            fileSize: Yup.string().required('This field is required')
+                .test(
+                    "filesize",
+                    function() {
+                        return "Max file size below 2MB"
+                    },
+                    function (value) {
+                        if (value && value.size > 2097152) {             
+                            return false;
+                        }   
+                        return true;
+                    }
+                ),
+                fileName: Yup.string().required('This field is required')
+                    .test('type', "Only Jpeg, Jpg, Png, Pdf file format is allowed", (value) => {
+                        console.log("test Value ------------- ", value)
+                        if (value) {
+                            let fileType = value.split('.').pop();
+                            return (fileType === 'jpeg' || fileType === 'png' || fileType === 'pdf');
+                        }
+            
+                    }),   
+
+        })
+    ),
+
+
 })
 
 
@@ -69,6 +101,7 @@ class BasicInfo extends Component {
         product_list: [],
         request_receive_date: [],
         selectedFile:[],
+        selectedFileName: [],
         endorsement_info_id:"",
         endorsement_data_id:"",
         product_endorsement_list:"",
@@ -79,7 +112,8 @@ class BasicInfo extends Component {
         endorsement_array:[],
         type2_info_id:"",
         count:0,
-        add_endorsement_received_date: []
+        add_endorsement_received_date: [],
+        Document_List: []
        
     }
    
@@ -243,9 +277,12 @@ class BasicInfo extends Component {
         .post('dyi-endorsement/fields',formData)
         .then(res=>{
             if(res.data.error == false) {
+                let Document_List = res.data.data.Document_List
+                // let Document_List = "RC Copy/Birth Certificate/Aadhar Card"
                 this.setState({
-                    ...this.state,
-                    endorsementfields:res.data.data.fields
+                    endorsementfields:res.data.data.fields,
+                    Document_List: Document_List.split("/"),
+                    upload_count: res.data.data.upload_count
                 })         
                 this.props.loadingStop();
                 this.initEndorsementUpdate(values,setFieldTouched, setFieldValue, res.data.data.fields)   
@@ -263,26 +300,27 @@ class BasicInfo extends Component {
     makeAddEndorsementOldField=(values, errors, touched, setFieldTouched, setFieldValue,j)=>{
         const arr=[];
         const {addEndorsementFields} =this.state
-        addEndorsementFields && addEndorsementFields[j] && Object.keys(addEndorsementFields[j]).map((item,i)=>
+        // addEndorsementFields && addEndorsementFields[j] && Object.keys(addEndorsementFields[j]).map((item,i)=>
         arr.push(
-            <FormGroup key={`oldAdd${i}`}>
+            <FormGroup key={`oldAdd${j}`}>
                 <Field
-                    name={`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`}
+                    name = {`additionalEndorsement[${j}]add_endorsement_old_value`}
                     type="text"
                     autoComplete="off"
-                    placeholder={`Additional Old ${addEndorsementFields[j][item]}`}
+                    placeholder={`Additional Old Values`}
                     className="formGrp inputfs12"
                     onChange={(e)=>{
-                        setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`,e.target.value)
+                        setFieldValue(`additionalEndorsement[${j}]add_endorsement_old_value`,e.target.value)
                     }}
                 >
                 </Field>
-                {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].addEndorsementInitValues && errors.additionalEndorsement[j].addEndorsementInitValues[i] && errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_old_value
-                && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].addEndorsementInitValues && touched.additionalEndorsement[j].addEndorsementInitValues[i] && touched.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_old_value ? (
-                    <span className="errorMsg">{errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_old_value}</span>
+                {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].add_endorsement_old_value 
+                && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].add_endorsement_old_value? (
+                    <span className="errorMsg">{errors.additionalEndorsement[j].add_endorsement_old_value}</span>
                 ) : null}
             </FormGroup>
-        ) )      
+        ) 
+        // )      
        return arr;            
      }
      
@@ -316,26 +354,26 @@ class BasicInfo extends Component {
      makeEndorsementOldField=(values, errors, touched, setFieldTouched, setFieldValue)=>{
         const arr=[];
         const {endorsementfields} =this.state
-        endorsementfields && Object.keys(endorsementfields).map((item,i)=>
+        // endorsementfields && Object.keys(endorsementfields).map((item,i)=>
         arr.push(    
-             <FormGroup key={`old${i}`}>
+             <FormGroup key={`old0`}>
                  <Field
-                    name={`makeEndorsement[${i}].Old_values`}
+                    name={`Old_values`}
                     type="text"
                     autoComplete="off"
-                    placeholder = {`Old ${endorsementfields[item]}`}
+                    placeholder = {`Old Value`}
                     className="formGrp inputfs12"
                     onChange={(e)=>{
-                        setFieldValue(`makeEndorsement[${i}].Old_values`,e.target.value)
+                        setFieldValue(`Old_values`,e.target.value)
                     }}                                             
                 >  
-                </Field>
-                {errors.makeEndorsement && errors.makeEndorsement[i] && errors.makeEndorsement[i].Old_values 
-                && touched.makeEndorsement && touched.makeEndorsement[i] && touched.makeEndorsement[i].Old_values ? (
-                    <span className="errorMsg">{errors.makeEndorsement[i].Old_values}</span>
-                ) : null}
+                </Field>         
+                 {errors.Old_values && touched.Old_values ? (
+                        <span className="errorMsg">{errors.Old_values}</span>
+                    ) : null}
              </FormGroup>
-        ) )   
+        ) 
+        // )   
        return arr;
              
      }
@@ -378,7 +416,7 @@ class BasicInfo extends Component {
                     // endorsement_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_type ? endorsement_array[i].endorsement_type : "",
                     // endorsement_sub_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_sub_type ? endorsement_array[i].endorsement_sub_type : "",
                     // request_receive_date: endorsement_array && endorsement_array[i] && endorsement_array[i].request_receive_date ? endorsement_array[i].request_receive_date : "",
-                    Old_values: "",
+                    // Old_values: "",
                     New_values: "",
                 }
                 
@@ -388,17 +426,44 @@ class BasicInfo extends Component {
     };
 
     initAddClaimDetailsList = (values,setFieldTouched, setFieldValue ,endorsementfields, j ) => {
+        setFieldValue(`additionalEndorsement[${j}]add_endorsement_old_value`,"")
         endorsementfields && Object.keys(endorsementfields).map((item,i)=>{
-            setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`,"")
+            // setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`,"")
             setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,"")
         })
     };
 
-    onFileChange=(e)=>{
-        this.setState({
-            ...this.state,
-            selectedFile:e.target.files
-        }) 
+
+    onFileChange = async (fileSize,setFieldValue,setFieldTouched, i) => {
+
+        console.log("fileSize ================== ", fileSize
+        )
+        if (fileSize[0] && fileSize[0].name !== "") {
+            let selectedFileSize = fileSize[0].size;
+            setFieldTouched(`fileData[${i}]fileSize`)
+            setFieldValue(`fileData[${i}]fileSize`, selectedFileSize);
+            setFieldTouched(`fileData[${i}]fileName`)
+            setFieldValue(`fileData[${i}]fileName`, fileSize[0].name);
+            
+            if(selectedFileSize <= 2097152) {
+                let selectedFile = fileSize[0];
+                let selectedFileName = fileSize[0].name;
+  
+                // await this.setState({
+                //     selectedFile,
+                //     selectedFileName
+                // })         
+                this.state.selectedFile[i] = selectedFile
+                this.state.selectedFileName[i] = selectedFileName
+            }
+            else {
+                await this.setState({
+                    selectedFile: [],
+                    selectedFileName: []
+                })      
+            }
+             
+        }
     }
 
     upload=()=>{
@@ -410,13 +475,16 @@ class BasicInfo extends Component {
             formData.append(`attachment_file[${i}]`,this.state.selectedFile[item])
            }
         )
+        this.props.loadingStart();
         axios
         .post('dyi-endorsement/document',formData)
         .then(res=>{
             swal(res.data.msg)
+            this.props.loadingStop();
         })
         .catch(err=>{
             swal(err.data.msg)
+            this.props.loadingStop();
         })
     }
     
@@ -453,27 +521,27 @@ class BasicInfo extends Component {
     formData.append("user_email",values.email_id)
     formData.append("user_mobile",values.mobile_no)
     formData.append("endorsementdata_id",this.state.endorsement_data_id)
-    formData.append("endorsementinfo_id",this.state.endorsement_info_id)
+    // formData.append("endorsementinfo_id",this.state.endorsement_info_id)
     let newValues = []
-    let oldValues = []
+    // let oldValues = []
     values.makeEndorsement && values.makeEndorsement.length > 0 && values.makeEndorsement.map((item,i)=>{
         newValues.push(item.New_values)
-        oldValues.push(item.Old_values)
+        // oldValues.push(item.Old_values)
     } )
     formData.append(`new_endrosment_values`,JSON.stringify(newValues))
-    formData.append(`old_endrosment_values`,JSON.stringify(oldValues))
+    formData.append(`old_endrosment_values`,values.Old_values)
 
     
     values.additionalEndorsement && values.additionalEndorsement.length > 0 && values.additionalEndorsement.map((item,i)=>{
         let addNewValues = []
-        let addOldValues = []
+        // let addOldValues = []
         item.addEndorsementInitValues && item.addEndorsementInitValues.length > 0 && item.addEndorsementInitValues.map((subItem,j)=>{
             addNewValues.push(subItem.add_endorsement_new_value)
-            addOldValues.push(subItem.add_endorsement_old_value)
+            // addOldValues.push(subItem.add_endorsement_old_value)
         } )
 
         formData.append(`new_additional_endrosment_values[${i}]`,JSON.stringify(addNewValues))
-        formData.append(`old_additional_endrosment_values[${i}]`,JSON.stringify(addOldValues))     
+        formData.append(`old_additional_endrosment_values[${i}]`,item.add_endorsement_old_value)     
     })
    
     this.props.loadingStart();
@@ -772,12 +840,13 @@ class BasicInfo extends Component {
     }
 
     render() {
-        const { product_category_list, product_list,count} = this.state
+        const { product_category_list, product_list,count, Document_List, upload_count} = this.state
         const newInitialValues = Object.assign(initialValues,{
             makeEndorsement: [],
             additionalEndorsement: []
         }
         )
+        console.log("Document_List ============= ", this.state.selectedFile)
 
         return (
             <>
@@ -789,8 +858,8 @@ class BasicInfo extends Component {
                              validationSchema={endorsementValidation}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                // console.log("values ---------- ", values)
-                                // console.log("error=======",errors)
+                                console.log("values ---------- ", values)
+                                console.log("error=======",errors)
                                 
                             return (
                                 <Form>    
@@ -939,18 +1008,43 @@ class BasicInfo extends Component {
                                     {values.newCount > 0 ?
                                         this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
-                                    
+
+                                    {Document_List && Document_List.length > 0 ?
                                     <Row className="row formSection">
                                         <label className="col-md-3">Attach Documents:</label>
-                                        <div className="col-md-4">
+                                    </Row> : null }
+
+                                    {Document_List && Document_List.length > 0 && Document_List.map((item,i)=> 
+                                        <Row className="row formSection" key = {i}>
+                                            <label className="col-md-3">{item}:</label>
+                                            <div className="col-md-4">
+                                                <input type="file" key={i} name="file"
+                                                accept=".png, .jpeg, .jpg, .pdf"
+                                                onChange={(e) => {
+                                                    const { target } = e
+                                                    if (target.value.length > 0) {           
+                                                        this.onFileChange(e.target.files, setFieldValue,setFieldTouched, i)
+                                                    } 
+                                                }}
+                                            />
+                                            {errors.fileData && errors.fileData[i] && errors.fileData[i].fileSize ? (
+                                                <span className="errorMsg">{errors.fileData[i].fileSize}</span>
+                                            ) : null}
+                                             {errors.fileData && errors.fileData[i] && errors.fileData[i].fileName ? (
+                                                <span className="errorMsg">{errors.fileData[i].fileName}</span>
+                                            ) : null}
+                                            </div>
                                             
-                                            <input type="file" multiple name="file" onChange={(e)=> this.onFileChange(e)}/>
-                                        </div>
-                                        <Button type="button" onClick={()=>this.upload()}>Upload</Button>
-                                    </Row>
+                                        </Row> )
+                                    }
+                                    
+                                    
                                     <Button className={`proceedBtn`} type="submit">
                                         Submit
                                     </Button>
+                                    {Document_List && Document_List.length > 0 ?
+                                        <Button type="button" onClick={()=>this.upload()}>Upload Document</Button>
+                                    : null }
                                     {/* <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
                                     {isSubmitting ? "Wait...." : "CREATE"}
                                     </Button> */}

@@ -234,7 +234,7 @@ class ViewStatus extends Component {
             <>           
               <BaseComponent>        
                 <div className="page-wrapper">
-                      <div className="flex-fill w-100">
+                      <div className="container-fluid">
                         <div class="row">
 
                           <aside className="left-sidebar">
@@ -243,7 +243,7 @@ class ViewStatus extends Component {
                             </div>
                           </aside>
 
-                          <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
+                          <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox breakin">
                           {viewEndorsement == true ?
                             <div>
                               <h4 className="text-center mt-3 mb-3">Update Endorsement </h4>
@@ -253,34 +253,32 @@ class ViewStatus extends Component {
                             :
                             <div>
                               <h4 className="text-center mt-3 mb-3">View Endorsement </h4>
-                              <Formik initialValues={initialValues} 
-                              onSubmit={this.getSearch }
-                                  //  validationSchema={endorsementValidation}
+                                <div className="contBox m-b-45 tickedTable">
+                                  <Formik initialValues={initialValues} 
+                                    onSubmit={this.getSearch }
                                   >
                                   {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                  return (
-                                      <Form>    
-                                          <Row className="row formSection">
-                                          <Col sm={6} md={6} lg={4}  >
-                                            <Field 
-                                                class="form-control me-2" 
-                                                type="text" 
-                                                placeholder="Search Sr no" 
-                                                aria-label="Search" 
-                                                name = "sr_no" 
-                                            />
-                                          </Col>
-                                          <Col sm={6} md={6} lg={4} >
-                                            <Button class="btn btn-outline-success" type="submit" >Search </Button>
-                                          </Col>
-                                          </Row >
-                                      </Form>
-                                  )}}
-                              </Formik>
+                                    return (
+                                        <Form>    
+                                              <Row className="row formSection">
+                                              <Col sm={6} md={6} lg={4}  >
+                                                <Field 
+                                                    class="form-control me-2" 
+                                                    type="text" 
+                                                    placeholder="Search Sr no" 
+                                                    aria-label="Search" 
+                                                    name = "sr_no" 
+                                                />
+                                              </Col>
+                                              <Col sm={6} md={6} lg={4} >
+                                                <Button class="btn btn-outline-success" type="submit" >Search </Button>
+                                              </Col>
+                                              </Row >
+                                          </Form>
+                                      )}}
+                                  </Formik>
+                                  <Row> &nbsp; </Row>
 
-
-                              <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox breakin">
-                                <div className="contBox m-b-45 tickedTable">
                                   <div className="customInnerTable dataTableCustom">
                                     <BootstrapTable ref="table"
                                         data={list}
@@ -303,7 +301,6 @@ class ViewStatus extends Component {
                                     </BootstrapTable>
                                   </div>
                                 </div>
-                              </div>
                               </div>}
                           </div>
                         </div>     

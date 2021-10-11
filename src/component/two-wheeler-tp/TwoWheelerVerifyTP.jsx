@@ -488,7 +488,9 @@ class TwoWheelerVerify extends Component {
             }
         }
         console.log('post_data',post_data)
-        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        if(values.chasis_no.slice(values.chasis_no.length-5)===values.chasis_no_last_part)
+        {
+            formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('two-wh/previous-vehicle-details', formData).then(res => {
             this.props.loadingStop();
@@ -508,6 +510,12 @@ class TwoWheelerVerify extends Component {
             let decryptErr = JSON.parse(encryption.decrypt(err.data));
             console.log('decryptErr-----', decryptErr)
         })
+        }
+        else
+        {
+            swal("Chasis no mismatch")
+        }
+        
     }
 
 

@@ -1486,6 +1486,7 @@ class AdditionalDetailsPCV_TP extends Component {
                                                 maxLength="10"            
                                                 onChange = {(e) => {
                                                     let dob =  moment().subtract(e.target.value, 'year').format("YYYY-MM-DD")
+                                                    this.ageCheck(dob)
                                                     setFieldValue('nominee_dob',dob)
                                                     setFieldValue('nominee_age',e.target.value)
                                                 }}                                                                                                 
@@ -1519,7 +1520,7 @@ class AdditionalDetailsPCV_TP extends Component {
                                         </FormGroup>
                                     </Col>
                                 </Row>
-                                {appointeeFlag || is_appointee == '1' || (values.nominee_age<18 && values.nominee_age>0)? 
+                                {appointeeFlag || is_appointee == '1' ? 
                                     <div>
                                         <div className="d-flex justify-content-left carloan">
                                             <h4> </h4>
