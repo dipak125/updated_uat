@@ -60,11 +60,7 @@ class Premium extends Component {
             paymentgateway: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
-                                localStorage.getItem("policyHolder_refNo"),
-           policy_date:{
-               start_date:"",
-               end_date:""
-           }
+                                localStorage.getItem("policyHolder_refNo")
         };
     }
 
@@ -117,12 +113,11 @@ class Premium extends Component {
                     refNumber: decryptResp.data.policyHolder.reference_no,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
-                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[],
+                    nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
                     
                     
                 })
 
-                this.getAccessToken(motorInsurance)
                 this.getAccessToken(motorInsurance)
                
                
@@ -131,12 +126,24 @@ class Premium extends Component {
                 // handle error
                 this.props.loadingStop();
             })
-            axios.get(`two-wh/details/${policyHolder_id}`)
-            .then(res=>{
+    }
+
+    fetchRequestData = () => {
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+        let encryption = new Encryption();
+    
+        axios.get(`two-wh/details/${policyHolder_id}`)
+            .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
+                this.setState({
+                    request_data
+                })
             })
-           
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
     }
 
     getAccessToken = (motorInsurance) => {
@@ -189,6 +196,7 @@ class Premium extends Component {
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
                     });
+                    this.fetchRequestData()
                 } else {
                     this.setState({
                         fulQuoteResp: [],
@@ -247,14 +255,8 @@ sendPaymentLink = () => {
 
 
     componentDidMount() {
-         this.fetchData()
-        this.fetchRelationships();
-        this.fetchRelationships();
-        this.fetchRelationships();
-        this.fetchRelationships();
-        this.fetchRelationships();
-
-        
+        // this.fetchData()
+        this.fetchRelationships()
     }
     
 

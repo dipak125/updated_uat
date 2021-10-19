@@ -18,7 +18,8 @@ import { assertCompletionStatement } from '@babel/types';
 
 
 const initialValues = {
-    makeEndorsement: []
+    makeEndorsement: [],
+    status:""
 
 }
 
@@ -315,6 +316,7 @@ class UpdateEndorsement extends Component {
                     autoComplete="off"
                     placeholder={`Additional Old values`}
                     className="formGrp inputfs12"
+                    disabled = {values.status == "discrepancy" ? false : true}  
                     // onChange={(e)=>{
                     //     setFieldValue(`additionalEndorsement[${j}]add_endorsement_old_value`,e.target.value)
                     // }}
@@ -343,6 +345,7 @@ class UpdateEndorsement extends Component {
                     autoComplete="off"
                     placeholder={`Additional New ${endorsementfields[item]}`}
                     className="formGrp inputfs12"
+                    disabled = {values.status == "discrepancy" ? false : true}  
                     // onChange={(e)=>{                     
                     //     setFieldValue(`additionalEndorsement[${j}]add_endorsement_new_value`,e.target.value)
                     // }}
@@ -372,6 +375,7 @@ class UpdateEndorsement extends Component {
                     autoComplete="off"
                     placeholder = {`Old values`}
                     className="formGrp inputfs12"
+                    disabled = {values.status == "discrepancy" ? false : true}  
                     // onChange={(e)=>{
                     //     setFieldValue(`Old_values`,e.target.value)
                     // }}                                             
@@ -399,6 +403,7 @@ class UpdateEndorsement extends Component {
                     autoComplete="off"
                     placeholder = {`New ${endorsementfields[item]}`}
                     className="formGrp inputfs12"
+                    disabled = {values.status == "discrepancy" ? false : true}  
                         // onChange={(e)=>{
                         //     setFieldValue(`makeEndorsement[${i}].New_values`,e.target.value)
                         // }}                                             
@@ -493,8 +498,6 @@ class UpdateEndorsement extends Component {
     };
 
     onFileChange = async (uploadFile,setFieldValue,setFieldTouched, i) => {
-
-        console.log("uploadFile ================== ", uploadFile)
 
         if (uploadFile[0] && uploadFile[0].name !== "") {
             let selectedFileSize = uploadFile[0].size;
@@ -645,60 +648,64 @@ class UpdateEndorsement extends Component {
     formData.append("endorsementdata_id",this.state.endorsement_data_id)
     // formData.append("endorsementinfo_id",this.state.endorsement_info_id)
     let newValues = []
-    let oldValues = []
+    // let oldValues = []
     values.makeEndorsement && values.makeEndorsement.length > 0 && values.makeEndorsement.map((item,i)=>{
         newValues.push(item.New_values)
-        oldValues.push(item.Old_values)
+        // oldValues.push(item.Old_values)
     } )
     formData.append(`new_endrosment_values`,JSON.stringify(newValues))
-    formData.append(`old_endrosment_values`,JSON.stringify(oldValues))
+    formData.append(`old_endrosment_values`,JSON.stringify(values.Old_values))
     
     values.additionalEndorsement && values.additionalEndorsement.length > 0 && values.additionalEndorsement.map((item,i)=>{
         let addNewValues = []
-        let addOldValues = []
+        // let addOldValues = []
         if(i > 0) {
             item.addEndorsementInitValues && item.addEndorsementInitValues.length > 0 && item.addEndorsementInitValues.map((subItem,j)=>{
                 addNewValues.push(subItem.add_endorsement_new_value)
-                addOldValues.push(subItem.add_endorsement_old_value)
+                // addOldValues.push(subItem.add_endorsement_old_value)
             } )
-    
+
             formData.append(`new_additional_endrosment_values[${i-1}]`,JSON.stringify(addNewValues))
-            formData.append(`old_additional_endrosment_values[${i-1}]`,JSON.stringify(addOldValues))
-        }       
-    } )
-   
-    this.props.loadingStart();
-    axios
-    .post("dyi-endorsement/update",formData)
-    .then(res=>{
-        if(res.data.error == false) {
-            swal({
-                title: res.data.msg,
-                text: "Serial number: "+res.data.data.sr_no,
-                icon: "success",
-                // buttons: true,
-                dangerMode: false,
-              })
-              .then((willDownload) => {
-                if (willDownload) {
-                    actions.setSubmitting(false)
-                    actions.resetForm(true)
-                    this.props.updateList()
-                }             
-              })
+            formData.append(`old_additional_endrosment_values[${i-1}]`,item.add_endorsement_old_value)     
+        }
+    })
+    if (values.status == "discrepancy"){
+        this.props.loadingStart();
+        axios
+        .post("dyi-endorsement/update",formData)
+        .then(res=>{
+            if(res.data.error == false) {
+                swal({
+                    title: res.data.msg,
+                    text: "Serial number: "+res.data.data.sr_no,
+                    icon: "success",
+                    // buttons: true,
+                    dangerMode: false,
+                })
+                .then((willDownload) => {
+                    if (willDownload) {
+                        actions.setSubmitting(false)
+                        actions.resetForm(true)
+                        this.props.updateList()
+                    }             
+                })
+                
+                this.props.loadingStop();
+            }
+            else{
+                swal(res.data.msg)
+                this.props.loadingStop();
+            }
             
-            this.props.loadingStop();
-        }
-        else{
-            swal(res.data.msg)
-            this.props.loadingStop();
-        }
-        
-    })
-    .catch((err)=>{
-        this.props.loadingStop()
-    })
-   
+        })
+        .catch((err)=>{
+            this.props.loadingStop()
+        })
+
+    }else {
+        swal('Values can not be updated')
+    }
+
 }
 
     endorsement = (values, errors, touched, setFieldTouched, setFieldValue, loop) => {
@@ -990,6 +997,7 @@ class UpdateEndorsement extends Component {
             mobile_no: endorsementDetails && endorsementInfo.length > 0 && endorsementDetails.mobile ? endorsementDetails.mobile : "",
             endorsement_received_date: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].req_receive_date ? new Date(endorsementInfo[0].req_receive_date) : "",
             Old_values: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].old_values ? endorsementInfo[0].old_values : "",
+            status: endorsementDetails && endorsementInfo.length > 0 && endorsementDetails.endorsement_status ? endorsementDetails.endorsement_status : "",
         })
         
         return (
@@ -1002,8 +1010,8 @@ class UpdateEndorsement extends Component {
                              validationSchema={endorsementValidation}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                console.log("newInitialValues ---------- ", values)
-                                console.log("error=======",errors)
+                                // console.log("newInitialValues ---------- ", values)
+                                // console.log("error=======",errors)
                                 
                             return (
                                 <Form>    
@@ -1020,7 +1028,7 @@ class UpdateEndorsement extends Component {
                                                     placeholder = "Email Address"
                                                     className="formGrp inputfs12"
                                                     value = {values.email_id}      
-                                                    // disabled = {true}                                       
+                                                    disabled = {values.status == "discrepancy" ? false : true}                                       
                                                 >  
                                                 </Field>
                                                 {errors.email_id && touched.email_id ? (
@@ -1042,7 +1050,7 @@ class UpdateEndorsement extends Component {
                                                     placeholder = "Mobile Number"
                                                     className="formGrp inputfs12"
                                                     value = {values.mobile_no}          
-                                                    // disabled = {true}                                    
+                                                    disabled = {values.status == "discrepancy" ? false : true}                                     
                                                 >  
                                                 </Field>
                                                 {errors.mobile_no && touched.mobile_no ? (
@@ -1135,23 +1143,6 @@ class UpdateEndorsement extends Component {
                                     </Row>
                                     {this.endorsement(values, errors, touched, setFieldTouched, setFieldValue)}
                                     
-
-                                    {/* <Row className="row formSection">
-                                        <label className="col-md-3">Add another endorsement:</label>
-                                        <div className="col-md-4">                                
-                                       {<Button type="button" onClick = {()=> {
-                                                let newCount = count+1
-                                                this.setState({count:newCount})
-                                                setFieldValue("newCount", newCount)
-                                            }               
-                                        } 
-                                        >
-                                           +
-                                        </Button>}
-
-                                        </div>
-                                    </Row> */}
-                                    {/* {this.state.endorsement_array} */}
                                     {values.newCount > 0 ?
                                         this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue) : null
                                     }
@@ -1159,8 +1150,7 @@ class UpdateEndorsement extends Component {
                                     {endorsementDetails && endorsementDetails.endorsement_doc_id && endorsementDetails.endorsement_doc_id.length > 0 ?
                                         documents && documents.length > 0 && documents.map((item,i)=> 
                                         <Row className="row formSection" key = {i}>
-                                            <label className="col-md-3">{Document_List[i]}:</label>
-                                            {console.log("item ------------- ", endorsement_doc_id)}     
+                                            <label className="col-md-3">{Document_List[i]}:</label>  
                                             {item == " " ?
                                             <div className="col-md-4">
                                                 <input type="file" key={i} name="file"
@@ -1173,22 +1163,22 @@ class UpdateEndorsement extends Component {
                                                 }}
                                             />
                                             </div> : <label className="col-md-3">{item}:</label> }
-                                            { item == " " ? <Button type="button" onClick={()=>this.upload()}>Upload Document</Button> :
-                                            <Button type="button" onClick={()=>this.Delete(endorsement_doc_id[i])}>Delete</Button>
-                                             }
+                                            {values.status == "discrepancy" ?
+                                            (item == " " ? <Button type="button" onClick={()=>this.upload()}>Upload Document</Button> :
+                                            <Button type="button" onClick={()=>this.Delete(endorsement_doc_id[i])}>Delete</Button>)
+                                            : null
+                                            }
                                         </Row> )  : null
                                     }
 
                                     <Button className={`proceedBtn`} type="button" onClick = {this.props.backButton}>
                                         Back
                                     </Button>
-                                    <Button className={`proceedBtn`} type="submit">
-                                        Update
-                                    </Button>
-                                    
-                                    {/* <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
-                                    {isSubmitting ? "Wait...." : "CREATE"}
-                                    </Button> */}
+                                    {values.status == "discrepancy" ?
+                                    <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
+                                    {isSubmitting ? "Wait...." : "Update"}
+                                    </Button> : null
+                                    }
                                     
                                 </div>                                           
                                 

@@ -108,7 +108,30 @@ class SideNav extends Component {
             ))        
           }
 
-          <li className="treeview leftIcon02">
+          <li key= "1a">
+            <Link to="/NewEndorsement" activeClassName="active" onClick = {this.toggle.bind(this)}>
+              <span className="leftIcon01">
+                <img
+                    src={require('../../../assets/images/leftIcon02Hover.svg')}
+                  alt=""
+                />
+              </span>
+              <span className="hidemenu">New Endorsement</span>
+            </Link>
+          </li>
+          <li key= "2a">
+              <Link to="/ViewEndorsement" activeClassName="active" onClick = {this.toggle.bind(this)}>
+                <span className="leftIcon01">
+                  <img
+                     src={require('../../../assets/images/leftIcon02Hover.svg')}
+                    alt=""
+                  />
+                </span>
+                <span className="hidemenu">View Endorsement</span>
+              </Link>
+            </li>
+
+          {/* <li className="treeview leftIcon02">
             <Link to= '#' activeClassName="active" onClick = {this.toggle.bind(this)}>
                 <span className="leftIcon01">
                   <img
@@ -130,7 +153,7 @@ class SideNav extends Component {
                   </NavLink>
               </li>
            </ul>
-          </li>
+          </li> */}
 
 					<li className="logoutbtn">
 					 <button className="btn-lg" onClick={this.handleLogout}>

@@ -259,18 +259,6 @@ class TwoWheelerOtherComprehensive extends Component {
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
-
-                    if(res.data.UnderwritingResult.MessageList != undefined)
-                    {
-                        var error_messages = res.data.UnderwritingResult.MessageList;
-                        for(var x in error_messages)
-                        {
-                            if(error_messages[x].Code == 'SBIG-PA-UW-U1030') // Decline vehicle
-                            {
-                                swal(error_messages[x].Message);
-                            }
-                        }
-                    }
                 }
                 else {
                     this.setState({
@@ -278,6 +266,18 @@ class TwoWheelerOtherComprehensive extends Component {
                         error: res.data,
                         serverResponse: []
                     });
+
+                    if(res.data.messages != undefined)
+                    {
+                        var error_messages = res.data.messages;
+                        for(var x in error_messages)
+                        {
+                            if(error_messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
+                            {
+                                swal(error_messages[x].message);
+                            }
+                        }
+                    }
                 }
                 this.props.loadingStop();
             })

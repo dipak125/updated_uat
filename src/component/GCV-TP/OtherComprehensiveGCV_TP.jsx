@@ -737,6 +737,16 @@ class OtherComprehensiveGCV extends Component {
                         error: res.data,
                         serverResponse: []
                     });
+
+                    if(res.data.messages != undefined)
+                    {
+                        for (const x in res.data.messages) {
+                            if(res.data.messages[x].code == 'SBIG-PA-Validation-B2321')  // Decline vehicle
+                            {
+                                swal(res.data.messages[x].message);
+                            }
+                        }
+                    }
                 }
                 this.props.loadingStop();
             })

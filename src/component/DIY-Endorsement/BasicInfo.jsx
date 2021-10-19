@@ -54,8 +54,41 @@ const endorsementValidation = Yup.object().shape({
         })
     ),
 
-    email_id: Yup.string().required('This field is required'),
-    mobile_no: Yup.string().required('This field is required'),
+    email_id: Yup.string().required('This field is required')
+                .test("email checking",
+                function(){
+                    return "Invalid email"
+                },
+                
+                (value)=>{
+                   if(value)
+                   {
+                    if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value))
+                    {
+                        return false;
+                    }
+                    return true;
+                   }
+                   return true;
+                }),
+    mobile_no: Yup.string().matches(/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+    ,"Invalid mobile").required('This field is required')
+    .test("length checking",
+    function(){
+        return "Invalid mobile no"
+    },
+    (value)=>{
+       if(value)
+       {
+        console.log("mobile no",typeof(value))
+        if( value.length!==10)
+        {
+            return false;
+        }
+        return true;
+       }
+       return true;
+    }),
     product_category: Yup.string().required('This field is required'),
     product: Yup.string().required('This field is required'),
     policy_no: Yup.string().required('This field is required'),
@@ -252,12 +285,19 @@ class BasicInfo extends Component {
         axios
         .post('dyi-endorsement/fields',formData)
         .then(res=>{
-            addEndorsementFields[i] = res.data.data.fields
+            if(res.data.error == false)
+            {
+                addEndorsementFields[i] = res.data.data.fields
             // this.setState({
             //     addEndorsementFields:res.data.data.fields
             // })
             // this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue)
             this.initAddClaimDetailsList(values,setFieldTouched, setFieldValue, res.data.data.fields, i) 
+            }
+            else
+            {
+                swal("Invalid Policy no")
+            }
             this.props.loadingStop();
            
         })
@@ -288,6 +328,7 @@ class BasicInfo extends Component {
                 this.initEndorsementUpdate(values,setFieldTouched, setFieldValue, res.data.data.fields)   
             }
             else {
+                swal("Invalid Policy no")
                 this.props.loadingStop();
             }
             
