@@ -75,34 +75,6 @@ class SideNav extends Component {
       })
     }
   }
-  endorsement=()=>{
-    return(
-      <>
-        <li key= "1a">
-            <Link to="/NewEndorsement" activeClassName="active" onClick = {this.toggle.bind(this)}>
-              <span className="leftIcon01">
-                <img
-                    src={require('../../../assets/images/leftIcon02Hover.svg')}
-                  alt=""
-                />
-              </span>
-              <span className="hidemenu">New Endorsement</span>
-            </Link>
-          </li>
-          <li key= "2a">
-              <Link to="/ViewEndorsement" activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                     src={require('../../../assets/images/leftIcon02Hover.svg')}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">View Endorsement</span>
-              </Link>
-            </li>
-      </>
-    )
-  }
 
   componentDidMount() {
     this.checkBC();
@@ -135,32 +107,6 @@ class SideNav extends Component {
             </li>
             ))        
           }
-
-          {login_type.bc_master_id == 5 ? this.endorsement():null }
-
-          {/* <li className="treeview leftIcon02">
-            <Link to= '#' activeClassName="active" onClick = {this.toggle.bind(this)}>
-                <span className="leftIcon01">
-                  <img
-                    src={require('../../../assets/images/leftIcon02Hover.svg')}
-                    alt=""
-                  />
-                </span>
-                <span className="hidemenu">Endorsement</span>
-              </Link>
-            <ul className="treeview-menu" >
-              <li>
-                  <NavLink to="/NewEndorsement">                 
-                        New Endorsement Request
-                  </NavLink>
-              </li>
-              <li>
-                  <NavLink to="/ViewEndorsement">
-                        View Status
-                  </NavLink>
-              </li>
-           </ul>
-          </li> */}
 
 					<li className="logoutbtn">
 					 <button className="btn-lg" onClick={this.handleLogout}>
