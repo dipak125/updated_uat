@@ -176,7 +176,9 @@ const ownerValidation = Yup.object().shape({
         }).matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
             return "ValidPan"
         }),
-        otherwise: Yup.string()
+        otherwise: Yup.string().matches(/^[A-Z]{3}[CPHFATBLJG]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}$/, function() {
+            return "ValidPan"
+        })
     }), 
     
     pincode_id:Yup.string().required('LocationRequired'),
