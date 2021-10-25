@@ -144,9 +144,10 @@ const ownerValidation = Yup.object().shape({
             }),
         otherwise: Yup.mixed().nullable()
     }),
-    nominee_age: Yup.mixed().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.mixed().required('RequiredField')
+    
+    nominee_age: Yup.mixed().when(['policy_for','pa_flag'], {
+        is: (policy_for,pa_flag) => (policy_for == '1') && (pa_flag == '1'), 
+        then: Yup.mixed().required('This field is required')
         .test(
             "18YearsChecking",
             function() {
@@ -842,7 +843,7 @@ class AdditionalDetailsGCV extends Component {
 
         const quoteNumber =
         quoteId ? (
-            <h4>{phrases['PolicyReady']}: {quoteId}. {phrases['MoreDetailsPolicy']} </h4>
+            <h4>{phrases['PolicyReady']}: {quoteId} {phrases['MoreDetailsPolicy']} </h4>
         ) : null;
 
         

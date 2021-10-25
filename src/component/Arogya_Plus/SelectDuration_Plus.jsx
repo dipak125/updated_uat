@@ -41,6 +41,7 @@ const initialValues = {
     select_sum_insured: "",
     select_deductible: "",
     select_tenure: "",
+    opd_premium : "",
 }
 
 const today = moment().add(30, 'days');;
@@ -117,6 +118,9 @@ class arogya_SelectDuration extends Component {
         serverResponse: [],
         SliderVal: '',
         sliderVal: '',
+        opdPremiumList: [],
+        opdLimitOfMembers: [],
+        opdFlag: false
     };
 
 
@@ -238,6 +242,7 @@ class arogya_SelectDuration extends Component {
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
 
                 this.quote(values)
+                this.getOpDPremium(values)
             })
             .catch(err => {
                 this.setState({
@@ -247,12 +252,14 @@ class arogya_SelectDuration extends Component {
             });
     }
 
-    SliderValue = (value) => {
+    SliderValue = (value, values) => {
         this.setState({
             SliderVal: value,
             serverResponse: [],
             error: []
         })
+
+        this.handleChangeOpdLimit(values, 0, true, value)
     }
     deductibleSliderValue = (value) => {
         this.setState({
@@ -362,12 +369,82 @@ class arogya_SelectDuration extends Component {
         })
     }
 
+    handleChangeOpdLimit = (values, premium_amount_id = 0, stop, slider_sum_insured = 0) => {
 
+        let polStartDate = moment(values.polStartDate).format("YYYY-MM-DD");
+        let SumInsuredsliderVal = slider_sum_insured ? slider_sum_insured : values.slider_sum_insured;
+        let policyHolderId = localStorage.getItem('policyHolder_id');
+        const formData = new FormData();
+        this.props.loadingStart();
 
+        let premiumAamountId = premium_amount_id ? premium_amount_id : values.opd_premium;
+
+        const post_data = {
+            'policy_holder_id': policyHolderId,
+            'policy_start_date': polStartDate,
+            'sum_insured': parseInt(SumInsuredsliderVal),
+            'premium_amount_id': premiumAamountId,
+        }
+
+        this.setState({
+            'polStartDate' : polStartDate,
+            'slider_sum_insured' : SumInsuredsliderVal,
+            'premium_amount_id' : premiumAamountId,
+            serverResponse: [],
+            error: []
+        });
+
+        console.log(post_data, 'opd-post-data');
+
+        let encryption = new Encryption();
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        
+        axios
+            .post(`/arogya-plus/opd-limit-calculation`, formData)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log(decryptResp.data.opd_amounts, 'opd-response-data');
+                this.setState({
+                    opdLimitOfMembers : decryptResp.data.opd_amounts,
+                    error: [],
+                    opdFlag: true
+                })
+
+                if(stop)
+                {
+                    this.props.loadingStop();
+                }
+            })
+            .catch(err => {
+                this.setState({
+                    serverResponse: []
+                });
+                this.props.loadingStop();
+            });
+    }
+
+    getOpDPremium = (values) => {
+        let encryption = new Encryption();
+        axios
+            .get(`/arogya-plus/opd-premium-list`)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                this.setState({
+                    opdPremiumList: decryptResp.data.premium_list,
+                    error: []
+                });
+                this.handleChangeOpdLimit(values, 1)
+            })
+            .catch(err => {
+                this.setState({
+                    serverResponse: []
+                });
+                this.props.loadingStop();
+            });
+    }
 
     componentDidMount() {
         this.getPolicyHolderDetails();
-        // this.getAccessToken();
     }
 
     render() {
@@ -375,11 +452,10 @@ class arogya_SelectDuration extends Component {
         const { policyHolderDetails, serverResponse, error, EndDate, endDateFlag, validation_error } = this.state
         const request_data = policyHolderDetails ? policyHolderDetails.request_data : null;
         let start_date = request_data && request_data.start_date ? new Date(request_data.start_date) : '';
-        const { SliderVal, deductibleSliderVal, tenureSliderVal } = this.state
+        const { SliderVal, deductibleSliderVal, tenureSliderVal, opdPremiumList, opdLimitOfMembers, opdFlag } = this.state
 
         let end_date = request_data && request_data.end_date ? new Date(request_data.end_date) : "";
         // console.log("policyHolderDetails-----", this.state.policyHolderDetails.request_data.deductible)
-
 
         const newInitialValues = Object.assign(initialValues, {
             polStartDate: start_date ? start_date : new Date(),
@@ -392,6 +468,7 @@ class arogya_SelectDuration extends Component {
             slider_deductible: deductibleSliderVal ? deductibleSliderVal : defaultdeductibleSliderValue,
 
             slider_tenure: tenureSliderVal ? tenureSliderVal : defaulttenureSliderValue,
+            opd_premium: 1
         })
 
         const errMsg = error && error.message ? (
@@ -536,7 +613,7 @@ class arogya_SelectDuration extends Component {
                                                                                     onChange={(e) => {
                                                                                         setFieldTouched("slider_sum_insured");
                                                                                         setFieldValue("slider_sum_insured", e.target.value);
-                                                                                        this.SliderValue(e.target.value)
+                                                                                        this.SliderValue(e.target.value, values)
                                                                                     }}
                                                                                 />
                                                                             </FormGroup>
@@ -591,6 +668,56 @@ class arogya_SelectDuration extends Component {
                                                                             </FormGroup>
                                                                         </Col>
                                                                     </Row>
+                                                                    <Row>
+                                                                        <Col sm={12} md={4} lg={4}>
+                                                                            <FormGroup>
+                                                                                <div className="insurerName">
+                                                                                    Premium Amount
+                                                                                </div>
+                                                                            </FormGroup>
+                                                                        </Col>
+                                                                        <Col sm={12} md={12} lg={6}>
+                                                                            <FormGroup>
+                                                                                <label>
+                                                                                    {opdPremiumList.map((opd, qIndex) => ( 
+                                                                                        <>
+                                                                                            <Field
+                                                                                                type="radio"
+                                                                                                name='opd_premium'
+                                                                                                value={opd.id}
+                                                                                                key={opd.id}
+                                                                                                checked = {values.opd_premium == opd.id ? true : false}
+                                                                                                onChange = {(e) =>{
+                                                                                                    setFieldTouched('opd_premium')
+                                                                                                    setFieldValue('opd_premium', e.target.value)
+                                                                                                    this.handleChangeOpdLimit(values, e.target.value, true)
+                                                                                                }
+                                                                                                }
+                                                                                            />
+                                                                                            <span className="fs-14"> &#8377; {opd.premium_amount} </span>
+                                                                                        </>
+                                                                                    ))}
+                                                                                </label>
+                                                                            </FormGroup>
+                                                                        </Col>
+                                                                    </Row>
+                                                                    <div className="d-flex justify-content-left carloan m-b-25">
+                                                                        <h4> OPD(&#8377;)</h4>
+                                                                    </div>
+                                                                    <Row>
+                                                                    {Object.keys(opdLimitOfMembers).length > 0 ? <Col sm={12}>
+                                                                            <div className="d-flex justify-content-between align-items-center premium m-b-25">
+                                                                                    {Object.keys(opdLimitOfMembers).map((relation, i) => ( 
+                                                                                        <>
+                                                                                            <span className="text-left">
+                                                                                                <p>{relation} :</p>
+                                                                                                <p><strong>Rs:</strong> {opdLimitOfMembers[relation]}</p>
+                                                                                            </span>
+                                                                                        </>
+                                                                                    ))}
+                                                                            </div>
+                                                                        </Col> : null }
+                                                                    </Row>
                                                                     <div className="d-flex justify-content-left carloan m-b-25">
                                                                         <h4> Premium</h4>
                                                                     </div>
@@ -619,14 +746,14 @@ class arogya_SelectDuration extends Component {
                                                                             <Button className={`backBtn`} type="button" onClick={this.medicalQuestions.bind(this, productId)} >
                                                                                 Back
                                                                             </Button>
-                                                                            {serverResponse && serverResponse != "" ? (serverResponse.message ?
+                                                                            {opdFlag ? (serverResponse && serverResponse != "" ? (serverResponse.message ?
                                                                                 <Button className={`proceedBtn`} type="submit"  >
                                                                                     Recalculate
                                                                                 </Button> : <Button className={`proceedBtn`} type="submit"  >
                                                                                     Continue
                                                                                 </Button>) : <Button className={`proceedBtn`} type="submit"  >
                                                                                 Recalculate
-                                                                            </Button>}
+                                                                            </Button>)  : null }
 
                                                                         </div>
                                                                     </Row>

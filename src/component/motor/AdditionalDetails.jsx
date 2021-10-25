@@ -96,19 +96,23 @@ const ownerValidation = Yup.object().shape({
         }
     ),
 
-    nominee_age: Yup.mixed().required('RequiredField')
-    .test(
-        "18YearsChecking",
-        function() {
-            return "Age shoule be minimum 3 month & maximum 100 years"
-        },
-        function (value) {
-            if (value) {
-                return value <= 100 && value >0;
-            }
-            return true;
-        }
-    ),
+    nominee_age: Yup.mixed().when(['policy_for','pa_flag'], {
+        is: (policy_for,pa_flag) => (policy_for == '1') && (pa_flag == '1'), 
+        then: Yup.mixed().required('This field is required')
+        .test(
+            "18YearsChecking",
+            function() {
+                return "Age should be minimum 3 months & maximum 100 years"
+            },
+            function (value) {
+                if (value) {
+                    return value <= 100 && value > 0;
+                }
+                return true;
+        }),
+
+        otherwise: Yup.mixed().nullable()
+    }),
 
     pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
@@ -722,7 +726,7 @@ console.log('post_data', post_data);
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors ------------------ ", errors)
+
                         return (
                         <Form>
                         <Row>

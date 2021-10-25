@@ -294,7 +294,6 @@ class TwoWheelerOtherComprehensive extends Component {
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
-
             if((post_data.idv_value> 5000000) && user_data.user_type == "POSP"  ) {
                 swal("Quote cannot proceed with IDV greater than 5000000")
                 this.props.loadingStop();

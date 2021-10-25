@@ -107,9 +107,10 @@ const ownerValidation = Yup.object().shape({
             }),
         otherwise: Yup.mixed().nullable()
     }), 
-    nominee_age: Yup.mixed().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.mixed().required('RequiredField')
+    
+    nominee_age: Yup.mixed().when(['policy_for','pa_flag'], {
+        is: (policy_for,pa_flag) => (policy_for == '1') && (pa_flag == '1'), 
+        then: Yup.mixed().required('This field is required')
         .test(
             "18YearsChecking",
             function() {
@@ -738,7 +739,7 @@ console.log('post_data', post_data);
                         </div>
                         </aside>
 
-                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
+                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox addiOd">
                             <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                             <section className="brand m-b-25">
                                 <div className="brand-bg">
@@ -751,7 +752,7 @@ console.log('post_data', post_data);
                                     return (
                                     <Form autoComplete="off">
                                     <Row>
-                                        <Col sm={12} md={9} lg={9}>
+                            <Col sm={12} md={12} lg={9}>
                                         <div className="d-flex justify-content-left brandhead">
                                         {quoteNumber}
                                         </div>

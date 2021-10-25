@@ -120,13 +120,14 @@ const ownerValidation = Yup.object().shape({
             }),
         otherwise: Yup.mixed().nullable()
     }),
-    nominee_age: Yup.mixed().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.mixed().required('RequiredField')
+    
+    nominee_age: Yup.mixed().when(['policy_for','pa_flag'], {
+        is: (policy_for,pa_flag) => (policy_for == '1') && (pa_flag == '1'), 
+        then: Yup.mixed().required('This field is required')
         .test(
             "18YearsChecking",
             function() {
-                return "Age should be minimum 3 month & maxmium 100 years"
+                return "Age should be minimum 3 months & maximum 100 years"
             },
             function (value) {
                 if (value) {

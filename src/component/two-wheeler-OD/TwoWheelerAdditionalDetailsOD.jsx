@@ -130,9 +130,10 @@ const ownerValidation = Yup.object().shape({
             }),
         otherwise: Yup.mixed().nullable()
     }),
-    nominee_age: Yup.mixed().when(['policy_for'], {
-        is: policy_for => policy_for == '1', 
-        then: Yup.mixed().required('RequiredField')
+    
+    nominee_age: Yup.mixed().when(['policy_for','pa_flag'], {
+        is: (policy_for,pa_flag) => (policy_for == '1') && (pa_flag == '1'), 
+        then: Yup.mixed().required('This field is required')
         .test(
             "18YearsChecking",
             function() {
@@ -147,7 +148,6 @@ const ownerValidation = Yup.object().shape({
 
         otherwise: Yup.mixed().nullable()
     }),
-	
 	
     pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 

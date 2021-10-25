@@ -54,28 +54,17 @@ const endorsementValidation = Yup.object().shape({
         })
     ),
 
-    email_id: Yup.string().required('This field is required')
-                .test("email checking",
-                function(){
-                    return "Invalid email"
-                },
-                
-                (value)=>{
-                   if(value)
-                   {
-                    if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value))
-                    {
-                        return false;
-                    }
-                    return true;
-                   }
-                   return true;
-                }),
+    email_id:Yup.string().email().required('EmailRequired').min(8, function() {
+        return "EmainMin"
+    })
+    .max(75, function() {
+        return "EmailMax"
+    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
     mobile_no: Yup.string().matches(/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-    ,"Invalid mobile").required('This field is required')
+    ,"Invalid mobile number").required('This field is required')
     .test("length checking",
     function(){
-        return "Invalid mobile no"
+        return "Invalid mobile number"
     },
     (value)=>{
        if(value)
@@ -129,6 +118,7 @@ const endorsementValidation = Yup.object().shape({
 
 class BasicInfo extends Component {
     check=0;
+    field_check=false;
     state = {
         product_category_list: [],
         product_list: [],
@@ -146,7 +136,8 @@ class BasicInfo extends Component {
         type2_info_id:"",
         count:0,
         add_endorsement_received_date: [],
-        Document_List: []
+        Document_List: [],
+        
        
     }
    
@@ -287,6 +278,7 @@ class BasicInfo extends Component {
         .then(res=>{
             if(res.data.error == false)
             {
+                this.field_check=true;
                 addEndorsementFields[i] = res.data.data.fields
             // this.setState({
             //     addEndorsementFields:res.data.data.fields
@@ -296,6 +288,7 @@ class BasicInfo extends Component {
             }
             else
             {
+                this.field_check=false;
                 swal("Invalid Policy no")
             }
             this.props.loadingStop();
@@ -317,6 +310,7 @@ class BasicInfo extends Component {
         .post('dyi-endorsement/fields',formData)
         .then(res=>{
             if(res.data.error == false) {
+                this.field_check=true;
                 let Document_List = res.data.data.Document_List
                 // let Document_List = "RC Copy/Birth Certificate/Aadhar Card"
                 this.setState({
@@ -328,6 +322,7 @@ class BasicInfo extends Component {
                 this.initEndorsementUpdate(values,setFieldTouched, setFieldValue, res.data.data.fields)   
             }
             else {
+                this.field_check=false;
                 swal("Invalid Policy no")
                 this.props.loadingStop();
             }
@@ -586,7 +581,9 @@ class BasicInfo extends Component {
     })
    
     this.props.loadingStart();
-    axios
+    if(this.field_check==true)
+    {
+        axios
     .post("dyi-endorsement/create",formData)
     .then(res=>{
         if(res.data.error == false) {
@@ -617,6 +614,12 @@ class BasicInfo extends Component {
     .catch((err)=>{
         this.props.loadingStop()
     })
+    }
+    else
+    {
+        swal("Policy No Invalid");
+        this.props.loadingStop();
+    }
    
 }
 
@@ -937,6 +940,7 @@ class BasicInfo extends Component {
                                                     autoComplete="off"
                                                     placeholder = "Mobile Number"
                                                     className="formGrp inputfs12"
+                                                    maxLength="10"
                                                     value = {values.mobile_no}                                             
                                                 >  
                                                 </Field>
