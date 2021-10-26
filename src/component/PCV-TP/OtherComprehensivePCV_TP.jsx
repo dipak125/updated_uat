@@ -50,7 +50,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     chasis_no_last_part: Yup.string().required('RequiredField')
         .matches(/^([0-9]*)$/, function () {
-            return "Invalid number"
+            return "InvalidNumber"
         })
         .min(5, function () {
             return "ChasisLastDigit"

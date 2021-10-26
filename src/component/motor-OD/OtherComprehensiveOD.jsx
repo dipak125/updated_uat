@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber,compareStartEndYear } from "../../shared/validationFunctions";
+import {  userTypes } from "../../shared/staticValues";
 
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
@@ -55,7 +56,7 @@ const ComprehensiveValidation = Yup.object().shape({
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
     chasis_no_last_part:Yup.string().required('RequiredField')
-    .matches(/^([0-9]*)$/, function() {
+    .matches(/^([a-zA-Z0-9]*)$/, function() {
         return "InvalidNumber"
     })
     .min(5, function() {
@@ -1340,7 +1341,7 @@ class OtherComprehensiveOD extends Component {
                                                                             setFieldValue('vahanVerify', false)
 
                                                                             setFieldTouched('chasis_no_last_part')
-                                                                            setFieldValue('chasis_no_last_part', e.target.value)                       
+                                                                setFieldValue('chasis_no_last_part', e.target.value.toUpperCase())                       
                                                                         }}                           
                                                                         
                                                                     />
@@ -1375,11 +1376,11 @@ class OtherComprehensiveOD extends Component {
                                                             autoComplete="off"
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                            value= {values.engine_no.toUpperCase()}
+                                                value= {values.engine_no}
                                                             maxLength="17"
                                                             onChange = {(e) => {
                                                                 setFieldTouched('engine_no')
-                                                                setFieldValue('engine_no', e.target.value)                       
+                                                    setFieldValue('engine_no', e.target.value.toUpperCase())                       
                                                             }}  
                                                         />
                                                         {errors.engine_no && touched.engine_no ? (
@@ -1398,11 +1399,11 @@ class OtherComprehensiveOD extends Component {
                                                             autoComplete="off"
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                            value= {values.chasis_no.toUpperCase()}
+                                                value= {values.chasis_no}
                                                             maxLength="25"
                                                             onChange = {(e) => {
                                                                 setFieldTouched('chasis_no')
-                                                                setFieldValue('chasis_no', e.target.value)                       
+                                                    setFieldValue('chasis_no', e.target.value.toUpperCase())                       
                                                             }} 
                                                         />
                                                         {errors.chasis_no && touched.chasis_no ? (

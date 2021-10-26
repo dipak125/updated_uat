@@ -150,6 +150,7 @@ class arogya_SelectDuration extends Component {
         let SumInsuredsliderVal = values.slider_sum_insured ? values.slider_sum_insured : 0
         let deductibleSliderVal = values.slider_deductible ? values.slider_deductible : 0
         let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
+        let opd_premium = values.opd_premium ? values.opd_premium : 0
 
         let total_idv = 0
         let coverTypeId = policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.cover_type_id
@@ -192,6 +193,7 @@ class arogya_SelectDuration extends Component {
             'sum_insured': parseInt(SumInsuredsliderVal),
             'deductible': parseInt(deductibleSliderVal),
             'tenure_year': parseInt(tenureSliderVal),
+            'opd_premium_amount_id': opd_premium
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
 
@@ -217,7 +219,7 @@ class arogya_SelectDuration extends Component {
         this.props.loadingStart();
         let encryption = new Encryption();
         let policyHolder_refNo = localStorage.getItem("policyHolder_refNo");
-        console.log("policyHolderDetails-----", this.policyHolderDetails)
+
         axios.get(`arogya-plus/health-policy-details/${policyHolder_refNo}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
@@ -240,6 +242,7 @@ class arogya_SelectDuration extends Component {
                 values['slider_sum_insured'] = insuredAmountDetails && insuredAmountDetails.insured_amount ? parseInt(insuredAmountDetails.insured_amount) : defaultSliderVal
                 values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
+                values['opd_premium'] = policyDetails && policyDetails.opd_premium_amount_id ? policyDetails.opd_premium_amount_id : 1
 
                 this.quote(values)
                 this.getOpDPremium(values)
@@ -259,7 +262,7 @@ class arogya_SelectDuration extends Component {
             error: []
         })
 
-        this.handleChangeOpdLimit(values, 0, true, value)
+        this.handleChangeOpdLimit(values, 0, value)
     }
     deductibleSliderValue = (value) => {
         this.setState({
@@ -369,7 +372,7 @@ class arogya_SelectDuration extends Component {
         })
     }
 
-    handleChangeOpdLimit = (values, premium_amount_id = 0, stop, slider_sum_insured = 0) => {
+    handleChangeOpdLimit = (values, premium_amount_id = 0, slider_sum_insured = 0) => {
 
         let polStartDate = moment(values.polStartDate).format("YYYY-MM-DD");
         let SumInsuredsliderVal = slider_sum_insured ? slider_sum_insured : values.slider_sum_insured;
@@ -389,9 +392,7 @@ class arogya_SelectDuration extends Component {
         this.setState({
             'polStartDate' : polStartDate,
             'slider_sum_insured' : SumInsuredsliderVal,
-            'premium_amount_id' : premiumAamountId,
-            serverResponse: [],
-            error: []
+            'premium_amount_id' : premiumAamountId
         });
 
         console.log(post_data, 'opd-post-data');
@@ -406,14 +407,12 @@ class arogya_SelectDuration extends Component {
                 console.log(decryptResp.data.opd_amounts, 'opd-response-data');
                 this.setState({
                     opdLimitOfMembers : decryptResp.data.opd_amounts,
+                    serverResponse: [],
                     error: [],
                     opdFlag: true
                 })
 
-                if(stop)
-                {
-                    this.props.loadingStop();
-                }
+                this.props.loadingStop();
             })
             .catch(err => {
                 this.setState({
@@ -433,7 +432,8 @@ class arogya_SelectDuration extends Component {
                     opdPremiumList: decryptResp.data.premium_list,
                     error: []
                 });
-                this.handleChangeOpdLimit(values, 1)
+
+                this.handleChangeOpdLimit(values)
             })
             .catch(err => {
                 this.setState({
@@ -468,7 +468,7 @@ class arogya_SelectDuration extends Component {
             slider_deductible: deductibleSliderVal ? deductibleSliderVal : defaultdeductibleSliderValue,
 
             slider_tenure: tenureSliderVal ? tenureSliderVal : defaulttenureSliderValue,
-            opd_premium: 1
+            opd_premium: request_data && request_data.opd_premium_amount_id ? request_data.opd_premium_amount_id : 1,
         })
 
         const errMsg = error && error.message ? (
@@ -690,7 +690,7 @@ class arogya_SelectDuration extends Component {
                                                                                                 onChange = {(e) =>{
                                                                                                     setFieldTouched('opd_premium')
                                                                                                     setFieldValue('opd_premium', e.target.value)
-                                                                                                    this.handleChangeOpdLimit(values, e.target.value, true)
+                                                                                                    this.handleChangeOpdLimit(values, e.target.value)
                                                                                                 }
                                                                                                 }
                                                                                             />
