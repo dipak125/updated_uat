@@ -179,8 +179,8 @@ class arogya_SelectDuration extends Component {
         const post_data = {
             'page_name': `SelectDuration_Plus/${productId}`,
             'policy_holder_id': policy_holder_id,
-            'start_date': serverResponse.EffectiveDate,
-            'end_date': serverResponse.ExpiryDate,
+            'start_date': moment(serverResponse.EffectiveDate).format("YYYY-MM-DD"),
+            'end_date': moment(serverResponse.ExpiryDate).format("YYYY-MM-DD"),
             'gross_premium': serverResponse.GrossPremium,
             'service_tax': serverResponse.TGST,
             'swatch_bharat_cess': 0,
@@ -285,6 +285,8 @@ class arogya_SelectDuration extends Component {
         let SumInsuredsliderVal = values.slider_sum_insured ? values.slider_sum_insured : 0
         let deductibleSliderVal = values.slider_deductible ? values.slider_deductible : 0
         let tenureSliderVal = values.slider_tenure ? values.slider_tenure : 0
+        let premiumAamountId = values.opd_premium;
+
         const formData = new FormData();
         this.props.loadingStart();
 
@@ -295,6 +297,7 @@ class arogya_SelectDuration extends Component {
             'sum_insured': parseInt(SumInsuredsliderVal),
             'deductible': parseInt(deductibleSliderVal),
             'tenure_year': parseInt(tenureSliderVal),
+            'opd_premium_amount_id': premiumAamountId,
         }
         console.log('post_data-----', post_data);
 

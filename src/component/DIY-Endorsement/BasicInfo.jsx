@@ -104,7 +104,7 @@ const endorsementValidation = Yup.object().shape({
                         console.log("test Value ------------- ", value)
                         if (value) {
                             let fileType = value.split('.').pop();
-                            return (fileType === 'jpeg' || fileType === 'png' || fileType === 'pdf');
+                            return (fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG' || fileType === 'pdf' || fileType === 'jpg' || fileType === 'JPG');
                         }
             
                     }),   
@@ -512,6 +512,7 @@ class BasicInfo extends Component {
            }
         )
         this.props.loadingStart();
+        
         axios
         .post('dyi-endorsement/document',formData)
         .then(res=>{
@@ -519,7 +520,7 @@ class BasicInfo extends Component {
             this.props.loadingStop();
         })
         .catch(err=>{
-            swal(err.data.msg)
+            swal("Unable to upload")
             this.props.loadingStop();
         })
     }
@@ -1066,6 +1067,7 @@ class BasicInfo extends Component {
                                                 <input type="file" key={i} name="file"
                                                 accept=".png, .jpeg, .jpg, .pdf"
                                                 onChange={(e) => {
+                        
                                                     const { target } = e
                                                     if (target.value.length > 0) {           
                                                         this.onFileChange(e.target.files, setFieldValue,setFieldTouched, i)

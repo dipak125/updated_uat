@@ -201,6 +201,7 @@ class PolicyDetails_Plus extends Component {
       'sum_insured': sunInsured ? parseInt(sunInsured) : null,
       'deductible': policyDetails ? parseInt(policyDetails.deductible) : null,
       'tenure_year': policyDetails ? parseInt(policyDetails.tenure_year) : null,
+      'opd_premium_amount_id': policyDetails && policyDetails.opd_premium_amount_id ? policyDetails.opd_premium_amount_id : 1,
     }
     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
 
