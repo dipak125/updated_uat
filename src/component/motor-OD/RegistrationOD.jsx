@@ -584,7 +584,7 @@ class RegistrationOD extends Component {
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value={values.reg_number_part_one}
-                                                                            maxLength="2"
+                                                                            maxLength="3"
                                                                             onInput={e => {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                                 setFieldTouched('check_registration')
@@ -602,7 +602,7 @@ class RegistrationOD extends Component {
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value={values.reg_number_part_two}
-                                                                            maxLength="3"
+                                                                            maxLength="2"
                                                                             onInput={e => {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                                 setFieldTouched('check_registration')

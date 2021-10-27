@@ -225,7 +225,7 @@ export const validRegistrationNumber = (value) => {
 
 export const registrationNumberFirstBlock = (value) => {
     var str = /^[a-zA-Z]*$/;
-        if(value && value.match(str) && value.length == 2) {    
+        if(value && value.match(str) && value.length >= 2 && value.length <= 3) {    
             if (value == 0) {
                 return false;
             }         
@@ -238,20 +238,17 @@ export const registrationNumberSecondBlock = (value) => {
     var str1 = /^([0]+[1-9]*)$/;
     var str2 = /^([0]+[a-zA-Z]*)$/;
         if(value) {
-            if(value.match(str) && value.length <= 3) {    
-                if (value == 0 || value.match(str1) || value.match(str2)) {
-                    return false;
-                }         
-                else return true;  
+            if(value.match(str) && value.length == 2) {    
+               return true;  
             }
             else return false;
         }
-        else return true;
+        else return false;
 }
 export const registrationNumberThirdBlock = (value) => {
     var str = /^[a-zA-Z0-9]*$/;
         if(value) {
-            if(value.match(str) && value.length <= 3) {    
+            if(value.match(str) && value.length >= 2 && value.length <= 3) {    
                 if (value == 0) {
                     return false;
                 }         
@@ -265,7 +262,7 @@ export const registrationNumberThirdBlock = (value) => {
 
 export const registrationNumberLastBlock = (value) => {
     var str = /^[0-9]*$/;
-        if(value && value.match(str)) {    
+        if(value && value.match(str) && value.length == 4) {    
             if (value == 0) {
                 return false;
             }         

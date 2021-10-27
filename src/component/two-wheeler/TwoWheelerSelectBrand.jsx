@@ -825,7 +825,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={values.reg_number_part_one}
                                                                     disabled= {values.check_registration == '1' ? true : false}
-                                                                    maxLength="2"
+                                                                    maxLength="3"
                                                                     onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                         setFieldTouched('check_registration')
@@ -844,7 +844,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={values.reg_number_part_two}
                                                                     disabled= {values.check_registration == '1' ? true : false}
-                                                                    maxLength="3"
+                                                                    maxLength="2"
                                                                     onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
                                                                         setFieldTouched('check_registration')
