@@ -86,7 +86,7 @@ const endorsementValidation = Yup.object().shape({
 
     fileData: Yup.array().of(
         Yup.object().shape({
-            fileSize: Yup.string().required('This field is required')
+            fileSize: Yup.string()
                 .test(
                     "filesize",
                     function() {
@@ -99,13 +99,18 @@ const endorsementValidation = Yup.object().shape({
                         return true;
                     }
                 ),
-                fileName: Yup.string().required('This field is required')
-                    .test('type', "Only Jpeg, Jpg, Png, Pdf file format is allowed", (value) => {
+                fileName: Yup.string()
+                    .test('type', 
+                    function (){
+                        return "Only Jpeg, Jpg, Png, Pdf file format is allowed"
+                    },
+                    function (value){
                         console.log("test Value ------------- ", value)
                         if (value) {
                             let fileType = value.split('.').pop();
                             return (fileType === 'jpeg' || fileType === 'JPEG' || fileType === 'png' || fileType === 'PNG' || fileType === 'pdf' || fileType === 'jpg' || fileType === 'JPG');
                         }
+                        return true;
             
                     }),   
 
@@ -312,6 +317,7 @@ class BasicInfo extends Component {
             if(res.data.error == false) {
                 this.field_check=true;
                 let Document_List = res.data.data.Document_List
+                console.log("document list===",res.data.data)
                 // let Document_List = "RC Copy/Birth Certificate/Aadhar Card"
                 this.setState({
                     endorsementfields:res.data.data.fields,
@@ -475,12 +481,13 @@ class BasicInfo extends Component {
         console.log("fileSize ================== ", fileSize
         )
         if (fileSize[0] && fileSize[0].name !== "") {
+            i=0;
             let selectedFileSize = fileSize[0].size;
-            setFieldTouched(`fileData[${i}]fileSize`)
-            setFieldValue(`fileData[${i}]fileSize`, selectedFileSize);
-            setFieldTouched(`fileData[${i}]fileName`)
-            setFieldValue(`fileData[${i}]fileName`, fileSize[0].name);
             
+            setFieldValue(`fileData[${i}]fileSize`, selectedFileSize);
+            setFieldValue(`fileData[${i}]fileName`, fileSize[0].name);
+            // setFieldTouched(`fileData[${i}]fileSize`)
+            // setFieldTouched(`fileData[${i}]fileName`)
             if(selectedFileSize <= 2097152) {
                 let selectedFile = fileSize[0];
                 let selectedFileName = fileSize[0].name;
@@ -764,13 +771,13 @@ class BasicInfo extends Component {
                             
                             <div className="formSection">
                                 <Field
-                                    name= {`additionalEndorsement[${i}]add_endorsement_type`}
+                                    name= {`additionalEndorsement[${i}].add_endorsement_type`}
                                     component="select"
                                     autoComplete="off"
                                     className="formGrp inputfs12"
                                     //  value = {values.add_endorsement_type} 
                                      onChange={(e)=>{         
-                                        setFieldValue(`additionalEndorsement[${i}]add_endorsement_type`,e.target.value)
+                                        setFieldValue(`additionalEndorsement[${i}].add_endorsement_type`,e.target.value)
                                          this.getAddEndorsementSubTypeList(e.target.value,values, errors, touched, setFieldTouched, setFieldValue, i)                             
                                      }} 
                                                                       
@@ -1042,6 +1049,7 @@ class BasicInfo extends Component {
                                                 let newCount = count+1
                                                 this.setState({count:newCount})
                                                 setFieldValue("newCount", newCount)
+                                                
                                             }               
                                         } 
                                         >
@@ -1069,7 +1077,9 @@ class BasicInfo extends Component {
                                                 onChange={(e) => {
                         
                                                     const { target } = e
-                                                    if (target.value.length > 0) {           
+                                                    if (target.value.length > 0) {   
+                                                        
+                                                            
                                                         this.onFileChange(e.target.files, setFieldValue,setFieldTouched, i)
                                                     } 
                                                 }}
