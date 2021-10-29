@@ -102,7 +102,7 @@ const endorsementValidation = Yup.object().shape({
 
     fileData: Yup.array().of(
         Yup.object().shape({
-            fileSize: Yup.string().required('This field is required')
+            fileSize: Yup.string()
                 .test(
                     "filesize",
                     function() {
