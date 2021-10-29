@@ -36,48 +36,64 @@ const endorsementValidation = Yup.object().shape({
 
     makeEndorsement: Yup.array().of(
         Yup.object().shape({
-            New_values: Yup.string().required('This field is required'),
+            New_values: Yup.string().required('This field is required')
+            .test(
+                "validation_rules",
+                function(){return "Invalid Input"; },
+                function (value) {    
+                    if ( value && (value != '' || value != undefined) ) { 
+                        let str = new RegExp(this.parent.validation_rules)
+                        if(value.match(str)) { 
+                        return true
+                        }
+                        else return false
+                    }
+                    else {
+                        return false
+                    }
+            }),
             // Old_values: Yup.string().required('This field is required')            
         })
     ),
-
+    
     additionalEndorsement: Yup.array().of(
         Yup.object().shape({
             add_endorsement_sub_type: Yup.string().required('This field is required'),
             add_endorsement_type: Yup.string().required('This field is required'),
             addEndorsementInitValues: Yup.array().of(
                 Yup.object().shape({
-                    add_endorsement_new_value: Yup.string().required('This field is required'),
+                    add_endorsement_new_value: Yup.string().required('This field is required')
+                    .test(
+                        "validation_rules",
+                        function(){return "Invalid Input"; },
+                        function (value) {    
+                            if ( value && (value != '' || value != undefined) ) { 
+                                let str = new RegExp(this.parent.add_endorsement_validation_rules)
+                                if(value.match(str)) { 
+                                return true
+                                }
+                                else return false
+                            }
+                            else {
+                                return false
+                            }
+                    }),
                     // add_endorsement_old_value: Yup.string().required('This field is required')            
                 })
             )
         })
     ),
 
-    email_id:Yup.string().email().required('EmailRequired').min(8, function() {
-        return "EmainMin"
-    })
-    .max(75, function() {
-        return "EmailMax"
-    }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
-    mobile_no: Yup.string().matches(/^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-    ,"Invalid mobile number").required('This field is required')
-    .test("length checking",
-    function(){
-        return "Invalid mobile number"
-    },
-    (value)=>{
-       if(value)
-       {
-        console.log("mobile no",typeof(value))
-        if( value.length!==10)
-        {
-            return false;
-        }
-        return true;
-       }
-       return true;
-    }),
+    email_id:Yup.string().email().required('This field is required').min(8, function() {
+        return "Min 8 characters required"
+        })
+        .max(75, function() {
+            return "Max 75 characters required"
+        }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'Invalid Email'),
+
+    mobile_no: Yup.string()
+        .matches(/^[6-9][0-9]{9}$/,'Invalid mobile number').required('This field is required'),
+
     product_category: Yup.string().required('This field is required'),
     product: Yup.string().required('This field is required'),
     policy_no: Yup.string().required('This field is required'),
@@ -86,7 +102,7 @@ const endorsementValidation = Yup.object().shape({
 
     fileData: Yup.array().of(
         Yup.object().shape({
-            fileSize: Yup.string()
+            fileSize: Yup.string().required('This field is required')
                 .test(
                     "filesize",
                     function() {
@@ -142,6 +158,8 @@ class BasicInfo extends Component {
         count:0,
         add_endorsement_received_date: [],
         Document_List: [],
+        endorsementValidationRules: [],
+        addEndorsementValidationRules: []
         
        
     }
@@ -272,7 +290,7 @@ class BasicInfo extends Component {
 
     getAddEndorsementFields=(field_id,values, errors, touched, setFieldTouched, setFieldValue, i)=>{
         const formData=new FormData();
-        const {addEndorsementFields} = this.state
+        const {addEndorsementFields, addEndorsementValidationRules} = this.state
         formData.append("endorsementinfo_id",this.state.type2_info_id);
         formData.append("endrosment_data_id",this.state.endorsement_data_id);
         formData.append("field_id",field_id);
@@ -285,11 +303,12 @@ class BasicInfo extends Component {
             {
                 this.field_check=true;
                 addEndorsementFields[i] = res.data.data.fields
+                addEndorsementValidationRules[i]= res.data.data.validation_rules ? res.data.data.validation_rules : []
             // this.setState({
             //     addEndorsementFields:res.data.data.fields
             // })
             // this.additionalEndorsement(values, errors, touched, setFieldTouched, setFieldValue)
-            this.initAddClaimDetailsList(values,setFieldTouched, setFieldValue, res.data.data.fields, i) 
+            this.initAddClaimDetailsList(values,setFieldTouched, setFieldValue, res.data.data.fields, i, addEndorsementValidationRules) 
             }
             else
             {
@@ -317,15 +336,15 @@ class BasicInfo extends Component {
             if(res.data.error == false) {
                 this.field_check=true;
                 let Document_List = res.data.data.Document_List
-                console.log("document list===",res.data.data)
                 // let Document_List = "RC Copy/Birth Certificate/Aadhar Card"
                 this.setState({
                     endorsementfields:res.data.data.fields,
                     Document_List: Document_List.split("/"),
-                    upload_count: res.data.data.upload_count
+                    upload_count: res.data.data.upload_count,
+                    endorsementValidationRules : res.data.data.validation_rules
                 })         
                 this.props.loadingStop();
-                this.initEndorsementUpdate(values,setFieldTouched, setFieldValue, res.data.data.fields)   
+                this.initEndorsementUpdate(values,setFieldTouched, setFieldValue, res.data.data.fields, res.data.data.validation_rules)   
             }
             else {
                 this.field_check=false;
@@ -422,7 +441,7 @@ class BasicInfo extends Component {
 
     makeEndorsementNewField=(values, errors, touched, setFieldTouched, setFieldValue)=>{
        const arr=[];
-       const {endorsementfields} =this.state
+       const {endorsementfields,endorsementValidationRules} =this.state
        endorsementfields && Object.keys(endorsementfields).map((item,i)=>
        arr.push( 
             <FormGroup key={`new${i}`}>
@@ -449,10 +468,11 @@ class BasicInfo extends Component {
             
     }
 
-    initEndorsementUpdate = async (values,setFieldTouched, setFieldValue ,endorsementfields ) => {
+    initEndorsementUpdate = async (values,setFieldTouched, setFieldValue ,endorsementfields,endorsementValidationRules ) => {
         let innicialClaimList = []
 
-        endorsementfields && Object.keys(endorsementfields).map((item,i)=>{
+        endorsementfields && endorsementValidationRules && Object.keys(endorsementfields).map((item,i)=>{
+            let validationLength = endorsementValidationRules[item].length
             innicialClaimList.push(
                 {
                     // endorsement_type: endorsement_array && endorsement_array[i] && endorsement_array[i].endorsement_type ? endorsement_array[i].endorsement_type : "",
@@ -460,6 +480,7 @@ class BasicInfo extends Component {
                     // request_receive_date: endorsement_array && endorsement_array[i] && endorsement_array[i].request_receive_date ? endorsement_array[i].request_receive_date : "",
                     // Old_values: "",
                     New_values: "",
+                    validation_rules: endorsementValidationRules[item].substring(2,validationLength-2)
                 }
                 
             )
@@ -467,11 +488,13 @@ class BasicInfo extends Component {
         setFieldValue("makeEndorsement",innicialClaimList)
     };
 
-    initAddClaimDetailsList = (values,setFieldTouched, setFieldValue ,endorsementfields, j ) => {
+    initAddClaimDetailsList = (values,setFieldTouched, setFieldValue ,endorsementfields, j, addEndorsementValidationRules ) => {
         setFieldValue(`additionalEndorsement[${j}]add_endorsement_old_value`,"")
-        endorsementfields && Object.keys(endorsementfields).map((item,i)=>{
+        endorsementfields && addEndorsementValidationRules && Object.keys(endorsementfields).map((item,i)=>{
+            let validationLength = addEndorsementValidationRules[j][item].length
             // setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_old_value`,"")
             setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,"")
+            setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_validation_rules`,addEndorsementValidationRules[j][item].substring(2,validationLength-2))
         })
     };
 
@@ -801,13 +824,13 @@ class BasicInfo extends Component {
                             
                             <div className="formSection">
                                 <Field
-                                    name= {`additionalEndorsement[${i}]add_endorsement_sub_type`}
+                                    name= {`additionalEndorsement[${i}].add_endorsement_sub_type`}
                                     component="select"
                                     autoComplete="off"
                                     className="formGrp inputfs12"
                                     //  value = {values.endorsement_sub_type}  
                                      onChange={(e)=>{
-                                        setFieldValue(`additionalEndorsement[${i}]add_endorsement_sub_type`,e.target.value)
+                                        setFieldValue(`additionalEndorsement[${i}].add_endorsement_sub_type`,e.target.value)
                                         this.getAddEndorsementFields(e.target.value,values, errors, touched, setFieldTouched, setFieldValue, i);
                                      }}                                                                  
                                 >  
@@ -829,7 +852,7 @@ class BasicInfo extends Component {
                         <div className="col-md-4">                                            
                             <div className="formSection">                         
                                 <DatePicker
-                                    name= {`additionalEndorsement[${i}]add_endorsement_received_date`}
+                                    name= {`additionalEndorsement[${i}].add_endorsement_received_date`}
                                     dateFormat="dd MMM yyyy"
                                     placeholderText="Request Receive Date"
                                     peekPreviousMonth
@@ -845,8 +868,8 @@ class BasicInfo extends Component {
                                     // selected={add_endorsement_received_date[i]}
                                     onChange={(val) => {  
                                         add_endorsement_received_date[i]=val
-                                        setFieldTouched(`additionalEndorsement[${i}]add_endorsement_received_date`);
-                                        setFieldValue(`additionalEndorsement[${i}]add_endorsement_received_date`, val);
+                                        setFieldTouched(`additionalEndorsement[${i}].add_endorsement_received_date`);
+                                        setFieldValue(`additionalEndorsement[${i}].add_endorsement_received_date`, val);
                                         }}
                                 />
                                 {errors.additionalEndorsement && errors.additionalEndorsement[i] && errors.additionalEndorsement[i].add_endorsement_received_date 
@@ -892,13 +915,13 @@ class BasicInfo extends Component {
     }
 
     render() {
-        const { product_category_list, product_list,count, Document_List, upload_count} = this.state
+        const { product_category_list, product_list,count, Document_List, upload_count, endorsementValidationRules, addEndorsementValidationRules} = this.state
         const newInitialValues = Object.assign(initialValues,{
             makeEndorsement: [],
             additionalEndorsement: []
         }
         )
-        console.log("Document_List ============= ", this.state.selectedFile)
+        // console.log("endorsementValidationRules ============= ", endorsementValidationRules)
 
         return (
             <>
@@ -911,7 +934,7 @@ class BasicInfo extends Component {
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                 console.log("values ---------- ", values)
-                                console.log("error=======",errors)
+                                // console.log("error=======",errors)
                                 
                             return (
                                 <Form>    
@@ -1049,7 +1072,6 @@ class BasicInfo extends Component {
                                                 let newCount = count+1
                                                 this.setState({count:newCount})
                                                 setFieldValue("newCount", newCount)
-                                                
                                             }               
                                         } 
                                         >
@@ -1077,9 +1099,7 @@ class BasicInfo extends Component {
                                                 onChange={(e) => {
                         
                                                     const { target } = e
-                                                    if (target.value.length > 0) {   
-                                                        
-                                                            
+                                                    if (target.value.length > 0) {           
                                                         this.onFileChange(e.target.files, setFieldValue,setFieldTouched, i)
                                                     } 
                                                 }}
