@@ -40,7 +40,7 @@ const actionFormatter = (refObj) => (cell, row) => {
         <Button type="button" style = {style}>View</Button>
       </LinkWithTooltip>
   &nbsp;
-      <LinkWithTooltip
+      {/* <LinkWithTooltip
       tooltip="Click to get updated status"
       href="#"
       clicked={() => refObj.getStatus(cell,row)
@@ -48,7 +48,7 @@ const actionFormatter = (refObj) => (cell, row) => {
       id="tooltip-1"
       >               
       <Button type="button" style = {style}>Get Status</Button>
-      </LinkWithTooltip>
+      </LinkWithTooltip> */}
     </div>
   )
 }
