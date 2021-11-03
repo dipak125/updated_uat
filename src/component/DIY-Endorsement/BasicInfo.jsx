@@ -43,7 +43,7 @@ const endorsementValidation = Yup.object().shape({
                 function (value) {    
                     if ( value && (value != '' || value != undefined) ) { 
                         let str = new RegExp(this.parent.validation_rules)
-                        if(value.match(str)) { 
+                        if(this.parent.validation_rules=="at" || value.match(str)) { 
                         return true
                         }
                         else return false
@@ -51,6 +51,7 @@ const endorsementValidation = Yup.object().shape({
                     else {
                         return false
                     }
+                   
             }),
             // Old_values: Yup.string().required('This field is required')            
         })
@@ -69,7 +70,7 @@ const endorsementValidation = Yup.object().shape({
                         function (value) {    
                             if ( value && (value != '' || value != undefined) ) { 
                                 let str = new RegExp(this.parent.add_endorsement_validation_rules)
-                                if(value.match(str)) { 
+                                if( this.parent.add_endorsement_validation_rules=="at" || value.match(str)) { 
                                 return true
                                 }
                                 else return false
@@ -388,26 +389,55 @@ class BasicInfo extends Component {
      makeAddEndorsementNewField=(values, errors, touched, setFieldTouched, setFieldValue,j)=>{
         const arr=[];
         const {addEndorsementFields} =this.state
-        addEndorsementFields && addEndorsementFields[j] && Object.keys(addEndorsementFields[j]).map((item,i)=>
+        console.log("1=",addEndorsementFields)
+        addEndorsementFields && addEndorsementFields[j] && Object.keys(addEndorsementFields[j]).map((item,i)=>{
+       
         arr.push(
-            <FormGroup key={`newAdd${i}`}>
-                <Field
-                    name={`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`}
-                    type="text"
-                    autoComplete="off"
-                    placeholder={`Additional New ${addEndorsementFields[j][item]}`}
-                    className="formGrp inputfs12"
-                    onChange={(e)=>{                     
-                        setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,e.target.value)
-                    }}
-                >
-                </Field>
-                {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].addEndorsementInitValues && errors.additionalEndorsement[j].addEndorsementInitValues[i] && errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value 
-                && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].addEndorsementInitValues && touched.additionalEndorsement[j].addEndorsementInitValues[i] && touched.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value ? (
-                    <span className="errorMsg">{errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}</span>
-                ) : null}
-            </FormGroup>
-        )  )      
+           addEndorsementFields[j][item].includes("Date") || addEndorsementFields[j][item].includes("DOB")?
+           <FormGroup key={`newAdd${i}`}>
+           <DatePicker
+           name={`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`}
+           placeholderText={`Additional New ${addEndorsementFields[j][item]}`}
+           dateFormat="dd MMM yyyy"
+            peekPreviousMonth
+            peekPreviousYear
+            showMonthDropdown
+             showYearDropdown
+              dropdownMode="select"
+            //  maxDate={new Date(maxDobAdult)}
+            //  minDate={new Date(minDobAdult)}
+           className="datePckr"   
+             selected={values.additionalEndorsement && values.additionalEndorsement[j] && values.additionalEndorsement[j].addEndorsementInitValues && values.additionalEndorsement[j].addEndorsementInitValues[i] && values.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}
+           className="formGrp inputfs12"
+               onChange={(e)=>{
+                setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,e)
+                   
+               }}                                             
+       />  
+           {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].addEndorsementInitValues && errors.additionalEndorsement[j].addEndorsementInitValues[i] && errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value 
+           && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].addEndorsementInitValues && touched.additionalEndorsement[j].addEndorsementInitValues[i] && touched.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value ? (
+               <span className="errorMsg">{errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}</span>
+           ) : null}
+       </FormGroup>
+           :
+           <FormGroup key={`newAdd${i}`}>
+           <Field
+               name={`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`}
+               type="text"
+               autoComplete="off"
+               placeholder={`Additional New ${addEndorsementFields[j][item]}`}
+               className="formGrp inputfs12"
+               onChange={(e)=>{                     
+                   setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,e.target.value)
+               }}
+           >
+           </Field>
+           {errors.additionalEndorsement && errors.additionalEndorsement[j] && errors.additionalEndorsement[j].addEndorsementInitValues && errors.additionalEndorsement[j].addEndorsementInitValues[i] && errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value 
+           && touched.additionalEndorsement && touched.additionalEndorsement[j] && touched.additionalEndorsement[j].addEndorsementInitValues && touched.additionalEndorsement[j].addEndorsementInitValues[i] && touched.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value ? (
+               <span className="errorMsg">{errors.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}</span>
+           ) : null}
+       </FormGroup>
+        ) } )      
        return arr;             
      }
 
@@ -442,27 +472,56 @@ class BasicInfo extends Component {
     makeEndorsementNewField=(values, errors, touched, setFieldTouched, setFieldValue)=>{
        const arr=[];
        const {endorsementfields,endorsementValidationRules} =this.state
-       endorsementfields && Object.keys(endorsementfields).map((item,i)=>
+       endorsementfields && Object.keys(endorsementfields).map((item,i)=>{
+           console.log("field1==",endorsementfields[item])
        arr.push( 
-            <FormGroup key={`new${i}`}>
-                 <Field
-                    name= {`makeEndorsement[${i}].New_values`}
-                    type="text"
-                    autoComplete="off"
-                    placeholder = {`New ${endorsementfields[item]}`}
-                    className="formGrp inputfs12"
-                        onChange={(e)=>{
-                            setFieldValue(`makeEndorsement[${i}].New_values`,e.target.value)
-                        }}                                             
-                >  
-                 </Field>
-                 {errors.makeEndorsement && errors.makeEndorsement[i] && errors.makeEndorsement[i].New_values 
-                 && touched.makeEndorsement && touched.makeEndorsement[i] && touched.makeEndorsement[i].New_values ? (
-                    <span className="errorMsg">{errors.makeEndorsement[i].New_values}</span>
-                ) : null}
-            </FormGroup>
+        endorsementfields[item].includes("Date") ||endorsementfields[item].includes("DOB")?
+        <FormGroup key={`new${i}`}>
+        <DatePicker
+           name= {`makeEndorsement[${i}].New_values`}
+           placeholderText = {`New ${endorsementfields[item]}`}
+           dateFormat="dd MMM yyyy"
+            peekPreviousMonth
+            peekPreviousYear
+            showMonthDropdown
+             showYearDropdown
+              dropdownMode="select"
+            //  maxDate={new Date(maxDobAdult)}
+            //  minDate={new Date(minDobAdult)}
+           className="datePckr"   
+             selected={values.makeEndorsement&& values.makeEndorsement[i] && values.makeEndorsement[i].New_values}
+           className="formGrp inputfs12"
+               onChange={(e)=>{
+                    setFieldValue(`makeEndorsement[${i}].New_values`,e)
+                    console.log("1",values.makeEndorsement[i].New_values)
+               }}                                             
+       />  
+      
+        {errors.makeEndorsement && errors.makeEndorsement[i] && errors.makeEndorsement[i].New_values 
+        && touched.makeEndorsement && touched.makeEndorsement[i] && touched.makeEndorsement[i].New_values ? (
+           <span className="errorMsg">{errors.makeEndorsement[i].New_values}</span>
+       ) : null}
+   </FormGroup>
+   :
+   <FormGroup key={`new${i}`}>
+        <Field
+           name= {`makeEndorsement[${i}].New_values`}
+           type="text"
+           autoComplete="off"
+           placeholder = {`New ${endorsementfields[item]}`}
+           className="formGrp inputfs12"
+               onChange={(e)=>{
+                   setFieldValue(`makeEndorsement[${i}].New_values`,e.target.value)
+               }}                                             
+       >  
+        </Field>
+        {errors.makeEndorsement && errors.makeEndorsement[i] && errors.makeEndorsement[i].New_values 
+        && touched.makeEndorsement && touched.makeEndorsement[i] && touched.makeEndorsement[i].New_values ? (
+           <span className="errorMsg">{errors.makeEndorsement[i].New_values}</span>
+       ) : null}
+   </FormGroup>
        )
-        )
+                 })
        
       return arr;
             
@@ -930,7 +989,7 @@ class BasicInfo extends Component {
                         <div className="boxpd">
                             <Formik initialValues={newInitialValues} 
                             onSubmit={this.handleSubmit }
-                             validationSchema={endorsementValidation}
+                              validationSchema={endorsementValidation}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                 console.log("values ---------- ", values)
