@@ -133,10 +133,10 @@ class UpdateEndorsement extends Component {
             .post(`/dyi-endorsement/details`, formData)
             .then(res => {
                 if(res.data.error == false) {
-                    let endorsementDetails = res.data.data.details ? res.data.data.details : []
+                    let endorsementDetails = res.data.data && res.data.data.details ? res.data.data.details : []
                     let endorsementInfo = res.data.data.details && res.data.data.details.info ? res.data.data.details.info : []
-                    let documents = res.data.data.details ? res.data.data.details.documents.split(",") : []
-                    let endorsement_doc_id = res.data.data.details ? res.data.data.details.endorsement_doc_id.split(",") : []
+                    let documents = res.data.data && res.data.data.details && res.data.data.details.documents ? res.data.data.details.documents.split(",") : []
+                    let endorsement_doc_id = res.data.data && res.data.data.details && res.data.data.details.endorsement_doc_id ? res.data.data.details.endorsement_doc_id.split(",") : []
                     this.setState({
                         endorsementDetails,documents,endorsement_doc_id
                         
