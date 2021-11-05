@@ -244,8 +244,7 @@ class arogya_SelectDuration extends Component {
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
                 values['opd_premium'] = policyDetails && policyDetails.opd_premium_amount_id ? policyDetails.opd_premium_amount_id : 1
 
-                this.quote(values)
-                this.getOpDPremium(values)
+                this.quote(values)   
             })
             .catch(err => {
                 this.setState({
@@ -345,7 +344,7 @@ class arogya_SelectDuration extends Component {
                         serverResponse: []
                     });
                 }
-                this.props.loadingStop();
+                this.getOpDPremium(values)
             })
             .catch(err => {
                 // let decryptResp = JSON.parse(encryption.decrypt(err.data))
@@ -736,7 +735,7 @@ class arogya_SelectDuration extends Component {
                                                                                 <p>Your Health Insurance covers you for following :</p>
                                                                                 <ul>
                                                                                     <li>Hospital room rent, boarding expenses and doctor's fees</li>
-                                                                                    <li>Nursing expenses, Operation theatre and ICU charges</li>
+                                                                                    <li>Nursing Expenses, Operation Theatre and ICU charges</li>
                                                                                     <li>Medicines that you consume during the hospital stay</li>
                                                                                     <li>Alternative treatment taken in accredited or recognized hospitals</li>
                                                                                     <li>Outpatient Treatment</li>
@@ -769,7 +768,7 @@ class arogya_SelectDuration extends Component {
                                                                         <table className="table">
                                                                             <tbody>
                                                                                 <tr>
-                                                                                    <td>Gross Premium:</td>
+                                                                                    <td>Net Premium: </td>
                                                                                     <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.BeforeVatPremium) : 0)}</td>
                                                                                 </tr>
                                                                                 <tr>
@@ -777,7 +776,7 @@ class arogya_SelectDuration extends Component {
                                                                                     <td>₹{Math.round(serverResponse ? (serverResponse.message ? 0 : serverResponse.TGST) : 0)}</td>
                                                                                 </tr>
                                                                                 <tr>
-                                                                                    <td>Net Premium:</td>
+                                                                                    <td>Gross Premium: </td>
                                                                                     <td>₹{serverResponse ? (serverResponse.message ? 0 : serverResponse.DuePremium) : 0}</td>
                                                                                 </tr>
                                                                             </tbody>
