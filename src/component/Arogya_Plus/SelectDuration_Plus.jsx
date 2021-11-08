@@ -409,7 +409,6 @@ class arogya_SelectDuration extends Component {
                 console.log(decryptResp.data.opd_amounts, 'opd-response-data');
                 this.setState({
                     opdLimitOfMembers : decryptResp.data.opd_amounts,
-                    serverResponse: [],
                     error: [],
                     opdFlag: true
                 })
