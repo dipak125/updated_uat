@@ -8,7 +8,7 @@ import axios from "../../shared/axios";
 import { withRouter } from 'react-router-dom';
 import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
-import moment, { min } from "moment";
+// import moment, { min } from "moment";
 import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
@@ -16,6 +16,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { BootstrapTable, TableHeaderColumn, ExportCSVButton } from "react-bootstrap-table";
 import LinkWithTooltip from "../../shared/LinkWithTooltip";
 import UpdateEndorsement from './UpdateEndorsement';
+import moment from "moment-timezone"
 
 
 const initialValues = {
@@ -295,7 +296,7 @@ class ViewStatus extends Component {
                                         <TableHeaderColumn width='100px'  dataField="policydata" dataAlign="center" dataFormat={nameFormatter} >Customer Name</TableHeaderColumn>
                                         <TableHeaderColumn width='150px'   dataField='policy_no' dataAlign="center" dataSort>Policy Number</TableHeaderColumn>
                                         <TableHeaderColumn width='150px'  dataField="policydata" dataAlign="center"  dataFormat={policyFormatter} > Policy Product</TableHeaderColumn>
-                                        <TableHeaderColumn width='100px'  dataField="created_at" dataAlign="center" >Date</TableHeaderColumn>
+                                        <TableHeaderColumn width='100px'  dataField="created_at" dataAlign="center"  dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).add(5,"hours").add(30,"minutes").add(40,"seconds").format("DD-MM-YYYY HH:mm:ss a") : '')}>Date</TableHeaderColumn>
                                         <TableHeaderColumn width='100px'  dataField="endorsement_status" dataAlign="center" >Status</TableHeaderColumn>
                                         <TableHeaderColumn width='150px'  dataField="id" dataAlign="center" dataFormat={actionFormatter(this)} >Action</TableHeaderColumn>
                                     </BootstrapTable>
