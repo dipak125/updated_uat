@@ -140,6 +140,8 @@ const endorsementValidation = Yup.object().shape({
 
 class BasicInfo extends Component {
     check=0;
+    maxDate=new Date();
+   
     field_check=false;
     state = {
         product_category_list: [],
@@ -249,6 +251,7 @@ class BasicInfo extends Component {
     }
 
     getEndorsementSubtypeList=(product_endorsement_id)=>{
+        console.log("max date=",this.maxDate.toLocaleString())
         const formData=new FormData();
         formData.append("endrosment_data_id",this.state.endorsement_data_id);
         formData.append("endorsementinfo_id",this.state.endorsement_info_id)
@@ -404,11 +407,11 @@ class BasicInfo extends Component {
             showMonthDropdown
              showYearDropdown
               dropdownMode="select"
-            //  maxDate={new Date(maxDobAdult)}
+              maxDate={new Date(this.maxDate.toLocaleString())}
             //  minDate={new Date(minDobAdult)}
            className="datePckr"   
              selected={values.additionalEndorsement && values.additionalEndorsement[j] && values.additionalEndorsement[j].addEndorsementInitValues && values.additionalEndorsement[j].addEndorsementInitValues[i] && values.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}
-           className="formGrp inputfs12"
+           
                onChange={(e)=>{
                 setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,e)
                    
@@ -486,11 +489,11 @@ class BasicInfo extends Component {
             showMonthDropdown
              showYearDropdown
               dropdownMode="select"
-            //  maxDate={new Date(maxDobAdult)}
+              maxDate={new Date(this.maxDate.toLocaleString())}
             //  minDate={new Date(minDobAdult)}
            className="datePckr"   
              selected={values.makeEndorsement&& values.makeEndorsement[i] && values.makeEndorsement[i].New_values}
-           className="formGrp inputfs12"
+           
                onChange={(e)=>{
                     setFieldValue(`makeEndorsement[${i}].New_values`,e)
                     console.log("1",values.makeEndorsement[i].New_values)
