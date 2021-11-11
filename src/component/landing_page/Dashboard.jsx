@@ -55,15 +55,15 @@ const option = {
     // text: 'Line chart'
   },
   scales: {
-    // yAxes: [
-    //   {
-    //     ticks: {
-    //       min: 0,
-    //       max: 100,
-    //       stepSize: 10,
-    //     },
-    //   },
-    // ],
+    yAxes: [
+      {
+        ticks: {
+          min: 0,
+          // max: 100,
+          stepSize: 1000,
+        },
+      },
+    ],
   },
 };
 
@@ -403,8 +403,8 @@ class Dashboard extends Component {
                                   <Col sm={12} md={12} lg={6}>
                                     <Card
                                       style={
-                                        ({ width: "30rem" },
-                                        { height: "30rem" })
+                                        ({ width: "35rem" },
+                                        { height: "35rem" })
                                       }
                                     >
                                       <Card.Header className="card-header-custom">
@@ -562,8 +562,8 @@ class Dashboard extends Component {
                                   <Col sm={12} md={12} lg={6}>
                                     <Card
                                       style={
-                                        ({ width: "30rem" },
-                                        { height: "30rem" })
+                                        ({ width: "35rem" },
+                                        { height: "35rem" })
                                       }
                                     >
                                       <Card.Header className="card-header-custom">

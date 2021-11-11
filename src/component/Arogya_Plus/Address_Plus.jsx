@@ -69,13 +69,13 @@ const validateAddress = Yup.object().shape({
     address2: Yup.string()
         .required(function () {
             return "Enter building name / number"
-        }).matches(/^[a-zA-z0-9]+([\s][a-zA-Z0-9,/-]+)*$/, function () {
+        }).matches(/^[a-zA-z0-9]+([\s][a-zA-Z0-9,./-]+)*$/, function () {
             return "Invalid building name / number"
         }),
     address3: Yup.string()
         .required(function () {
             return "Enter street name"
-        }).matches(/^[a-zA-z0-9]+([\s][a-zA-Z0-9,/-]]+)*$/, function () {
+        }).matches(/^[a-zA-z0-9]+([\s][a-zA-Z0-9,./-]]+)*$/, function () {
             return "Invalid street name"
         }),
     email: Yup.string().email().required('Email is required').min(8, function () {

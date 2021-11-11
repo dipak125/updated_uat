@@ -525,7 +525,7 @@ class PolicyDetails_Plus extends Component {
                                             </FormGroup>
                                           </Col>
                                           <Col sm={12} md={6} lg={3}>
-                                            <FormGroup>Gross Premium:</FormGroup>
+                                            <FormGroup>Net Premium:</FormGroup>
                                           </Col>
                                           <Col sm={12} md={6} lg={3}>
                                             <FormGroup>
@@ -534,7 +534,7 @@ class PolicyDetails_Plus extends Component {
                                             </FormGroup>
                                           </Col>
                                           <Col sm={12} md={6} lg={3}>
-                                            <FormGroup>Net Premium:</FormGroup>
+                                            <FormGroup>Gross Premium:</FormGroup>
                                           </Col>
                                           <Col sm={12} md={6} lg={3}>
                                             <FormGroup>
