@@ -262,9 +262,32 @@ class BasicInfo extends Component {
         axios
         .post('dyi-endorsement/endorsement-value',formData)
         .then(res=>{
+            
+            let list=res.data.data.endorsement_field_value;
+            let final_list=[];
+            console.log("list",list)
+            for(let i=0;i<list.length;i++)
+            {
+                let status=0;
+               for(let j=i+1;j<list.length;j++)
+               {
+                   if(list[i].Sub_Type==list[j].Sub_Type)
+                    {
+                        status=1;
+                        break;
+                    }
+
+                    
+               }
+               if(status==0)
+               {
+                    final_list.push(list[i])
+               }
+            }
+            console.log("final_list==",final_list)
             this.setState({
                 ...this.state,
-                endorsement_sub_type_list:res.data.data.endorsement_field_value
+                endorsement_sub_type_list:final_list
             })
             this.props.loadingStop();
         })
