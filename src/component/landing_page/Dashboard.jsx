@@ -31,7 +31,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import axios from "../../shared/axios";
 // import Encryption from "../../shared/payload-encryption";
-// import * as Yup from "yup";
+import * as Yup from "yup";
 // import swal from "sweetalert";
 import { useState } from "react"
 import Encryption from '../../shared/payload-encryption';
@@ -66,6 +66,12 @@ const option = {
     ],
   },
 };
+
+const DashboardValidation = Yup.object().shape({
+  // is_carloan: Yup.number().required('Please select one option')
+
+  start_date: Yup.date().required("Please Select date or Month"),
+});
 
 class Dashboard extends Component {
   state = {
@@ -125,8 +131,6 @@ class Dashboard extends Component {
       .post(`policy-master`, formData)
       .then((res) => {
         let rawData = res.data.data;
-        // console.log("chart data------->", chartData);
-        // console.log("rawdata------>", rawData);
         this.fetchChartData(rawData, 1);
         this.setState({
           rawData: rawData,
@@ -225,9 +229,11 @@ class Dashboard extends Component {
       });
   };
 
-  handleChange = (value) => {
+  handleChange = (value, setFieldValue,setFieldTouched) => {
+    setFieldValue("start_date","");
+    setFieldTouched("start_date");
     if (value == "1") {
-      this.setState({ search_flag: 1 });
+      this.setState({ search_flag: 1 });    
     } else if (value == "2") {
       this.setState({ search_flag: 2 });
     } else if (value == "3") {
@@ -375,7 +381,7 @@ class Dashboard extends Component {
                   <Formik
                     initialValues={initialValues}
                     onSubmit={this.handleSubmit}
-                    // validationSchema={ComprehensiveValidation}
+                    validationSchema={DashboardValidation}
                   >
                     {({
                       values,
@@ -434,7 +440,7 @@ class Dashboard extends Component {
                                                     onChange={(e) => {
                                                       setFieldTouched("report_range");
                                                       setFieldValue("report_range",e.target.value);
-                                                      this.handleChange(e.target.value);
+                                                      this.handleChange(e.target.value, setFieldValue, setFieldTouched);
                                                     }}
                                                   >
                                                     <option value="1">{phrases['Daily']}</option>
@@ -488,25 +494,33 @@ class Dashboard extends Component {
                                                 <FormGroup className="dashboard-date">
                                                   {values.report_range !=
                                                   "4" ? (
-                                                    <DatePicker
-                                                      name="start_date"
-                                                      selected={values.start_date}
-                                                      dateFormat="yyyy MMM dd"
-                                                      dropdownMode="select"
-                                                      showMonthDropdown={search_flag == 3 ? true : false }
-                                                      className="datePckr inputfs12"
-                                                      startDate={values.start_date}
-                                                      endDate={values.end_date}
-                                                      selectsRange
-                                                      disabledKeyboardNavigation
-                                                      onChange={(val) => {
-                                                        this.handleDateChange(
-                                                          val,
-                                                          setFieldTouched,
-                                                          setFieldValue
-                                                        );
-                                                      }}
-                                                    />
+                                                    <div>
+                                                      <DatePicker
+                                                        name="start_date"
+                                                        selected={values.start_date}
+                                                        dateFormat="yyyy MMM dd"
+                                                        dropdownMode="select"
+                                                        showMonthDropdown={search_flag == 3 ? true : false }
+                                                        className="datePckr inputfs12"
+                                                        startDate={values.start_date}
+                                                        endDate={values.end_date}
+                                                        selectsRange
+                                                        disabledKeyboardNavigation
+                                                        onChange={(val) => {
+                                                          this.handleDateChange(
+                                                            val,
+                                                            setFieldTouched,
+                                                            setFieldValue
+                                                          );
+                                                        }}
+                                                      />
+                                                      {errors.start_date &&
+                                                      touched.start_date ? (
+                                                        <span className="errorMsg">
+                                                          {errors.start_date}
+                                                        </span>
+                                                      ) : null}
+                                                    </div>                                           
                                                   ) : (
                                                     <div className="formSection">
                                                       <Field
@@ -537,10 +551,10 @@ class Dashboard extends Component {
                                                         <option value="11">November</option>
                                                         <option value="12">December</option>
                                                       </Field>
-                                                      {errors.report_month &&
-                                                      touched.report_month ? (
+                                                      {errors.start_date &&
+                                                      touched.start_date ? (
                                                         <span className="errorMsg">
-                                                          {errors.report_month}
+                                                          {errors.start_date}
                                                         </span>
                                                       ) : null}
                                                     </div>
