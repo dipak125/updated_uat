@@ -374,7 +374,7 @@ class arogya_SelectDuration extends Component {
         })
     }
 
-    handleChangeOpdLimit = (values, premium_amount_id = 0, slider_sum_insured = 0) => {
+    handleChangeOpdLimit = (values, premium_amount_id = 0, slider_sum_insured = 0, clicked = false) => {
 
         let polStartDate = moment(values.polStartDate).format("YYYY-MM-DD");
         let SumInsuredsliderVal = slider_sum_insured ? slider_sum_insured : values.slider_sum_insured;
@@ -396,6 +396,13 @@ class arogya_SelectDuration extends Component {
             'slider_sum_insured' : SumInsuredsliderVal,
             'premium_amount_id' : premiumAamountId
         });
+
+        if(clicked)
+        {
+            this.setState({
+                serverResponse: []
+            })
+        }
 
         console.log(post_data, 'opd-post-data');
 
@@ -691,7 +698,7 @@ class arogya_SelectDuration extends Component {
                                                                                                 onChange = {(e) =>{
                                                                                                     setFieldTouched('opd_premium')
                                                                                                     setFieldValue('opd_premium', e.target.value)
-                                                                                                    this.handleChangeOpdLimit(values, e.target.value)
+                                                                                                    this.handleChangeOpdLimit(values, e.target.value, 0, true)
                                                                                                 }
                                                                                                 }
                                                                                             />

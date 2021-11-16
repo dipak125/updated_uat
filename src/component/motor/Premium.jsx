@@ -344,7 +344,7 @@ sendPaymentLink = () => {
 
     render() {
         const { policyHolder, paymentgateway, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, 
-            memberdetails,nomineedetails, vehicleDetails, breakin_flag, request_data, bcMaster,menumaster } = this.state
+            memberdetails,nomineedetails, vehicleDetails, breakin_flag, request_data, bcMaster, step_completed } = this.state
         const { productId } = this.props.match.params
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -387,6 +387,7 @@ sendPaymentLink = () => {
 						</div>
 						</aside>
 								
+                            { step_completed >= '4' && vehicleDetails.vehicletype_id == '1' ?
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox premiumPage1">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                                 <Formik initialValues={initialValue} onSubmit={this.handleSubmit}
@@ -449,7 +450,6 @@ sendPaymentLink = () => {
                                                                                 </Col>
                                                                             </Row>
                                                                         </div>
-
                                                                     </Collapsible>
                                                                 </div>
 
@@ -491,7 +491,6 @@ sendPaymentLink = () => {
                                                                             </Col>          
                                                                         </Row>
                                                                     </div>
-
                                                                 </Collapsible>
                                                             </div>
 
@@ -593,7 +592,6 @@ sendPaymentLink = () => {
                                                                             </Row>
                                                                         </div>
                                                                     </div>
-
                                                                 </Collapsible>
                                                             </div>
 
@@ -609,13 +607,13 @@ sendPaymentLink = () => {
                                                                                         <Col sm={12} md={12}>
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['Name']}:</FormGroup>
+                                                                                            {motorInsurance.policy_for == '1' ?  <FormGroup>{phrases['Name']}:</FormGroup> : <FormGroup>{phrases['CompanyName']}:</FormGroup> }
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.first_name }</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
-
+                                                                                        {motorInsurance.policy_for == '1' ?
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['Age']}:</FormGroup>
@@ -624,24 +622,32 @@ sendPaymentLink = () => {
                                                                                                     {/* <FormGroup>{memberdetails.dob}</FormGroup> */}
                                                                                                     <FormGroup>{ memberdetails && memberdetails.dob ? Math.floor(moment().diff(memberdetails.dob, 'years', true) ) : null}</FormGroup>
                                                                                                 </Col>
-                                                                                            </Row>
+                                                                                            </Row> :
                                                                                             <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['MobileNo']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.mobile}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-                                                                                            <Row>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{phrases['EmailId']}</FormGroup>
-                                                                                                </Col>
-                                                                                                <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{memberdetails.email_id}</FormGroup>
-                                                                                                </Col>
-                                                                                            </Row>
-
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['IncorporationDate']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{ memberdetails ? moment(memberdetails.date_of_incorporation).format("DD-MM-YYYY") : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>}
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['MobileNo']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{memberdetails.mobile}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['EmailId']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{memberdetails.email_id}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        {motorInsurance.policy_for == '1' ?
                                                                                             <Row>
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{phrases['Gender']}</FormGroup>
@@ -649,69 +655,70 @@ sendPaymentLink = () => {
                                                                                                 <Col sm={12} md={6}>
                                                                                                     <FormGroup>{memberdetails.gender == "m" ? "Male" : "Female"}</FormGroup>
                                                                                                 </Col>
-                                                                                            </Row>
-
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                    <Row>
-                                                                                        <p></p>
-                                                                                    </Row>
-                                                                                </div>
-                                                                            : (<p></p>)}
-                                                                                   
-                                                                        <div>
-                                                                        {motorInsurance && motorInsurance.pa_flag == '1' ? 
-                                                                        <div>
-                                                                        <strong>{phrases['NomineeDetails']} :</strong>
-                                                                            <br/>
-                                                                            <Row>
-                                                                                <Col sm={12} md={12}>
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{phrases['Name']}:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.first_name}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{phrases['Age']}:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            {/* <FormGroup>{nomineedetails.dob}</FormGroup> */}
-                                                                                            <FormGroup>{ nomineedetails && nomineedetails.dob ? Math.floor(moment().diff(nomineedetails.dob, 'years', true) ) : null}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                        { relation.map((relations, qIndex) => 
-                                                                                        relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup>{relations.name}</FormGroup> : null
-                                                                                        )}
-                                                                                        </Col>
-                                                                                    </Row>
-
-                                                                                    <Row>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{phrases['Gender']}</FormGroup>
-                                                                                        </Col>
-                                                                                        <Col sm={12} md={6}>
-                                                                                            <FormGroup>{nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
-                                                                                        </Col>
-                                                                                    </Row>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <p></p>
-                                                                            </Row>
-                                                                            </div> : null }
-                                                                            {nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?      
+                                                                                            </Row> :
+                                                                                            <Row>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{phrases['GSTIN']}:</FormGroup>
+                                                                                                </Col>
+                                                                                                <Col sm={12} md={6}>
+                                                                                                    <FormGroup>{memberdetails.gstn_no}</FormGroup>
+                                                                                                </Col>
+                                                                                            </Row> }
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div> : (<p></p>)}
+                                                                        {motorInsurance.policy_for == '1' && motorInsurance.pa_flag == '1' ?
+                                                                            <div>
+                                                                            <strong>{phrases['NomineeDetails']} :</strong>
+                                                                                <br/>
+                                                                                <Row>
+                                                                                    <Col sm={12} md={12}>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['Name']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails ? nomineedetails.first_name : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['Age']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                {/* <FormGroup>{ nomineedetails ? moment(nomineedetails.dob).format("DD-MM-YYYY") : null}</FormGroup> */}
+                                                                                                <FormGroup>{ nomineedetails && nomineedetails.dob ? Math.floor(moment().diff(nomineedetails.dob, 'years', true) ) : null}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                            {nomineedetails && relation.map((relations, qIndex) =>
+                                                                                            relations.id == nomineedetails.relation_with ?
+                                                                                                <FormGroup>{relations.name}</FormGroup> : null
+                                                                                            )}
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                        <Row>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{phrases['Gender']}</FormGroup>
+                                                                                            </Col>
+                                                                                            <Col sm={12} md={6}>
+                                                                                                <FormGroup>{nomineedetails && nomineedetails.gender == "m" ? "Male" : "Female"}</FormGroup>
+                                                                                            </Col>
+                                                                                        </Row>
+                                                                                    </Col>
+                                                                                </Row>
+                                                                                <Row>
+                                                                                    <p></p>
+                                                                                </Row>
+                                                                            </div> : null}
+                                                                        {motorInsurance.policy_for == '1' && nomineedetails && nomineedetails.is_appointee == '1' && motorInsurance.pa_flag == '1' ?
                                                                             <div>
                                                                             <strong>{phrases['AppoDetails']} :</strong>
                                                                                 <br/>
@@ -725,10 +732,9 @@ sendPaymentLink = () => {
                                                                                                 <FormGroup>{nomineedetails && nomineedetails.appointee_name ? nomineedetails.appointee_name : null}</FormGroup>
                                                                                             </Col>
                                                                                         </Row>
-
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>{phrases['ProposerRelation']}:</FormGroup>
+                                                                                                <FormGroup>{phrases['RelationNominee']}:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                             {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) => 
@@ -742,11 +748,8 @@ sendPaymentLink = () => {
                                                                                 <Row>
                                                                                     <p></p>
                                                                                 </Row>
-                                                                            </div> 
-                                                                            : null }
-                                                                        </div>
+                                                                            </div> : null }
                                                                     </div>
-
                                                                 </Collapsible>
                                                             </div>
                                                           
@@ -836,6 +839,7 @@ sendPaymentLink = () => {
                                 </Modal> */}
 
                             </div>
+                            : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
                     </div>

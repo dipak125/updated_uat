@@ -391,7 +391,21 @@ class OtherComprehensive extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let values = []
-                let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
+                let add_more_coverage = []
+                if (motorInsurance && motorInsurance.policy_for == '1' && motorInsurance.add_more_coverage == null) {
+                    // var cov_val = ['B00015', 'B00005']
+                    var cov_val = ['B00015']
+                    add_more_coverage.push(cov_val);
+                }
+                else if (motorInsurance && motorInsurance.policy_for == '2' && motorInsurance.add_more_coverage == null) {
+                    // var cov_val = ['B00005']
+                    var cov_val = []
+                    add_more_coverage.push(cov_val);
+                }
+                else {
+                    var cov_val = motorInsurance.add_more_coverage.split(",")
+                    add_more_coverage.push(cov_val);
+                }
                 add_more_coverage = add_more_coverage.flat()
 
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
@@ -1121,9 +1135,9 @@ class OtherComprehensive extends Component {
                 engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
                 vahanVerify: vahanVerify,
                 newRegistrationNo: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                B00015: "B00015",
+                B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
                 PA_Cover: "",
-                PA_cover_flag: "1",
+                PA_cover_flag: motorInsurance && motorInsurance.policy_for == '2' ? '0' : '1',
                 PA_flag: '0',
                 Geographical_flag: "0",
                 CNG_OD_flag: "",
@@ -1529,6 +1543,7 @@ class OtherComprehensive extends Component {
  
                                     {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                     <Row key={qIndex}>   
+                                    {(motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018') || (motorInsurance && motorInsurance.policy_for == '1') ?
                                         <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
                                             <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                 <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
@@ -1554,7 +1569,7 @@ class OtherComprehensive extends Component {
                                                 <span className="checkmark mL-0"></span>
                                                 <span className="error-message"></span>
                                             </label>
-                                        </Col>
+                                        </Col> : null}
                                         {values.PA_flag == '1' && values[coverage.code] == 'B00016' ?
                                             <Col sm={12} md={11} lg={3} key={qIndex+"b"}>
                                                 <FormGroup>
