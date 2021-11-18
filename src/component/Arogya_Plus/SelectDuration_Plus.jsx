@@ -23,6 +23,7 @@ import {
 } from "../../shared/validationFunctions";
 
 import Encryption from '../../shared/payload-encryption';
+import { fourwheelerODEndDate } from "../../shared/reUseFunctions";
 
 let minSumInsured = 100000;
 let maxSumInsured = 300000;
@@ -551,7 +552,8 @@ class arogya_SelectDuration extends Component {
                                                                                     onChange={(value) => {
                                                                                         setFieldTouched("polStartDate");
                                                                                         setFieldValue("polStartDate", value);
-                                                                                        setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1));
+                                                                                        // setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1));
+                                                                                        setFieldValue("polEndDate", fourwheelerODEndDate(values.polStartDate,values.slider_tenure));
                                                                                         this.handleChange(value);
                                                                                     }}
                                                                                     selected={values.polStartDate}
@@ -574,7 +576,9 @@ class arogya_SelectDuration extends Component {
                                                                                     placeholderText="End Date"
                                                                                     disabled={true}
                                                                                     className="datePckr"
-                                                                                    selected={addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1)}
+                                                                                    // selected={addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1)}
+                                                                                    selected={fourwheelerODEndDate(values.polStartDate,values.slider_tenure)}                                                                                   
+                                                                                    
                                                                                 />
                                                                                 {errors.polEndDate && touched.polEndDate ? (
                                                                                     <span className="errorMsg">{errors.polEndDate}</span>
@@ -669,7 +673,8 @@ class arogya_SelectDuration extends Component {
                                                                                         setFieldTouched("polStartDate");
                                                                                         setFieldValue("polStartDate", values.polStartDate);
                                                                                         setFieldTouched("polEndDate");
-                                                                                        setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * e.target.value) - 1));
+                                                                                        // setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * e.target.value) - 1));
+                                                                                        setFieldValue("polEndDate", fourwheelerODEndDate(values.polStartDate,e.target.value));
                                                                                         this.tenureSliderValue(e.target.value)
                                                                                     }}
                                                                                 />

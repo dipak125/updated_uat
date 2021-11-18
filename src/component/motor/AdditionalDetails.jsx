@@ -612,8 +612,8 @@ class AdditionalDetails extends Component {
         axios
         .post(`/owner-details`, formData)
         .then(res => { 
-            let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp-----', decryptResp)
+            // let decryptResp = JSON.parse(encryption.decrypt(res.data));
+            let decryptResp = res.data;
             this.props.loadingStop();
             if (decryptResp.error == false) {
             this.props.history.push(`/Premium/${productId}`);
@@ -622,8 +622,6 @@ class AdditionalDetails extends Component {
         .catch(err => { 
           this.props.loadingStop();
           actions.setSubmitting(false)
-        //   let decryptErr = JSON.parse(encryption.decrypt(err.data));
-        //     console.log('decryptErr-----', decryptErr)
         });
 
     }

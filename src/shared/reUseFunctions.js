@@ -54,7 +54,6 @@ export const fourwheelerODEndDate = (value,tenure) => {
         var day =  value.getDate() - 1
         var month = value.getMonth()
         var year =   value.getFullYear() + parseInt(tenure)
-        console.log("tenure --year--------- ", year)
         var endDate = new Date(year,month,day)
         return endDate
     }

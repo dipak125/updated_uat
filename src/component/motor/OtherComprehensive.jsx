@@ -1051,7 +1051,7 @@ class OtherComprehensive extends Component {
     }
 
     render() {
-        const {showCNG, policy_for,vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,validation_error,
+        const {showCNG,vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,validation_error,
             moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
 
@@ -1144,7 +1144,7 @@ class OtherComprehensive extends Component {
                 electric_flag: '0',
                 LL_PD_flag: '0',
                 nonElectric_flag: '0',
-                policy_for:policy_for,
+                policy_for: motorInsurance && motorInsurance.policy_for,
                 geographical_extension_length: geographical_extension && geographical_extension.length,
                 tyre_rim_array:  this.initClaimDetailsList(),
 
@@ -1167,7 +1167,7 @@ class OtherComprehensive extends Component {
                     electric_flag: '0',
                     nonElectric_flag: '0',
                     LL_PD_flag: '0',
-                    policy_for:policy_for,
+                    policy_for: motorInsurance && motorInsurance.policy_for,
                     geographical_extension_length: geographical_extension && geographical_extension.length,
                     tyre_rim_array:  this.initClaimDetailsList(),
                 });
