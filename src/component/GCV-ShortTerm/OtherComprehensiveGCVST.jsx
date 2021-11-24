@@ -864,7 +864,7 @@ class OtherComprehensiveGCV extends Component {
             .then(res => {
 
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
-                    let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
                     let policyCoverage = res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
                     let IsGeographicalExtension = res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
 
@@ -1559,7 +1559,7 @@ class OtherComprehensiveGCV extends Component {
 
         policyCoverage.map((coverage, qIndex) => (
             coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-                benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM += benefit.AnnualPremium : 0
+                benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM += benefit.BeforeVatPremium : 0
             ))
         ))
 
@@ -1575,7 +1575,7 @@ class OtherComprehensiveGCV extends Component {
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
                                 <Col sm={12} md={6}>
-                                    <FormGroup>₹ {Math.round(benefit.AnnualPremium)}</FormGroup>
+                                    <FormGroup>₹ {Math.round(benefit.BeforeVatPremium)}</FormGroup>
                                 </Col></Row> : (benefit.ProductElementCode == 'B00007' && productCount == 1) ? <Row><Col sm={12} md={6}>
                                     <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                                 </Col>
@@ -1615,7 +1615,7 @@ class OtherComprehensiveGCV extends Component {
                     (benefit.ProductElementCode != 'B00007') ?
                         <tr>
                             <td>{Coverage[benefit.ProductElementCode]}:</td>
-                            <td>₹ {Math.round(benefit.AnnualPremium)}</td>
+                            <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
                         </tr> : (benefit.ProductElementCode == 'B00007' && productCount == 1) ? <tr label={productCount += 1}>
                             <td >{Coverage[benefit.ProductElementCode]}:</td>
                             <td>₹ {Math.round(TRAILOR_OD_PREMIUM)}</td>

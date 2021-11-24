@@ -828,7 +828,7 @@ class OtherComprehensiveMISCD extends Component {
 
                 if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
                     let PolicyArray = res.data.data.PolicyObject.PolicyLobList
-                    let ncbDiscount = (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let ncbDiscount = (res.data.data.PolicyObject.PolicyLobList && res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
                     this.setState({
                         fulQuoteResp: res.data.data.PolicyObject,
                         PolicyArray: PolicyArray,
@@ -1457,7 +1457,7 @@ class OtherComprehensiveMISCD extends Component {
         let TRAILOR_OD_PREMIUM = 0
         policyCoverage.map((coverage, qIndex) => (
             coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
-                benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM += benefit.AnnualPremium : 0
+                benefit.ProductElementCode == 'B00007' ? TRAILOR_OD_PREMIUM += benefit.BeforeVatPremium : 0
             ))
         ))
         let productCount = 1;
@@ -1471,7 +1471,7 @@ class OtherComprehensiveMISCD extends Component {
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
                                 <Col sm={12} md={6}>
-                                    <FormGroup>₹ {Math.round(benefit.AnnualPremium)}</FormGroup>
+                                    <FormGroup>₹ {Math.round(benefit.BeforeVatPremium)}</FormGroup>
                                 </Col></Row> : (benefit.ProductElementCode == 'B00007' && productCount == 1) ? <Row><Col sm={12} md={6}>
                                     <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                                 </Col>
@@ -1511,7 +1511,7 @@ class OtherComprehensiveMISCD extends Component {
                     (benefit.ProductElementCode != 'B00007') ?
                         <tr>
                             <td>{Coverage[benefit.ProductElementCode]}:</td>
-                            <td>₹ {Math.round(benefit.AnnualPremium)}</td>
+                            <td>₹ {Math.round(benefit.BeforeVatPremium)}</td>
                         </tr> : (benefit.ProductElementCode == 'B00007' && productCount == 1) ? <tr label={productCount += 1}>
                             <td >{Coverage[benefit.ProductElementCode]}:</td>
                             <td>₹ {Math.round(TRAILOR_OD_PREMIUM)}</td>
