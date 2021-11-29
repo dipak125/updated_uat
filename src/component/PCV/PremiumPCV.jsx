@@ -135,7 +135,7 @@ class PremiumPCV extends Component {
 
                 })
                 //this.fullQuote(motorInsurance)
-                this.getAccessToken(motorInsurance)
+                this.getAccessToken(motorInsurance, vehicleDetails)
             })
             .catch(err => {
                 // handle error
@@ -162,7 +162,6 @@ class PremiumPCV extends Component {
     }
 
     callBreakin=(regnNumber)=>{
-        console.log("regno====",regnNumber)
         const formData = new FormData();
         let encryption = new Encryption();
         let num = regnNumber
@@ -198,7 +197,7 @@ class PremiumPCV extends Component {
             this.props.loadingStop();
         })
     }
-    getAccessToken = (motorInsurance) => {
+    getAccessToken = (motorInsurance, vehicleDetails) => {
         axios
             .post(`/callTokenService`)
             .then((res) => {
@@ -206,7 +205,7 @@ class PremiumPCV extends Component {
                 this.setState({
                     accessToken: res.data.access_token,
                 });
-                this.fullQuote(res.data.access_token, motorInsurance)
+                this.fullQuote(res.data.access_token, motorInsurance, vehicleDetails)
             })
             .catch((err) => {
                 this.setState({
@@ -217,8 +216,7 @@ class PremiumPCV extends Component {
     };
 
 
-    fullQuote = ( access_token, motorInsurance) => {
-        console.log("motor=======2",motorInsurance,access_token)
+    fullQuote = ( access_token, motorInsurance, vehicleDetails) => {
         const formData = new FormData();
         let encryption = new Encryption();
         const {previousPolicy, request_data, policyHolder} = this.state
@@ -226,6 +224,7 @@ class PremiumPCV extends Component {
         let trailer_array = motorInsurance.trailers ? motorInsurance.trailers : null
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
         let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+        let valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
 
         const post_data = {
             'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
@@ -243,7 +242,7 @@ class PremiumPCV extends Component {
             'userIdvStatus' : 1,
             'bodyIdvStatus' : 1,
         }
-console.log("Post data ---------------- ", post_data)
+
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
 
         axios.post('pcv/full-quote', formData)
@@ -269,11 +268,14 @@ console.log("Post data ---------------- ", post_data)
                 }
                 this.props.loadingStop();
 
-                if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
+                if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") 
+                    || (valid_previous_policy == "0" && policy_type_id == "2" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
                     dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
                     let previousPolicyName = previousPolicy ? previousPolicy.name : ""
+                    let carrying_capacity = vehicleDetails && vehicleDetails.varientmodel ? vehicleDetails.varientmodel.carrying : ""
+                    let wheels_capacity = vehicleDetails && vehicleDetails.varientmodel ? vehicleDetails.varientmodel.wheels : ""
 
-                     if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {
+                     if((dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3" || valid_previous_policy == '0') && !(wheels_capacity == 3 && carrying_capacity <= 4) ) {
                             const formData1 = new FormData();
                             let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                             formData1.append('policy_ref_no',policyHolder_id)
@@ -818,7 +820,7 @@ console.log("Post data ---------------- ", post_data)
 
                                                                      { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
                                                                         gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ?
-                                                                        <div>
+                                                                        <div key= {index} >
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"

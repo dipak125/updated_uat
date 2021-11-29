@@ -237,7 +237,6 @@ handleSubmit=(values)=>{
                 'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                 'bc_token': "5",
 		        'lapse_duration': values.lapse_duration,
-                'page_name': `Registration/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
@@ -257,7 +256,6 @@ handleSubmit=(values)=>{
                 'bcmaster_id': bc_data ? bc_data.agent_id : "",
                 'bc_token': bc_data ? bc_data.token : "",
                 'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
-                'page_name': `Registration/${productId}`,
                 'policy_type_id':values.policy_type,
                 'policy_for': values.policy_for,
                 'subclass_id' : values.subclass_id,
@@ -597,7 +595,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         >
                                                             <option value="">{phrases['SelectProduct']}</option>
                                                             {subVehicleList.map((subVehicle, qIndex) => ( 
-                                                                <option value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
+                                                                                <option value={subVehicle.subclass_id} key={qIndex}>{subVehicle.subclass_title}</option>
                                                             ))}
                                                 
                                                         </Field>

@@ -474,7 +474,7 @@ class OtherComprehensiveGCV extends Component {
                 let add_more_coverage_request_json = motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : ""
 
                 let add_more_coverage_request_array = add_more_coverage_request_json != "" ? JSON.parse(add_more_coverage_request_json) : []
-		var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
+		        var geographical_extension = add_more_coverage_request_array && add_more_coverage_request_array.geographical_extension ? add_more_coverage_request_array.geographical_extension : []
 
                 values.ATC_value = add_more_coverage_request_array.ATC ? add_more_coverage_request_array.ATC.value : ""
                 values.B00018_value = add_more_coverage_request_array.B00018 ? add_more_coverage_request_array.B00018.value : ""
@@ -724,29 +724,47 @@ class OtherComprehensiveGCV extends Component {
                     });
                 }
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    var validationErrors = []
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.UnderwritingResult.MessageList[x].Message)
+                    }
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
-                        error: {"message": 1},
+                        error: {"message": 0},
                         serverResponse: [],
+                        validation_error: validationErrors,
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                    var validationErrors = []
+                    for (const x in res.data.messages) {
+                        let rgxp = res.data.messages[x].message
+                        let msg = ""
+                        let str = /blacklisted/gi
+                        if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
+                        {
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
+                        }
+                        else {
+                            msg = res.data.messages[x].message
+                        }
+                        validationErrors.push(msg)     
+                    }
+                    this.setState({
+                        fulQuoteResp: [], add_more_coverage,
+                        validation_error: validationErrors,
+                        error: { "message": 0 },
+                        serverResponse: []
                     });
                 }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data,
+                        error: { "message": 1 },
                         serverResponse: []
                     });
-
-                    if(res.data.messages != undefined)
-                    {
-                        for (const x in res.data.messages) {
-                            if(res.data.messages[x].code == 'SBIG-PA-Validation-B2321')  // Decline vehicle
-                            {
-                                swal(res.data.messages[x].message);
-                            }
-                        }
-                    }
                 }
                 this.props.loadingStop();
             })
@@ -1073,7 +1091,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, vehicleDetails, geographical_extension,
+        const {add_more_coverage, is_CNG_account, vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, validation_error, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array} = this.state
         const {productId} = this.props.match.params 
 
@@ -1269,6 +1287,19 @@ class OtherComprehensiveGCV extends Component {
                 </span>
             ) : null;
 
+        const validationErrors =
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg" key={qIndex}>
+                        <li>
+                            <strong>
+                                {errors}
+                            </strong>
+                        </li>
+                    </span>
+                ))
+            ) : null;
+
         return (
             <>
                 <BaseComponent>
@@ -1290,6 +1321,7 @@ class OtherComprehensiveGCV extends Component {
                         <div className="brandhead m-b-10">
                             <h4 className="m-b-30">{phrases['GCVDamage']} </h4>
                             <h5>{errMsg}</h5>
+                            <h5>{validationErrors}</h5>
                         </div>
                     </div>
                     <Formik initialValues={newInitialValues} 

@@ -276,24 +276,33 @@ class TwoWheelerOtherComprehensive extends Component {
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
                 }
-                else {
-
-                    if(res.data.code == 'validation failed' && res.data.messages)
-                    {
-                        var error_messages = res.data.messages;
-                        for(var x in error_messages)
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                    var validationErrors = []
+                    for (const x in res.data.messages) {
+                        let rgxp = res.data.messages[x].message
+                        let msg = ""
+                        let str = /blacklisted/gi
+                        if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
                         {
-                            if(error_messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
-                            {
-                                swal(error_messages[x].message);
-                            }
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
                         }
+                        else {
+                            msg = res.data.messages[x].message
+                        }
+                        validationErrors.push(msg)     
                     }
-                    
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data,
+                        validation_error: validationErrors,
                         serverResponse: []
+                    });
+                }
+                else {
+                    this.setState({
+                      fulQuoteResp: [],add_more_coverage,
+                      error: res.data,
+                      serverResponse: []
                     });
                 }
                 this.props.loadingStop();
@@ -646,8 +655,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-{console.log("values ---------------- ", values)}
-{console.log("errors ---------------- ", errors)}
+
                                             return (
                                                 <Form>
                                                     <Row>

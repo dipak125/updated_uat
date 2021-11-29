@@ -862,21 +862,33 @@ class OtherComprehensiveMISCD extends Component {
                 }
                 else if (res.data.data.code && res.data.data.message && res.data.data.code == "validation failed" && res.data.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.data.messages) {
-                        validationErrors.push(res.data.data.messages[x].message)
+                    for (const x in res.data.messages) {
+                        let rgxp = res.data.messages[x].message
+                        let msg = ""
+                        let str = /blacklisted/gi
+                        if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
+                        {
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
+                        }
+                        else {
+                            msg = res.data.messages[x].message
+                        }
+                        validationErrors.push(msg)     
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         validation_error: validationErrors,
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
+                        error: { "message": 0 },
                         serverResponse: []
                     });
                 }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data.data,
+                        error: { "message": 1 },
                         serverResponse: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,

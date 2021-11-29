@@ -459,6 +459,11 @@ class SelectBrandPCV extends Component {
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr">{phrases['Power']}<br />
+                                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : ""}</strong></div>
+                                                                    </div>
+
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['carryingCapacity']}<br />
                                                                             <strong>{carrying ? carrying : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.carrying ? vehicleDetails.varientmodel.carrying : "")} </strong></div>
                                                                     </div>

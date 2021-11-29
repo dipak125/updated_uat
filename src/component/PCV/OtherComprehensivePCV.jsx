@@ -497,7 +497,6 @@ class OtherComprehensivePCV extends Component {
                 else {
                     vehicle_age = moment(previous_end_date).add(1, 'day').diff(registration_date, 'days', true)
                 }
-                console.log("vehicle_age---------- ", vehicle_age)
 
                 trailer_array = trailer_array != null ? JSON.parse(trailer_array) : []
                 let values = []
@@ -808,10 +807,10 @@ class OtherComprehensivePCV extends Component {
         this.props.loadingStart();
         axios.post('pcv/full-quote', formData)
             .then(res => {
-                console.log("fullQuote=======>>>",res.data.PolicyObject)
+          
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let PolicyArray = res.data.PolicyObject.PolicyLobList
-                    let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
+                    let ncbDiscount = (res.data.PolicyObject.PolicyLobList && res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsNCB) ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: PolicyArray,
@@ -845,11 +844,23 @@ class OtherComprehensivePCV extends Component {
                 else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
                     for (const x in res.data.messages) {
-                        validationErrors.push(res.data.messages[x].message)
+                        let rgxp = res.data.messages[x].message
+                        let msg = ""
+                        let str = /blacklisted/gi
+                        if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
+                        {
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
+                        }
+                        else {
+                            msg = res.data.messages[x].message
+                        }
+                        validationErrors.push(msg)     
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
                         validation_error: validationErrors,
+                        error: { "message": 0 },
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
                         serverResponse: []
@@ -858,7 +869,7 @@ class OtherComprehensivePCV extends Component {
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
-                        error: res.data,
+                        error: { "message": 1},
                         serverResponse: [],
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
@@ -2500,7 +2511,7 @@ class OtherComprehensivePCV extends Component {
                             </thead>
                             <tbody>
                                 {premiumBreakup}
-                                {/* {ncbBreakup} */}
+                                {ncbBreakup}
                                 {premiumBreakupIMT}
 
                                 <tr>

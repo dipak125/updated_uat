@@ -24,17 +24,21 @@ import swal from 'sweetalert';
 
 
 const menumaster_id = 4
+
 const year = new Date('Y')
 const ageObj = new PersonAge();
-// const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
+const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
-const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
+// const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
+const minDatePypLapsed = moment(moment().subtract(1, 'years').calendar()).subtract(89, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
-const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
-const minRegnDate = moment().subtract(20, 'years').calendar();
-// const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
-const minRegnDateNew = moment().subtract(1, 'months').calendar();
+const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
+const maxDatePYPLapsed = moment().subtract(1, 'years').calendar();
+const startRegnDate = moment().subtract(20, 'years').calendar();
+const minRegnDate = startRegnDate;
+// const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
+const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {
@@ -542,10 +546,10 @@ class VehicleDetailsPCV extends Component {
         //     return false
         // }
 
-        if(values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
-            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-            return false
-        }
+        // if(values.valid_previous_policy == "0" && (motorInsurance.policytype_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1') )) {
+        //     swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+        //     return false
+        // }
 
         if(Math.floor(moment().diff(values.previous_end_date, 'days', true)) > 90 || (values.policy_type_id == '3' && values.lapse_duration == '2')) {
             values.previous_claim_bonus = 1
@@ -1293,8 +1297,8 @@ console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date(minDate)} 
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
+                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth
@@ -1616,6 +1620,11 @@ console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">{phrases['Power']}<br />
                                                             <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : ""}</strong></div>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                        <div className="txtRegistr">{phrases['carryingCapacity']}<br />
+                                                            <strong>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.carrying ? vehicleDetails.varientmodel.carrying : ""} </strong></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

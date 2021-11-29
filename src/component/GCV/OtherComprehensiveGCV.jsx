@@ -918,13 +918,41 @@ class OtherComprehensiveGCV extends Component {
                     });
                 }
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    var validationErrors = []
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        validationErrors.push(res.data.UnderwritingResult.MessageList[x].Message)
+                    }
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        error: { "message": 1 },
+                        error: { "message": 0 },
+                        validation_error: validationErrors,
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
+                    });
+                }
+                else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
+                    var validationErrors = []
+                    for (const x in res.data.messages) {
+                        let rgxp = res.data.messages[x].message
+                        let msg = ""
+                        let str = /blacklisted/gi
+                        if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
+                        {
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
+                        }
+                        else {
+                            msg = res.data.messages[x].message
+                        }
+                        validationErrors.push(msg)     
+                    }
+                    this.setState({
+                        fulQuoteResp: [], add_more_coverage,
+                        validation_error: validationErrors,
+                        error: { "message": 0 },
+                        serverResponse: []
                     });
                 }
                 else {
@@ -932,7 +960,7 @@ class OtherComprehensiveGCV extends Component {
                         fulQuoteResp: [], add_more_coverage,
                         userIdvStatus: 1,
                         bodyIdvStatus: 1,
-                        error: res.data,
+                        error: { "message": 1 },
                         serverResponse: []
                     });
                 }
@@ -1394,7 +1422,7 @@ class OtherComprehensiveGCV extends Component {
 
 
     render() {
-        const { add_more_coverage, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
+        const { add_more_coverage, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, validation_error, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
         const { productId } = this.props.match.params
         
@@ -1668,6 +1696,19 @@ class OtherComprehensiveGCV extends Component {
                     </h6>
                 </span>
             ) : null;
+        
+        const validationErrors =
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg" key={qIndex}>
+                        <li>
+                            <strong>
+                                {errors}
+                            </strong>
+                        </li>
+                    </span>
+                ))
+            ) : null;
 
         return (
             <>
@@ -1689,6 +1730,7 @@ class OtherComprehensiveGCV extends Component {
                                             <div className="brandhead m-b-10">
                                                 <h4 className="m-b-30">{phrases['GSBVehicleDamage']}</h4>
                                                 <h5>{errMsg}</h5>
+                                                <h5>{validationErrors}</h5>
                                             </div>
                                         </div>
                                         <Formik initialValues={newInitialValues}
@@ -1779,9 +1821,8 @@ class OtherComprehensiveGCV extends Component {
                                                                                             maxLength="5"
                                                                                             onChange={(e) => {
                                                                                                 setFieldValue('vahanVerify', false)
-
                                                                                                 setFieldTouched('chasis_no_last_part')
-                                                                    setFieldValue('chasis_no_last_part', e.target.value.toUpperCase())                       
+                                                                                                setFieldValue('chasis_no_last_part', e.target.value.toUpperCase())                       
                                                                                             }}
 
                                                                                         />
@@ -1813,11 +1854,11 @@ class OtherComprehensiveGCV extends Component {
                                                                                         autoComplete="off"
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.engine_no}
+                                                                                        value= {values.engine_no}
                                                                                         maxLength="17"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('engine_no')
-                                                    setFieldValue('engine_no', e.target.value.toUpperCase())                       
+                                                                                            setFieldValue('engine_no', e.target.value.toUpperCase())                       
                                                                                         }}
                                                                                     />
                                                                                     {errors.engine_no && touched.engine_no ? (
@@ -1836,11 +1877,11 @@ class OtherComprehensiveGCV extends Component {
                                                                                         autoComplete="off"
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                value= {values.chasis_no}
+                                                                                        value= {values.chasis_no}
                                                                                         maxLength="25"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('chasis_no')
-                                                    setFieldValue('chasis_no', e.target.value.toUpperCase())                       
+                                                                                            setFieldValue('chasis_no', e.target.value.toUpperCase())                       
                                                                                         }}
                                                                                     />
                                                                                     {errors.chasis_no && touched.chasis_no ? (

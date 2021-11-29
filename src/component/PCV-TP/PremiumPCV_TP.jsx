@@ -708,7 +708,7 @@ class PremiumPCV_TP extends Component {
 
                                                                      { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
                                                                         gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ?
-                                                                        <div>
+                                                                        <div key={index}>
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"

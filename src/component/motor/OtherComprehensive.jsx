@@ -662,12 +662,19 @@ class OtherComprehensive extends Component {
                 }
                 else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
-                    for (const x in res.data.data.messages) {
-                        validationErrors.push(res.data.messages[x].message)
-                        if(res.data.messages[x].code == 'SBIG-PA-Validation-B1064')  // Decline vehicle
+                    for (const x in res.data.messages) {
+                        let rgxp = res.data.messages[x].message
+                        let msg = ""
+                        let str = /blacklisted/gi
+                        if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
                         {
-                            swal(res.data.messages[x].message);
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
                         }
+                        else {
+                            msg = res.data.messages[x].message
+                        }
+                        validationErrors.push(msg)     
                     }
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
