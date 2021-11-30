@@ -1477,6 +1477,8 @@ class VehicleDetailsGCV extends Component {
                                                                                                                     setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
                                                                                                                     setFieldValue('no_of_claim', "")
+                                                                                                                    setFieldValue('previous_claim_bonus', 1) 
+                                                                                                                    setFieldValue('claim_array', [])
                                                                                                                     this.showClaimText(0, values);
                                                                                                                 }}
                                                                                                                 checked={values.previous_is_claim == '0' ? true : false}
@@ -1496,6 +1498,8 @@ class VehicleDetailsGCV extends Component {
                                                                                                                     setFieldTouched('previous_is_claim')
                                                                                                                     setFieldValue(`previous_is_claim`, e.target.value);
                                                                                                                     setFieldValue('no_of_claim', "")
+                                                                                                                    setFieldValue('previous_claim_bonus', 1)          
+                                                                                                                    setFieldValue('claim_array', [])                        
                                                                                                                     this.showClaimText(1, values);
                                                                                                                 }}
                                                                                                                 checked={values.previous_is_claim == '1' ? true : false}
@@ -1511,7 +1515,7 @@ class VehicleDetailsGCV extends Component {
                                                                                             </FormGroup>
                                                                                         </Col>
                                                                                     </Row>
-                                                                                    {values.previous_claim_for == "2" || previous_is_claim == "0" ?
+                                                                                    {values.previous_is_claim == "0" ?
                                                                                         <Row className="m-b-30">
                                                                                             <Col sm={12} md={5} lg={5}>
                                                                                                 <FormGroup>
@@ -1547,7 +1551,7 @@ class VehicleDetailsGCV extends Component {
                                                                                             </Col>
                                                                                         </Row>
                                                                                         : null}
-                                                                                    {showClaim || previous_is_claim == 1 ?
+                                                                                    {showClaim || values.previous_is_claim == 1 ?
                                                                                         <Row className="m-b-30">
                                                                                             <Col sm={12} md={6} lg={6}>
                                                                                                 <FormGroup>
@@ -1584,7 +1588,7 @@ class VehicleDetailsGCV extends Component {
                                                                                             </Col>
                                                                                         </Row>
                                                                                         : null}
-                                                                                    {values.no_of_claim != "" || previous_is_claim == "0" ?
+                                                                                    {values.no_of_claim != "" || previous_is_claim == "1" ?
                                                                                         this.handleClaims(values, errors, touched, setFieldTouched, setFieldValue)
                                                                                         : null}
                                                                                 </Fragment>

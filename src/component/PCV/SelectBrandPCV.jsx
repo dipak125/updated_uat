@@ -272,7 +272,7 @@ class SelectBrandPCV extends Component {
 
     }
 
-    setVarient = (varient, model_Id, modelName, fuelType, body_style, carrying) => {     
+    setVarient = (varient, model_Id, modelName, fuelType, body_style, carrying, varient_details) => {     
         console.log("body_style --------- ", body_style)   
         this.setState({
             selectedVarientId: varient,
@@ -280,11 +280,12 @@ class SelectBrandPCV extends Component {
             modelName: modelName,
             fuelType: fuelType,
             carrying : carrying,
-            body_style : body_style && body_style.DESCRIPTION
+            body_style : body_style && body_style.DESCRIPTION,
+            wheels_capacity: varient_details.wheels
         })
     }
 
-    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType, body_style, carrying) => {
+    setOtherVarient = (varient, model_Id, brand_Id, brandName, modelName, fuelType, body_style, carrying, varient_details) => {
         // brandEdit = 1 for model, 2 for other Varient
         this.setState({
             selectedVarientId: varient,
@@ -294,17 +295,26 @@ class SelectBrandPCV extends Component {
             modelName: modelName,
             fuelType: fuelType,
             carrying : carrying,
-            body_style : body_style && body_style.DESCRIPTION
+            body_style : body_style && body_style.DESCRIPTION,
+            wheels_capacity: varient_details.wheels
         })
     }
 
     handleSubmit = (values) => {
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId, modelName, vehicleDetails } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, modelName, vehicleDetails, carrying, wheels_capacity } = this.state
+
+        let carrying_capacity = carrying ? carrying : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.carrying ? vehicleDetails.varientmodel.carrying : "")
+        let wheels = wheels_capacity ? wheels_capacity : vehicleDetails && vehicleDetails.varientmodel ? vehicleDetails.varientmodel.wheels : ""
         let vehicleModel = modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")
+        
         if(vehicleModel == "" || vehicleModel == null || vehicleModel == undefined) {
             swal(phrases.PleaseVBrand)
+            return false
+        }
+        if(!(wheels == 3 && carrying_capacity <= 4)) {
+            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online. Please call 1800 22 1111")
             return false
         }
         const formData = new FormData();
@@ -382,12 +392,7 @@ class SelectBrandPCV extends Component {
 						 <SideNav />
 						</div>
 						</aside>
-								
-					 {/* <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">            
-						<SideNav />
-             		 </div>*/}
-                           
-							
+	
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox sbbrand">
                                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
 
@@ -545,7 +550,7 @@ class SelectBrandPCV extends Component {
                                                                     onClick={(e) =>
                                                                         // console.log("varient--------------- ", varient)
                                                                         this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                            varient.fuel_type, varient.bodystyle, varient.carrying )
+                                                                            varient.fuel_type, varient.bodystyle, varient.carrying, varient )
                                                                     }
                                                                 />
                                                                 <span className="checkmark mL-0"></span>
@@ -581,7 +586,7 @@ class SelectBrandPCV extends Component {
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
                                                                     this.setVarient(e.target.value, brand.id, brand.name+" "+varient.varient, 
-                                                                    varient.fuel_type, varient.bodystyle, varient.carrying)
+                                                                    varient.fuel_type, varient.bodystyle, varient.carrying, varient)
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -621,7 +626,7 @@ class SelectBrandPCV extends Component {
                                                                 aria-invalid="false"
                                                                 onClick={(e) =>
                                                                     this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.bodystyle, varient.carrying )
+                                                                        brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.bodystyle, varient.carrying, varient )
                                                                 }
                                                             />
                                                             <span className="checkmark mL-0"></span>
@@ -658,7 +663,7 @@ class SelectBrandPCV extends Component {
                                                             aria-invalid="false"
                                                             onClick={(e) =>
                                                                 this.setOtherVarient(e.target.value, model.id, model.brand_id,
-                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.bodystyle, varient.carrying )
+                                                                    brand.name, model.name+" "+varient.varient, varient.fuel_type, varient.bodystyle, varient.carrying, varient )
                                                             }
                                                         />
                                                         <span className="checkmark mL-0"></span>

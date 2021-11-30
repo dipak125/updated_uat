@@ -595,7 +595,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         >
                                                             <option value="">{phrases['SelectProduct']}</option>
                                                             {subVehicleList.map((subVehicle, qIndex) => ( 
-                                                                                <option value={subVehicle.subclass_id} key={qIndex}>{subVehicle.subclass_title}</option>
+                                                                <option value={subVehicle.subclass_id} key={qIndex} 
+                                                                disabled = {subVehicle.subclass_id != '2' ? true : false}>{subVehicle.subclass_title}</option>
                                                             ))}
                                                 
                                                         </Field>
