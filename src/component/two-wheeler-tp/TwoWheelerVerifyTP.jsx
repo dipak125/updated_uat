@@ -544,8 +544,8 @@ class TwoWheelerVerify extends Component {
                 'page_name': `two_wheeler_verifyTP/${productId}`,
                 'duration': values.duration,
                 'new_plolicy_duration': values.new_policy_duration,
-                'new_policy_start_date': values.new_policy_start_date,
-                'new_policy_end_date': values.new_policy_end_date
+                'new_policy_start_date': moment(values.new_policy_start_date).format("YYYY-MM-DD"),
+                'new_policy_end_date': moment(values.new_policy_end_date).format("YYYY-MM-DD"),
                         
             }
         }
@@ -623,7 +623,7 @@ class TwoWheelerVerify extends Component {
 
 
     render() {
-        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed} = this.state
+        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,request_data} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -641,7 +641,12 @@ class TwoWheelerVerify extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             newRegistrationNo:  motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
-            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+            policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
+            duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
+            new_policy_duration: request_data && request_data.duration ? request_data.duration : "",
+            new_policy_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
+            new_policy_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
+
 
         });
 
@@ -1154,6 +1159,7 @@ class TwoWheelerVerify extends Component {
                                                                                                 <option value='6'> Six Month</option>
                                                                                                 <option value='7'> Seven Month</option>
                                                                                                 <option value='8'> Eight Month</option>
+                                                                                                <option value='12'> One year</option>
 
                                                                                             </Field>
                                                                                             {errors.new_policy_duration && touched.new_policy_duration ? (

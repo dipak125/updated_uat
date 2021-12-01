@@ -1660,7 +1660,7 @@ class VehicleDetailsGCV extends Component {
                                                                                             minDate={new Date(minDate)}
                                                                                             maxDate={new Date()}
                                                                                             dateFormat="dd MMM yyyy"
-                                                                                            placeholderText={phrases['PPSD']}
+                                                                                            placeholderText={phrases['NPSD']}
                                                                                             peekPreviousMonth
                                                                                             autoComplete="off"
                                                                                             peekPreviousYear
@@ -1693,7 +1693,7 @@ class VehicleDetailsGCV extends Component {
                                                                                         <DatePicker
                                                                                             name="new_policy_end_date"
                                                                                             dateFormat="dd MMM yyyy"
-                                                                                            placeholderText={phrases['PPED']}
+                                                                                            placeholderText={phrases['NPED']}
                                                                                             disabled={true}
                                                                                             dropdownMode="select"
                                                                                             className="datePckr inputfs12"
