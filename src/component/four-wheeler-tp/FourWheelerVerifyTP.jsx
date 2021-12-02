@@ -553,6 +553,8 @@ class FourWheelerVerifyTP extends Component {
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'engine_no': values.engine_no,
                 'prev_policy_flag': 1,
+                'previous_start_date':moment(values.previous_start_date).format("YYYY-MM-DD"),
+                'previous_end_date':moment(values.previous_end_date).format("YYYY-MM-DD"),
                 'previous_policy_no': values.previous_policy_no,
                 'previous_policy_name':values.previous_policy_name,
                 'insurance_company_id':values.insurance_company_id,
@@ -680,7 +682,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                     validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            
+                            // console.log("values ------------ ", values)
                     return (
                         <Form>
                         <FormGroup>

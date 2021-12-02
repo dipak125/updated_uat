@@ -999,7 +999,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             >
                                                 <option value="">{phrases['Title']}</option>
                                                 {titleList.map((title, qIndex) => ( 
-                                                <option value={title.id}>{title.displayvalue}</option>
+                                                <option value={title.id} key = {qIndex}>{title.displayvalue}</option>
                                                 ))}
                                             </Field>     
                                             {errors.salutation_id && touched.salutation_id ? (
@@ -1250,7 +1250,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 type="test"
                                                 placeholder={phrases['Pincode']}
                                                 autoComplete="off"
-                                                maxlength = "6"
+                                                maxLength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                 onKeyUp={e=> this.fetchAreadetails(e)}
@@ -1282,7 +1282,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 >
                                                 <option value="">{phrases['SelectArea']}</option>
                                                 {pinDataArr && pinDataArr.length > 0 && pinDataArr.map((resource,rindex)=>
-                                                    <option value={resource.id}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
+                                                    <option value={resource.id} key = {rindex}>{resource.LCLTY_SUBRB_TALUK_TEHSL_NM}</option>
                                                 )}
                                                     
                                                     {/*<option value="area2">Area 2</option>*/}
@@ -1387,7 +1387,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             >
                                                 <option value="">{phrases['Title']}</option>
                                                 {titleList.map((title, qIndex) => ( 
-                                                <option value={title.id}>{title.displayvalue}</option>
+                                                <option value={title.id} key = {qIndex}>{title.displayvalue}</option>
                                                 ))}
                                             </Field>     
                                             {errors.nominee_salutation && touched.nominee_salutation ? (
@@ -1500,7 +1500,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                             >
                                             <option value="">{phrases['PrimaryRelation']}</option>
                                            { relation.map((relations, qIndex) => 
-                                            <option value={relations.id}>{relations.name}</option>                                        
+                                            <option value={relations.id} key = {qIndex}>{relations.name}</option>                                        
                                            )}
                                             </Field>     
                                             {errors.nominee_relation_with && touched.nominee_relation_with ? (
@@ -1550,7 +1550,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                         >
                                                         <option value="">{phrases['NomineeRelation']}</option>
                                                         { relation.map((relations, qIndex) => 
-                                                            <option value={relations.id}>{relations.name}</option>                                        
+                                                            <option value={relations.id} key = {qIndex}>{relations.name}</option>                                        
                                                         )}
                                                         </Field>     
                                                         {errors.appointee_relation_with && touched.appointee_relation_with ? (
@@ -1797,7 +1797,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                         >
                                                         <option value="">{phrases['SELECT_TPA']}</option>
                                                         { tpaInsurance.map((relations, qIndex) => 
-                                                            <option value={relations.repository_id}>{relations.name}</option>                                        
+                                                            <option value={relations.repository_id} key = {qIndex}>{relations.name}</option>                                        
                                                         )}
                                                         </Field>  
 														{errors.tpaInsurance && touched.tpaInsurance ? (
