@@ -253,9 +253,26 @@ class TwoWheelerOtherComprehensive extends Component {
                     });
                 } 
                 else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+                    var validationErrors = []
+                    for (const x in res.data.UnderwritingResult.MessageList) {
+                        let rgxp = res.data.UnderwritingResult.MessageList[x].Message
+                        let msg = ""
+                        let str = /restricted for selected Model or Location/gi
+                        if(rgxp.match(str) && res.data.UnderwritingResult.MessageList[x].Code == 'SBIG-PA-UW-U1030') // Decline vehicle
+                        {
+                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            swal(msg);
+                        }
+                        else {
+                            msg = res.data.UnderwritingResult.MessageList[x].Message
+                        }
+                        validationErrors.push(msg)  
+                    }
+
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
-                        error: {"message": 1},
+                        error: {"message": 0},
+                        validation_error: validationErrors,
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
@@ -420,7 +437,7 @@ class TwoWheelerOtherComprehensive extends Component {
 
     render() {
         const { vahanDetails, error, policyCoverage, vahanVerify, fulQuoteResp, PolicyArray, motorInsurance, serverResponse, add_more_coverage,moreCoverage,
-            step_completed, vehicleDetails, selectFlag} = this.state
+            step_completed, vehicleDetails, selectFlag, validation_error} = this.state
         const { productId } = this.props.match.params
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user) {
@@ -464,9 +481,6 @@ class TwoWheelerOtherComprehensive extends Component {
         newInnitialArray.PA_Cover = PA_Cover
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
 
-        console.log("InitialValues---", newInnitialArray)
-        console.log("add_more_coverage---", add_more_coverage)
-
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList && coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -506,12 +520,25 @@ class TwoWheelerOtherComprehensive extends Component {
                 </span>
             ) : null;
 
+        const validationErrors =
+            validation_error ? (
+                validation_error.map((errors, qIndex) => (
+                    <span className="errorMsg" key={qIndex}>
+                        <li>
+                            <strong>
+                                {errors}
+                            </strong>
+                        </li>
+                    </span>
+                ))
+            ) : null;
+
         return (
             
             <>
                 <BaseComponent>
-        {phrases ? 
-		 <div className="page-wrapper">
+                {phrases ? 
+                <div className="page-wrapper">
                     <div className="container-fluid">
                         <div className="row">
 			
@@ -529,6 +556,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                         <div className="brandhead m-b-10">
                                             <h4 className="m-b-30">{phrases['ThirdPartyLiability']}</h4>
                                             <h5>{errMsg}</h5>
+                                            <h5>{validationErrors}</h5>
                                         </div>
                                     </div>
                                     <Formik initialValues={newInitialValues}

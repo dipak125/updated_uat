@@ -57,15 +57,15 @@ const initialValue = {
     puc: '1',
     duration:"",
     new_policy_duration: "",
-    new_policy_start_date: "",
-    new_policy_end_date: "",
+    pol_start_date: "",
+    pol_end_date: "",
 }
 const ComprehensiveValidation = Yup.object().shape({
     new_policy_duration: Yup.string().required("New policy duration required"),
        
         
    
-    new_policy_start_date: Yup.date().
+    pol_start_date: Yup.date().
         
         required("PleaseESD")
             .test(
@@ -73,7 +73,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 "StartDateLessEnd",
                 function (value) {
                     if (value && this.parent.policy_type_id == '2' ||  this.parent.policy_type_id == '1') {
-                        return checkGreaterStartEndTimes(value, this.parent.new_policy_end_date);
+                        return checkGreaterStartEndTimes(value, this.parent.pol_end_date);
                     }
                     return true;
                 }
@@ -81,13 +81,13 @@ const ComprehensiveValidation = Yup.object().shape({
                 "checkStartDate",
                 "PleaseESD",
                 function (value) {
-                    if (this.parent.new_policy_end_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '1')) {
+                    if (this.parent.pol_end_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '1')) {
                         return false;
                     }
                     return true;
                 }
             ),
-            new_policy_end_date: Yup.date()
+            pol_end_date: Yup.date()
         
        .required("PleaseEED")
             .test(
@@ -95,7 +95,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 "EndDateGreaterStart",
                 function (value) {
                     if (value && this.parent.policy_type_id == '2' || this.parent.policy_type_id == '1') {
-                        return checkGreaterTimes(value, this.parent.new_policy_start_date);
+                        return checkGreaterTimes(value, this.parent.pol_start_date);
                     }
                     return true;
                 }
@@ -103,7 +103,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 "checkEndDate",
                 "PleaseEED",
                 function (value) {
-                    if (this.parent.new_policy_start_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '2')) {
+                    if (this.parent.pol_start_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '2')) {
                         return false;
                     }
                     return true;
@@ -523,6 +523,9 @@ class TwoWheelerVerify extends Component {
                 'prev_policy_flag': 0,
                 'cng_kit': 0,
                 'page_name': `two_wheeler_verifyTP/${productId}`,
+                'new_policy_duration': values.new_policy_duration,
+                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
             }
         }
         else {
@@ -543,9 +546,9 @@ class TwoWheelerVerify extends Component {
                 'previous_city':values.previous_city,
                 'page_name': `two_wheeler_verifyTP/${productId}`,
                 'duration': values.duration,
-                'new_plolicy_duration': values.new_policy_duration,
-                'new_policy_start_date': moment(values.new_policy_start_date).format("YYYY-MM-DD"),
-                'new_policy_end_date': moment(values.new_policy_end_date).format("YYYY-MM-DD"),
+                'new_policy_duration': values.new_policy_duration,
+                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
                         
             }
         }
@@ -626,7 +629,8 @@ class TwoWheelerVerify extends Component {
         const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,request_data} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-
+        console.log("request==",request_data.start_date,)
+        console.log("request2==",request_data.end_date,)
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
             chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
@@ -644,8 +648,8 @@ class TwoWheelerVerify extends Component {
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
             new_policy_duration: request_data && request_data.duration ? request_data.duration : "",
-            new_policy_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
-            new_policy_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
+            pol_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
+            pol_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
 
 
         });
@@ -694,7 +698,7 @@ class TwoWheelerVerify extends Component {
                     validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            
+                       console.log("values==",values)     
                     return (
                         <Form>
                         <FormGroup>
@@ -876,7 +880,7 @@ class TwoWheelerVerify extends Component {
                                                                                                             date1 = moment(moment(values.previous_start_date).add(values.duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
                                                                                                             tempDate = moment(values.previous_start_date).add(values.duration, 'month').format('YYYY-MM-DD')
                                                                                                             setFieldValue("previous_end_date", new Date(date1));
-                                                                                                            setFieldValue("new_policy_start_date", new Date(tempDate));
+                                                                                                            setFieldValue("pol_start_date", new Date(tempDate));
                                                                                                         }
                                                                                                         else setFieldValue("previous_end_date", "");
 
@@ -884,8 +888,8 @@ class TwoWheelerVerify extends Component {
                                                                                                     else {
                                                                                                         setFieldValue("previous_start_date", "");
                                                                                                         setFieldValue("previous_end_date", "");
-                                                                                                        setFieldValue("new_policy_start_date", "");
-                                                                                                        setFieldValue("new_policy_end_date", "");
+                                                                                                        setFieldValue("pol_start_date", "");
+                                                                                                        setFieldValue("pol_end_date", "");
                                                                                                     }
                                                                                                     // else if( values.previous_start_date && e.target.value != '3'){
                                                                                                     //     var date = new Date(values.previous_start_date)
@@ -937,10 +941,10 @@ class TwoWheelerVerify extends Component {
                                                                                                             }
                                                                                                             if (values.new_policy_duration) {
                                                                                                                 tempEndDate = moment(moment(tempDate).add(values.new_policy_duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                                setFieldValue("new_policy_end_date", new Date(tempEndDate));
+                                                                                                                setFieldValue("pol_end_date", new Date(tempEndDate));
                                                                                                             }
                                                                                                             setFieldValue("previous_end_date", new Date(date2));
-                                                                                                            setFieldValue("new_policy_start_date", new Date(tempDate));
+                                                                                                            setFieldValue("pol_start_date", new Date(tempDate));
                                                                                                         }
                                                                                                         setFieldValue("duration", e.target.value);
                                                                                                     }}
@@ -1006,11 +1010,11 @@ class TwoWheelerVerify extends Component {
                                                                                                 }
                                                                                                 if (values.new_policy_duration) {
                                                                                                     tempEndDate = moment(moment(tempDate).add(values.new_policy_duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                    setFieldValue("new_policy_end_date", new Date(tempEndDate));
+                                                                                                    setFieldValue("pol_end_date", new Date(tempEndDate));
                                                                                                 }
                                                                                                 setFieldTouched('previous_start_date')
                                                                                                 setFieldValue("previous_end_date", new Date(date2));
-                                                                                                setFieldValue("new_policy_start_date", new Date(tempDate));
+                                                                                                setFieldValue("pol_start_date", new Date(tempDate));
                                                                                                 setFieldValue('previous_start_date', val);
                                                                                             }}
                                                                                         />
@@ -1110,7 +1114,19 @@ class TwoWheelerVerify extends Component {
                                         </FormGroup>
                                     </Col>   
                                 </Row>
-                                {values.policy_type_id == '2' || values.policy_type_id == '1' ?
+                                
+                                <Row>
+                                <Col sm={12}>
+                                        <FormGroup>
+                                            <div className="carloan">
+                                                <h4> </h4>
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                </Fragment> 
+                              : null}
+{values.policy_type_id == '2' || values.policy_type_id == '3' ?
                                                                         <Fragment>
                                                                             <Row>
                                                                                 <Col sm={12}>
@@ -1143,9 +1159,9 @@ class TwoWheelerVerify extends Component {
                                                                                                 value={values.new_policy_duration}
                                                                                                 onChange={(e) => {
                                                                                                     let date2 = new Date()
-                                                                                                    if (values.new_policy_start_date) {
-                                                                                                        date2 = moment(moment(values.new_policy_start_date).add(e.target.value, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                        setFieldValue("new_policy_end_date", new Date(date2));
+                                                                                                    if (values.pol_start_date) {
+                                                                                                        date2 = moment(moment(values.pol_start_date).add(e.target.value, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                                                        setFieldValue("pol_end_date", new Date(date2));
                                                                                                     }
                                                                                                     setFieldValue("new_policy_duration", e.target.value);
                                                                                                 }}
@@ -1184,7 +1200,7 @@ class TwoWheelerVerify extends Component {
                                                                                             showYearDropdown
                                                                                             dropdownMode="select"
                                                                                             className="datePckr inputfs12"
-                                                                                            selected={values.new_policy_start_date}
+                                                                                            selected={values.pol_start_date}
                                                                                         // onChange={(val) => {
                                                                                         //     var date = new Date(val)
                                                                                         //     var date2 = new Date(val)
@@ -1197,8 +1213,8 @@ class TwoWheelerVerify extends Component {
                                                                                         //     setFieldValue('new_policy_start_date', val);
                                                                                         // }}
                                                                                         />
-                                                                                        {errors.new_policy_start_date && touched.new_policy_start_date ? (
-                                                                                            <span className="errorMsg">{phrases[errors.new_policy_start_date]}</span>
+                                                                                        {errors.pol_start_date && touched.pol_start_date ? (
+                                                                                            <span className="errorMsg">{phrases[errors.pol_start_date]}</span>
                                                                                         ) : null}
                                                                                     </FormGroup>
                                                                                 </Col>
@@ -1212,32 +1228,20 @@ class TwoWheelerVerify extends Component {
                                                                                             disabled={true}
                                                                                             dropdownMode="select"
                                                                                             className="datePckr inputfs12"
-                                                                                            selected={values.new_policy_end_date}
+                                                                                            selected={values.pol_end_date}
                                                                                         // onChange={(val) => {
                                                                                         //     setFieldTouched('new_policy_end_date');
                                                                                         //     setFieldValue('new_policy_end_date', val);
                                                                                         // }}
                                                                                         />
-                                                                                        {errors.new_policy_end_date && touched.new_policy_end_date ? (
-                                                                                            <span className="errorMsg">{phrases[errors.new_policy_end_date]}</span>
+                                                                                        {errors.pol_end_date && touched.pol_end_date ? (
+                                                                                            <span className="errorMsg">{phrases[errors.pol_end_date]}</span>
                                                                                         ) : null}
                                                                                     </FormGroup>
                                                                                 </Col>
                                                                             </Row>
                                                                         </Fragment>
                                                                         : null}
-                                <Row>
-                                <Col sm={12}>
-                                        <FormGroup>
-                                            <div className="carloan">
-                                                <h4> </h4>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                </Fragment> 
-                              : null}
-
                                <Row>
                                     <Col sm={12}>
                                         <FormGroup>

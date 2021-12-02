@@ -560,7 +560,6 @@ class OtherComprehensive extends Component {
         let encryption = new Encryption();
         let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
 
-        console.log("Values------------------ ", values)
         if(add_more_coverage) {
             coverage_data = {
                 'B00004' : {'value': values.B00004_value, 'description': values.B00004_description},

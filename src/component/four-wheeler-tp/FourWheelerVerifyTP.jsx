@@ -58,15 +58,15 @@ const initialValue = {
     puc: '1',
     duration:"",
     new_policy_duration: "",
-    new_policy_start_date: "",
-    new_policy_end_date: "",
+    pol_start_date: "",
+    pol_end_date: "",
 }
 const ComprehensiveValidation = Yup.object().shape({
     new_policy_duration: Yup.string().required("New policy duration required"),
        
         
    
-    new_policy_start_date: Yup.date().
+    pol_start_date: Yup.date().
         
         required("PleaseESD")
             .test(
@@ -74,7 +74,7 @@ const ComprehensiveValidation = Yup.object().shape({
                 "StartDateLessEnd",
                 function (value) {
                     if (value && this.parent.policy_type_id == '2' ||  this.parent.policy_type_id == '1') {
-                        return checkGreaterStartEndTimes(value, this.parent.new_policy_end_date);
+                        return checkGreaterStartEndTimes(value, this.parent.pol_end_date);
                     }
                     return true;
                 }
@@ -82,13 +82,13 @@ const ComprehensiveValidation = Yup.object().shape({
                 "checkStartDate",
                 "PleaseESD",
                 function (value) {
-                    if (this.parent.new_policy_end_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '1')) {
+                    if (this.parent.pol_end_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '1')) {
                         return false;
                     }
                     return true;
                 }
             ),
-            new_policy_end_date: Yup.date()
+            pol_end_date: Yup.date()
         
             .required("PleaseEED")
                  .test(
@@ -96,7 +96,7 @@ const ComprehensiveValidation = Yup.object().shape({
                      "EndDateGreaterStart",
                      function (value) {
                          if (value && this.parent.policy_type_id == '2' || this.parent.policy_type_id == '1') {
-                             return checkGreaterTimes(value, this.parent.new_policy_start_date);
+                             return checkGreaterTimes(value, this.parent.pol_start_date);
                          }
                          return true;
                      }
@@ -104,7 +104,7 @@ const ComprehensiveValidation = Yup.object().shape({
                      "checkEndDate",
                      "PleaseEED",
                      function (value) {
-                         if (this.parent.new_policy_start_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '2')) {
+                         if (this.parent.pol_start_date != undefined && value == undefined && (this.parent.policy_type_id == '2' || this.parent.policy_type_id == '2')) {
                              return false;
                          }
                          return true;
@@ -512,9 +512,14 @@ class FourWheelerVerifyTP extends Component {
                 'prev_policy_flag': 0,
                 'cng_kit': 0,
                 'page_name': `four_wheeler_verifyTP/${productId}`,
+                'new_policy_duration': values.new_policy_duration,
+                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
             }
         }
         else {
+           if(values.previous_policy_name == '3')
+           {
             post_data = {
                 'policy_holder_id': request_data.policyholder_id,
                 'menumaster_id': 1,
@@ -532,11 +537,34 @@ class FourWheelerVerifyTP extends Component {
                 'previous_city':values.previous_city,
                 'page_name': `four_wheeler_verifyTP/${productId}`,
                 'duration':values.duration,
-                'new_plolicy_duration': values.new_policy_duration,
-                'new_policy_start_date': moment(values.new_policy_start_date).format("YYYY-MM-DD"),
-                'new_policy_end_date': moment(values.new_policy_end_date).format("YYYY-MM-DD"),
+                'new_policy_duration': values.new_policy_duration,
+                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
                         
             }
+           }
+           else
+           {
+            post_data = {
+                'policy_holder_id': request_data.policyholder_id,
+                'menumaster_id': 1,
+                'registration_no': values.registration_no,
+                'chasis_no': values.chasis_no,
+                'chasis_no_last_part': values.chasis_no_last_part,
+                'engine_no': values.engine_no,
+                'prev_policy_flag': 1,
+                'previous_policy_no': values.previous_policy_no,
+                'previous_policy_name':values.previous_policy_name,
+                'insurance_company_id':values.insurance_company_id,
+                'cng_kit': 0,
+                'previous_city':values.previous_city,
+                'page_name': `four_wheeler_verifyTP/${productId}`,
+                'new_policy_duration': values.new_policy_duration,
+                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
+                        
+            }
+           }
         }
          console.log('post_data',post_data)
         if(values.chasis_no.slice(values.chasis_no.length-5)===values.chasis_no_last_part)
@@ -571,38 +599,7 @@ class FourWheelerVerifyTP extends Component {
 
 regnoFormat = (e, setFieldTouched, setFieldValue) => {
         
-        let regno = e.target.value
-        // this.setState({fastLaneData: [], brandView: '0', vehicleDetails: []})
-        // let brandEdit = {'brandEdit' : 1}
-        // this.props.setData(brandEdit)
-        // let formatVal = ""
-        // let regnoLength = regno.length
-        // var letter = /^[a-zA-Z]+$/;
-        // var number = /^[0-9]+$/;
-        // let subString = regno.substring(regnoLength-1, regnoLength)
-        // let preSubString = regno.substring(regnoLength-2, regnoLength-1)
-    
-        // if(subString.match(letter) && preSubString.match(letter) && regnoLength == 3) {        
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // }
-        // else if(subString.match(letter) && preSubString.match(letter)) {
-        //     formatVal = regno
-        // }
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 6) {
-        //     formatVal = formatVal = regno.substring(0, regnoLength-1) + " " +subString
-        // } 
-        // else if(subString.match(number) && preSubString.match(number) && regnoLength == 11 && regno.substring(3, 4).match(letter) && regno.substring(5, 7).match(number) ) {
-        //     formatVal = formatVal = regno.substring(0, 7) + " " +regno.substring(7, 11)
-        // } 
-        // else if(subString.match(number) && preSubString.match(letter)) {        
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString      
-        // } 
-        // else if(subString.match(letter) && preSubString.match(number)) {
-        //     formatVal = regno.substring(0, regnoLength-1) + " " +subString   
-        // } 
-        
-        // else formatVal = regno.toUpperCase()
-        
+        let regno = e.target.value    
         e.target.value = regno.toUpperCase()
 
     }
@@ -635,8 +632,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
             new_policy_duration: request_data && request_data.duration ? request_data.duration : "",
-            new_policy_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
-            new_policy_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
+            pol_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
+            pol_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
 
         });
 
@@ -661,18 +658,13 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 				
                 <div className="container-fluid">
                 <div className="row">
-				
-				
-						<aside className="left-sidebar">
-		 				 <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-						 <SideNav />
-						</div>
-						</aside>
-								
-								 {/*<div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">               
-									<SideNav />
-             					 </div>*/}				
-                   					
+						
+                <aside className="left-sidebar">
+                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                        <SideNav />
+                    </div>
+                </aside>
+		              					
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox">
                 <h4 className="text-center mt-3 mb-3">{phrases['SBIGICL']}</h4>
                 { step_completed >= '3' && vehicleDetails.vehicletype_id == '6' ?
@@ -853,193 +845,193 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                 </Row>
 
                                 <Row>
-                                                                                <Col sm={12} md={11} lg={3}>
-                                                                                    <FormGroup>
-                                                                                        <div className="formSection">
-                                                                                            <Field
-                                                                                                name='previous_policy_name'
-                                                                                                component="select"
-                                                                                                autoComplete="off"
-                                                                                                className="formGrp inputfs12"
-                                                                                                value={values.previous_policy_name}
-                                                                                                onChange={(e) => {
-                                                                                                    if (e.target.value == '3') {
-                                                                                                        if (values.duration && values.previous_start_date) {
-                                                                                                            let date1 = ""
-                                                                                                            var tempDate = ""
-                                                                                                            date1 = moment(moment(values.previous_start_date).add(values.duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                            tempDate = moment(values.previous_start_date).add(values.duration, 'month').format('YYYY-MM-DD')
-                                                                                                            setFieldValue("previous_end_date", new Date(date1));
-                                                                                                            setFieldValue("new_policy_start_date", new Date(tempDate));
-                                                                                                        }
-                                                                                                        else setFieldValue("previous_end_date", "");
+                                    <Col sm={12} md={11} lg={3}>
+                                        <FormGroup>
+                                            <div className="formSection">
+                                                <Field
+                                                    name='previous_policy_name'
+                                                    component="select"
+                                                    autoComplete="off"
+                                                    className="formGrp inputfs12"
+                                                    value={values.previous_policy_name}
+                                                    onChange={(e) => {
+                                                        if (e.target.value == '3') {
+                                                            if (values.duration && values.previous_start_date) {
+                                                                let date1 = ""
+                                                                var tempDate = ""
+                                                                date1 = moment(moment(values.previous_start_date).add(values.duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                tempDate = moment(values.previous_start_date).add(values.duration, 'month').format('YYYY-MM-DD')
+                                                                setFieldValue("previous_end_date", new Date(date1));
+                                                                setFieldValue("pol_start_date", new Date(tempDate));
+                                                            }
+                                                            else setFieldValue("previous_end_date", "");
 
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        setFieldValue("previous_start_date", "");
-                                                                                                        setFieldValue("previous_end_date", "");
-                                                                                                        setFieldValue("new_policy_start_date", "");
-                                                                                                        setFieldValue("new_policy_end_date", "");
-                                                                                                    }
-                                                                                                    // else if( values.previous_start_date && e.target.value != '3'){
-                                                                                                    //     var date = new Date(values.previous_start_date)
-                                                                                                    //     var tempDate = ""
-                                                                                                    //     date = date.setFullYear(date.getFullYear() + 1);
-                                                                                                    //     var date2 = new Date(date)
-                                                                                                    //     date2 = date2.setDate(date2.getDate() - 1);
-                                                                                                    //     tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')
-                                                                                                    //     setFieldValue("previous_policy_name", e.target.value);
-                                                                                                    //     setFieldValue("previous_start_date", "");                
-                                                                                                    //     setFieldValue("previous_end_date", new Date(date2));
-                                                                                                    //     setFieldValue("new_policy_start_date", new Date(tempDate)); 
-                                                                                                    // }
-                                                                                                    setFieldValue("previous_policy_name", e.target.value);
-                                                                                                }}
-                                                                                            // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                                            >
-                                                                                                <option value="">{phrases['SPT']}</option>
-                                                                                                <option value="1">{phrases['Package']}</option>
-                                                                                                <option value="2">{phrases['LiabilityOnly']}</option>
-                                                                                                <option value="3">{phrases['shortTerm']}</option>
+                                                        }
+                                                        else {
+                                                            setFieldValue("previous_start_date", "");
+                                                            setFieldValue("previous_end_date", "");
+                                                            setFieldValue("pol_start_date", "");
+                                                            setFieldValue("pol_end_date", "");
+                                                        }
+                                                        // else if( values.previous_start_date && e.target.value != '3'){
+                                                        //     var date = new Date(values.previous_start_date)
+                                                        //     var tempDate = ""
+                                                        //     date = date.setFullYear(date.getFullYear() + 1);
+                                                        //     var date2 = new Date(date)
+                                                        //     date2 = date2.setDate(date2.getDate() - 1);
+                                                        //     tempDate = moment(date2).add(1,'day').format('YYYY-MM-DD')
+                                                        //     setFieldValue("previous_policy_name", e.target.value);
+                                                        //     setFieldValue("previous_start_date", "");                
+                                                        //     setFieldValue("previous_end_date", new Date(date2));
+                                                        //     setFieldValue("pol_start_date", new Date(tempDate)); 
+                                                        // }
+                                                        setFieldValue("previous_policy_name", e.target.value);
+                                                    }}
+                                                // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                >
+                                                    <option value="">{phrases['SPT']}</option>
+                                                    <option value="1">{phrases['Package']}</option>
+                                                    <option value="2">{phrases['LiabilityOnly']}</option>
+                                                    <option value="3">{phrases['shortTerm']}</option>
 
-                                                                                            </Field>
-                                                                                            {errors.previous_policy_name && touched.previous_policy_name ? (
-                                                                                                <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
-                                                                                            ) : null}
-                                                                                        </div>
-                                                                                    </FormGroup>
-                                                                                </Col>
-                                                                                {values.previous_policy_name == '3' ?
-                                                                                    <Col sm={12} md={5} lg={3}>
-                                                                                        <FormGroup>
-                                                                                            <div className="formSection">
-                                                                                                <Field
-                                                                                                    name='duration'
-                                                                                                    component="select"
-                                                                                                    autoComplete="off"
-                                                                                                    className="formGrp inputfs12"
-                                                                                                    value={values.duration}
-                                                                                                    onChange={(e) => {
-                                                                                                        let date2 = new Date()
-                                                                                                        var tempDate = ""
-                                                                                                        var tempEndDate = ""
-                                                                                                        if (values.previous_start_date) {
-                                                                                                            date2 = moment(moment(values.previous_start_date).add(e.target.value, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                            tempDate = moment(values.previous_start_date).add(e.target.value, 'month').format('YYYY-MM-DD')
-                                                                                                            if (checkGreaterStartEndTimes(tempDate, new Date())) {
-                                                                                                                tempDate = moment().add(1, 'day').format('YYYY-MM-DD')
-                                                                                                            }
-                                                                                                            if (values.new_policy_duration) {
-                                                                                                                tempEndDate = moment(moment(tempDate).add(values.new_policy_duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                                setFieldValue("new_policy_end_date", new Date(tempEndDate));
-                                                                                                            }
-                                                                                                            setFieldValue("previous_end_date", new Date(date2));
-                                                                                                            setFieldValue("new_policy_start_date", new Date(tempDate));
-                                                                                                        }
-                                                                                                        setFieldValue("duration", e.target.value);
-                                                                                                    }}
-                                                                                                // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
-                                                                                                >
-                                                                                                    <option value="">Select Duration</option>
-                                                                                                    <option value='1'> One Month</option>
-                                                                                                    <option value='2'> Two Month</option>
-                                                                                                    <option value='3'> Three Month</option>
-                                                                                                    <option value='4'> Four Month</option>
-                                                                                                    <option value='5'> Five Month</option>
-                                                                                                    <option value='6'> Six Month</option>
-                                                                                                    <option value='7'> Seven Month</option>
-                                                                                                    <option value='8'> Eight Month</option>
+                                                </Field>
+                                                {errors.previous_policy_name && touched.previous_policy_name ? (
+                                                    <span className="errorMsg">{phrases[errors.previous_policy_name]}</span>
+                                                ) : null}
+                                            </div>
+                                        </FormGroup>
+                                    </Col>
+                                    {values.previous_policy_name == '3' ?
+                                        <Col sm={12} md={5} lg={3}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='duration'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value={values.duration}
+                                                        onChange={(e) => {
+                                                            let date2 = new Date()
+                                                            var tempDate = ""
+                                                            var tempEndDate = ""
+                                                            if (values.previous_start_date) {
+                                                                date2 = moment(moment(values.previous_start_date).add(e.target.value, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                tempDate = moment(values.previous_start_date).add(e.target.value, 'month').format('YYYY-MM-DD')
+                                                                if (checkGreaterStartEndTimes(tempDate, new Date())) {
+                                                                    tempDate = moment().add(1, 'day').format('YYYY-MM-DD')
+                                                                }
+                                                                if (values.new_policy_duration) {
+                                                                    tempEndDate = moment(moment(tempDate).add(values.new_policy_duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                    setFieldValue("pol_end_date", new Date(tempEndDate));
+                                                                }
+                                                                setFieldValue("previous_end_date", new Date(date2));
+                                                                setFieldValue("pol_start_date", new Date(tempDate));
+                                                            }
+                                                            setFieldValue("duration", e.target.value);
+                                                        }}
+                                                    // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
+                                                    >
+                                                        <option value="">Select Duration</option>
+                                                        <option value='1'> One Month</option>
+                                                        <option value='2'> Two Month</option>
+                                                        <option value='3'> Three Month</option>
+                                                        <option value='4'> Four Month</option>
+                                                        <option value='5'> Five Month</option>
+                                                        <option value='6'> Six Month</option>
+                                                        <option value='7'> Seven Month</option>
+                                                        <option value='8'> Eight Month</option>
 
-                                                                                                </Field>
-                                                                                                {errors.duration && touched.duration ? (
-                                                                                                    <span className="errorMsg">{errors.duration}</span>
-                                                                                                ) : null}
-                                                                                            </div>
-                                                                                        </FormGroup>
-                                                                                    </Col> : null
-                                                                                }
-                                                                                <Col sm={12} md={11} lg={values.previous_policy_name == '3' ? 3 : 4}>
-                                                                                    <FormGroup>
-                                                                                        <DatePicker
-                                                                                            name="previous_start_date"
-                                                                                            minDate={new Date(minDate)}
-                                                                                            maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
-                                                                                            dateFormat="dd MMM yyyy"
-                                                                                            placeholderText={phrases['PPSD']}
-                                                                                            peekPreviousMonth
-                                                                                            autoComplete="off"
-                                                                                            peekPreviousYear
-                                                                                            showMonthDropdown
-                                                                                            showYearDropdown
-                                                                                            dropdownMode="select"
-                                                                                            className="datePckr inputfs12"
-                                                                                            className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
-                                                                                            selected={values.previous_start_date}
-                                                                                            onChange={(val) => {
-                                                                                                var date = new Date(val)
-                                                                                                var date2 = new Date(val)
-                                                                                                var tempDate = new Date(val)
-                                                                                                var tempEndDate = ""
-                                                                                                if (values.previous_policy_name == '3') {
-                                                                                                    if (values.duration) {
-                                                                                                        date2 = moment(moment(val).add(values.duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                        tempDate = moment(val).add(values.duration, 'month').format('YYYY-MM-DD')
-                                                                                                        if (checkGreaterStartEndTimes(tempDate, new Date())) {
-                                                                                                            tempDate = moment().add(1, 'day').format('YYYY-MM-DD')
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                                else if (values.previous_policy_name == '1' || values.previous_policy_name == '2') {
-                                                                                                    date = date.setFullYear(date.getFullYear() + 1);
-                                                                                                    var date2 = new Date(date)
-                                                                                                    date2 = date2.setDate(date2.getDate() - 1);
-                                                                                                    tempDate = moment(date2).add(1, 'day').format('YYYY-MM-DD')
-                                                                                                    if (checkGreaterStartEndTimes(tempDate, new Date())) {
-                                                                                                        tempDate = moment().add(1, 'day').format('YYYY-MM-DD')
-                                                                                                    }
-                                                                                                }
-                                                                                                if (values.new_policy_duration) {
-                                                                                                    tempEndDate = moment(moment(tempDate).add(values.new_policy_duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                    setFieldValue("new_policy_end_date", new Date(tempEndDate));
-                                                                                                }
-                                                                                                setFieldTouched('previous_start_date')
-                                                                                                setFieldValue("previous_end_date", new Date(date2));
-                                                                                                setFieldValue("new_policy_start_date", new Date(tempDate));
-                                                                                                setFieldValue('previous_start_date', val);
-                                                                                            }}
-                                                                                        />
-                                                                                        {errors.previous_start_date && touched.previous_start_date ? (
-                                                                                            <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
-                                                                                        ) : null}
-                                                                                    </FormGroup>
-                                                                                </Col>
+                                                    </Field>
+                                                    {errors.duration && touched.duration ? (
+                                                        <span className="errorMsg">{errors.duration}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col> : null
+                                    }
+                                    <Col sm={12} md={11} lg={values.previous_policy_name == '3' ? 3 : 4}>
+                                        <FormGroup>
+                                            <DatePicker
+                                                name="previous_start_date"
+                                                minDate={new Date(minDate)}
+                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText={phrases['PPSD']}
+                                                peekPreviousMonth
+                                                autoComplete="off"
+                                                peekPreviousYear
+                                                showMonthDropdown
+                                                showYearDropdown
+                                                dropdownMode="select"
+                                                className="datePckr inputfs12"
+                                                className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
+                                                selected={values.previous_start_date}
+                                                onChange={(val) => {
+                                                    var date = new Date(val)
+                                                    var date2 = new Date(val)
+                                                    var tempDate = new Date(val)
+                                                    var tempEndDate = ""
+                                                    if (values.previous_policy_name == '3') {
+                                                        if (values.duration) {
+                                                            date2 = moment(moment(val).add(values.duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                            tempDate = moment(val).add(values.duration, 'month').format('YYYY-MM-DD')
+                                                            if (checkGreaterStartEndTimes(tempDate, new Date())) {
+                                                                tempDate = moment().add(1, 'day').format('YYYY-MM-DD')
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (values.previous_policy_name == '1' || values.previous_policy_name == '2') {
+                                                        date = date.setFullYear(date.getFullYear() + 1);
+                                                        var date2 = new Date(date)
+                                                        date2 = date2.setDate(date2.getDate() - 1);
+                                                        tempDate = moment(date2).add(1, 'day').format('YYYY-MM-DD')
+                                                        if (checkGreaterStartEndTimes(tempDate, new Date())) {
+                                                            tempDate = moment().add(1, 'day').format('YYYY-MM-DD')
+                                                        }
+                                                    }
+                                                    if (values.new_policy_duration) {
+                                                        tempEndDate = moment(moment(tempDate).add(values.new_policy_duration, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                        setFieldValue("pol_end_date", new Date(tempEndDate));
+                                                    }
+                                                    setFieldTouched('previous_start_date')
+                                                    setFieldValue("previous_end_date", new Date(date2));
+                                                    setFieldValue("pol_start_date", new Date(tempDate));
+                                                    setFieldValue('previous_start_date', val);
+                                                }}
+                                            />
+                                            {errors.previous_start_date && touched.previous_start_date ? (
+                                                <span className="errorMsg">{phrases[errors.previous_start_date]}</span>
+                                            ) : null}
+                                        </FormGroup>
+                                    </Col>
 
-                                                                                <Col sm={12} md={11} lg={values.previous_policy_name == '3' ? 3 : 4}>
+                                    <Col sm={12} md={11} lg={values.previous_policy_name == '3' ? 3 : 4}>
 
 
-                                                                                    {/* {values.previous_policy_name == '3' ? 189 px : NULL} */}
-                                                                                    <FormGroup>
-                                                                                        <DatePicker
-                                                                                            name="previous_end_date"
-                                                                                            dateFormat="dd MMM yyyy"
-                                                                                            placeholderText={phrases['PPED']}
-                                                                                            disabled={true}
-                                                                                            dropdownMode="select"
-                                                                                            // className="datePckr inputfs12ST"
-                                                                                            className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
-                                                                                            selected={values.previous_end_date}
-                                                                                        // onChange={(val) => {
-                                                                                        //     setFieldTouched('previous_end_date');
-                                                                                        //     setFieldValue('previous_end_date', val);
-                                                                                        // }} 
-                                                                                        />
-                                                                                        {errors.previous_end_date && touched.previous_end_date ? (
-                                                                                            <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
-                                                                                        ) : null}
-                                                                                    </FormGroup>
-                                                                                </Col>
+                                        {/* {values.previous_policy_name == '3' ? 189 px : NULL} */}
+                                        <FormGroup>
+                                            <DatePicker
+                                                name="previous_end_date"
+                                                dateFormat="dd MMM yyyy"
+                                                placeholderText={phrases['PPED']}
+                                                disabled={true}
+                                                dropdownMode="select"
+                                                // className="datePckr inputfs12ST"
+                                                className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
+                                                selected={values.previous_end_date}
+                                            // onChange={(val) => {
+                                            //     setFieldTouched('previous_end_date');
+                                            //     setFieldValue('previous_end_date', val);
+                                            // }} 
+                                            />
+                                            {errors.previous_end_date && touched.previous_end_date ? (
+                                                <span className="errorMsg">{phrases[errors.previous_end_date]}</span>
+                                            ) : null}
+                                        </FormGroup>
+                                    </Col>
 
-                                                                            </Row>
+                                </Row>
 
                                 <Row>
                                     <Col sm={12} md={6} lg={6}>
@@ -1053,7 +1045,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         >
                                             <option value="">{phrases['SelectInsurer']}</option>
                                             {insurerList.map((insurer, qIndex) => ( 
-                                                <option value= {insurer.Id}>{insurer.name}</option>
+                                                <option value= {insurer.Id} key = {qIndex} >{insurer.name}</option>
                                             ))}
                                         </Field>     
                                         {errors.insurance_company_id && touched.insurance_company_id ? (
@@ -1103,122 +1095,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         </FormGroup>
                                     </Col>   
                                 </Row>
-                                {values.policy_type_id == '2' || values.policy_type_id == '1' ?
-                                                                        <Fragment>
-                                                                            <Row>
-                                                                                <Col sm={12}>
-                                                                                    <FormGroup>
-                                                                                        <div className="carloan">
-                                                                                            <h4> </h4>
-                                                                                        </div>
-                                                                                    </FormGroup>
-                                                                                </Col>
-                                                                            </Row>
-                                                                            <Row>
-                                                                                <Col sm={12}>
-                                                                                    <FormGroup>
-                                                                                        <div className="carloan">
-                                                                                            <h4> {phrases['NPD']}</h4>
-                                                                                        </div>
-                                                                                    </FormGroup>
-                                                                                </Col>
-                                                                            </Row>
-
-                                                                            <Row>
-                                                                                <Col sm={12} md={11} lg={3}>
-                                                                                    <FormGroup>
-                                                                                        <div className="formSection">
-                                                                                            <Field
-                                                                                                name='new_policy_duration'
-                                                                                                component="select"
-                                                                                                autoComplete="off"
-                                                                                                className="formGrp inputfs12"
-                                                                                                value={values.new_policy_duration}
-                                                                                                onChange={(e) => {
-                                                                                                    let date2 = new Date()
-                                                                                                    if (values.new_policy_start_date) {
-                                                                                                        date2 = moment(moment(values.new_policy_start_date).add(e.target.value, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
-                                                                                                        setFieldValue("new_policy_end_date", new Date(date2));
-                                                                                                    }
-                                                                                                    setFieldValue("new_policy_duration", e.target.value);
-                                                                                                }}
-                                                                                            >
-                                                                                                <option value="">Select Duration</option>
-                                                                                                <option value='1'> One Month</option>
-                                                                                                <option value='2'> Two Month</option>
-                                                                                                <option value='3'> Three Month</option>
-                                                                                                <option value='4'> Four Month</option>
-                                                                                                <option value='5'> Five Month</option>
-                                                                                                <option value='6'> Six Month</option>
-                                                                                                <option value='7'> Seven Month</option>
-                                                                                                <option value='8'> Eight Month</option>
-                                                                                                <option value='12'> One year</option>
-
-                                                                                            </Field>
-                                                                                            {errors.new_policy_duration && touched.new_policy_duration ? (
-                                                                                                <span className="errorMsg">{errors.new_policy_duration}</span>
-                                                                                            ) : null}
-                                                                                        </div>
-                                                                                    </FormGroup>
-                                                                                </Col>
-                                                                                <Col sm={12} md={11} lg={4}>
-                                                                                    <FormGroup>
-                                                                                        <DatePicker
-                                                                                            name="new_policy_start_date"
-                                                                                            minDate={new Date(minDate)}
-                                                                                            maxDate={new Date()}
-                                                                                            dateFormat="dd MMM yyyy"
-                                                                                            placeholderText={phrases['PPSD']}
-                                                                                            peekPreviousMonth
-                                                                                            autoComplete="off"
-                                                                                            peekPreviousYear
-                                                                                            disabled={true}
-                                                                                            showMonthDropdown
-                                                                                            showYearDropdown
-                                                                                            dropdownMode="select"
-                                                                                            className="datePckr inputfs12"
-                                                                                            selected={values.new_policy_start_date}
-                                                                                        // onChange={(val) => {
-                                                                                        //     var date = new Date(val)
-                                                                                        //     var date2 = new Date(val)
-                                                                                        //     if(values.new_policy_duration  && values.previous_end_date) {
-                                                                                        //         date2 = moment(moment(val).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
-                                                                                        //     }                   
-
-                                                                                        //     setFieldTouched('new_policy_start_date')
-                                                                                        //     setFieldValue("new_policy_end_date", new Date(date2));
-                                                                                        //     setFieldValue('new_policy_start_date', val);
-                                                                                        // }}
-                                                                                        />
-                                                                                        {errors.new_policy_start_date && touched.new_policy_start_date ? (
-                                                                                            <span className="errorMsg">{phrases[errors.new_policy_start_date]}</span>
-                                                                                        ) : null}
-                                                                                    </FormGroup>
-                                                                                </Col>
-
-                                                                                <Col sm={12} md={11} lg={4}>
-                                                                                    <FormGroup>
-                                                                                        <DatePicker
-                                                                                            name="new_policy_end_date"
-                                                                                            dateFormat="dd MMM yyyy"
-                                                                                            placeholderText={phrases['PPED']}
-                                                                                            disabled={true}
-                                                                                            dropdownMode="select"
-                                                                                            className="datePckr inputfs12"
-                                                                                            selected={values.new_policy_end_date}
-                                                                                        // onChange={(val) => {
-                                                                                        //     setFieldTouched('new_policy_end_date');
-                                                                                        //     setFieldValue('new_policy_end_date', val);
-                                                                                        // }}
-                                                                                        />
-                                                                                        {errors.new_policy_end_date && touched.new_policy_end_date ? (
-                                                                                            <span className="errorMsg">{phrases[errors.new_policy_end_date]}</span>
-                                                                                        ) : null}
-                                                                                    </FormGroup>
-                                                                                </Col>
-                                                                            </Row>
-                                                                        </Fragment>
-                                                                        : null}
+                                
                                 <Row>
                                 <Col sm={12}>
                                         <FormGroup>
@@ -1230,6 +1107,122 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                 </Row>
                                 </Fragment> 
                               : null}
+                                {values.policy_type_id == '2' || values.policy_type_id == '3' ?
+                                <Fragment>
+                                    <Row>
+                                        <Col sm={12}>
+                                            <FormGroup>
+                                                <div className="carloan">
+                                                    <h4> </h4>
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col sm={12}>
+                                            <FormGroup>
+                                                <div className="carloan">
+                                                    <h4> {phrases['NPD']}</h4>
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+
+                                    <Row>
+                                        <Col sm={12} md={11} lg={3}>
+                                            <FormGroup>
+                                                <div className="formSection">
+                                                    <Field
+                                                        name='new_policy_duration'
+                                                        component="select"
+                                                        autoComplete="off"
+                                                        className="formGrp inputfs12"
+                                                        value={values.new_policy_duration}
+                                                        onChange={(e) => {
+                                                            let date2 = new Date()
+                                                            if (values.pol_start_date) {
+                                                                date2 = moment(moment(values.pol_start_date).add(e.target.value, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                setFieldValue("pol_end_date", new Date(date2));
+                                                            }
+                                                            setFieldValue("new_policy_duration", e.target.value);
+                                                        }}
+                                                    >
+                                                        <option value="">Select Duration</option>
+                                                        <option value='1'> One Month</option>
+                                                        <option value='2'> Two Month</option>
+                                                        <option value='3'> Three Month</option>
+                                                        <option value='4'> Four Month</option>
+                                                        <option value='5'> Five Month</option>
+                                                        <option value='6'> Six Month</option>
+                                                        <option value='7'> Seven Month</option>
+                                                        <option value='8'> Eight Month</option>
+                                                        <option value='12'> One year</option>
+
+                                                    </Field>
+                                                    {errors.new_policy_duration && touched.new_policy_duration ? (
+                                                        <span className="errorMsg">{errors.new_policy_duration}</span>
+                                                    ) : null}
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                        <Col sm={12} md={11} lg={4}>
+                                            <FormGroup>
+                                                <DatePicker
+                                                    name="pol_start_date"
+                                                    minDate={new Date(minDate)}
+                                                    maxDate={new Date()}
+                                                    dateFormat="dd MMM yyyy"
+                                                    placeholderText={phrases['PPSD']}
+                                                    peekPreviousMonth
+                                                    autoComplete="off"
+                                                    peekPreviousYear
+                                                    disabled={true}
+                                                    showMonthDropdown
+                                                    showYearDropdown
+                                                    dropdownMode="select"
+                                                    className="datePckr inputfs12"
+                                                    selected={values.pol_start_date}
+                                                // onChange={(val) => {
+                                                //     var date = new Date(val)
+                                                //     var date2 = new Date(val)
+                                                //     if(values.new_policy_duration  && values.previous_end_date) {
+                                                //         date2 = moment(moment(val).add(values.new_policy_duration ,'month')).subtract(1, 'day').format('YYYY-MM-DD') 
+                                                //     }                   
+
+                                                //     setFieldTouched('pol_start_date')
+                                                //     setFieldValue("pol_end_date", new Date(date2));
+                                                //     setFieldValue('pol_start_date', val);
+                                                // }}
+                                                />
+                                                {errors.pol_start_date && touched.pol_start_date ? (
+                                                    <span className="errorMsg">{phrases[errors.pol_start_date]}</span>
+                                                ) : null}
+                                            </FormGroup>
+                                        </Col>
+
+                                        <Col sm={12} md={11} lg={4}>
+                                            <FormGroup>
+                                                <DatePicker
+                                                    name="pol_end_date"
+                                                    dateFormat="dd MMM yyyy"
+                                                    placeholderText={phrases['PPED']}
+                                                    disabled={true}
+                                                    dropdownMode="select"
+                                                    className="datePckr inputfs12"
+                                                    selected={values.pol_end_date}
+                                                // onChange={(val) => {
+                                                //     setFieldTouched('pol_end_date');
+                                                //     setFieldValue('pol_end_date', val);
+                                                // }}
+                                                />
+                                                {errors.pol_end_date && touched.pol_end_date ? (
+                                                    <span className="errorMsg">{phrases[errors.pol_end_date]}</span>
+                                                ) : null}
+                                            </FormGroup>
+                                        </Col>
+                                    </Row>
+                                </Fragment>
+                                : null}
 
                                <Row>
                                     <Col sm={12}>
