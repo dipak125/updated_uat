@@ -234,6 +234,7 @@ class SelectBrandPCV extends Component {
     }
 
     selectVehicle = (productId) => {
+        this.state.brandName="";
         this.props.history.push(`/SelectBrand_PCV/${productId}`);
     }
 
@@ -313,7 +314,7 @@ class SelectBrandPCV extends Component {
             swal(phrases.PleaseVBrand)
             return false
         }
-        if(!(wheels == 3 && carrying_capacity <= 4)) {
+        if(!(wheels == 3 && carrying_capacity <= 6)) {
             swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online. Please call 1800 22 1111")
             return false
         }
@@ -448,7 +449,7 @@ class SelectBrandPCV extends Component {
                                                                             - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
-                                                                        {/* <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div> */}
+                                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

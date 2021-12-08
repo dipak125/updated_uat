@@ -48,16 +48,16 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part: Yup.string().required('RequiredField')
-        .matches(/^([0-9]*)$/, function () {
-            return "InvalidNumber"
-        })
-        .min(5, function () {
-            return "ChasisLastDigit"
-        })
-        .max(5, function () {
-            return "ChasisLastDigit"
-        }),
+    chasis_no_last_part:Yup.string().required('RequiredField')
+    .matches(/^([a-zA-Z0-9]*)$/, function() {
+        return "InvalidNumber"
+    })
+    .min(5, function() {
+        return "ChasisLastDigit"
+    })
+    .max(5, function() {
+        return "ChasisLastDigit"
+    }),
 
     engine_no: Yup.string().required('EngineRequired')
         .matches(/^[a-zA-Z0-9]*$/, function () {
@@ -979,6 +979,8 @@ class OtherComprehensivePCV extends Component {
                     return false
                 }
                 else {
+                    if(values.chasis_no.slice(values.chasis_no.length-5)===values.chasis_no_last_part)
+                    {
                     formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
                     this.props.loadingStart();
                     axios.post('pcv/update-insured-value', formData).then(res => {
@@ -999,6 +1001,11 @@ class OtherComprehensivePCV extends Component {
                         console.log("decryptErr--fetchData-- ", decryptResp)
                         this.props.loadingStop();
                     })
+                }
+                else
+                {
+                    swal("Chasis no mismatch")
+                }
                 }
             }      
         }      
@@ -1661,7 +1668,7 @@ class OtherComprehensivePCV extends Component {
                                                                                                 setFieldValue('vahanVerify', false)
 
                                                                                                 setFieldTouched('chasis_no_last_part')
-                                                                                                setFieldValue('chasis_no_last_part', e.target.value)
+                                                                                                setFieldValue('chasis_no_last_part', e.target.value.toUpperCase())
                                                                                             }}
 
                                                                                         />
@@ -1720,7 +1727,7 @@ class OtherComprehensivePCV extends Component {
                                                                                         maxLength="25"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('chasis_no')
-                                                                                            setFieldValue('chasis_no', e.target.value)
+                                                                                            setFieldValue('chasis_no', e.target.value.toUpperCase())
                                                                                         }}
                                                                                     />
                                                                                     {errors.chasis_no && touched.chasis_no ? (

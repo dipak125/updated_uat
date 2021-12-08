@@ -64,7 +64,15 @@ class LogIn extends Component {
             let phraseData = (res.data.phrase ? res.data.phrase : []);
             asyncLocalStorage.setItem("phrases", JSON.stringify(phraseData) ).then(
                 this.props.loadingStop()
-            ).then( this.props.history.push('/Products') )
+            ).then(
+                (queryString.parse(this.props.location.search).authentication_token 
+                    && queryString.parse(this.props.location.search).product_id && queryString.parse(this.props.location.search).product_id == '3') ? 
+                    this.props.history.push('two_wheeler_Select-brandTP/3' ) :
+                (queryString.parse(this.props.location.search).authentication_token 
+                    && queryString.parse(this.props.location.search).product_id && queryString.parse(this.props.location.search).product_id == '6') ? 
+                    this.props.history.push('four_wheeler_Select-brandTP/6' ) : this.props.history.push('/Products' )
+                 
+            )
           })
           .catch(err => {
             this.setState({

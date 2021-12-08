@@ -520,7 +520,7 @@ class RegistrationPCV_TP extends Component {
                                                                             ) : null}
                                                                         </div>
 
-                                                                        {/* <div className="p-r-25">
+                                                                        <div className="p-r-25">
                                                                             <label className="customRadio3">
                                                                                 <Field
                                                                                     type="radio"
@@ -541,11 +541,11 @@ class RegistrationPCV_TP extends Component {
                                                                             {errors.policy_type && touched.policy_type ? (
                                                                                 <span className="errorMsg">{phrases[errors.policy_type]}</span>
                                                                             ) : null}
-                                                                        </div> */}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            {/* {values.policy_type == '3' ?
+                                                            {values.policy_type == '3' ?
                                                                 <div className="d-flex justify-content-left">
                                                                     <div className="brandhead">
                                                                         <p>{phrases['LapseDuration']}</p>
@@ -579,7 +579,7 @@ class RegistrationPCV_TP extends Component {
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div> : null} */}
+                                                                </div> : null}
 
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">{phrases['SubProduct']}:</label>

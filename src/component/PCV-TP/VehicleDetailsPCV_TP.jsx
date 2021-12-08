@@ -58,7 +58,7 @@ const initialValue = {
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().required('RegistrationRequired')
+    registration_date: Yup.string().nullable().required('RegistrationRequired')
     .test(
         "checkMaxDateRollover",
         "RegistrationDateOld",
@@ -92,7 +92,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
     ),
     // location_id:Yup.string().matches(/^[A-Za-z0-9 ]+$/,'No special Character allowed').required('Registration city is required'),
 
-    location_id: Yup.string()
+    location_id: Yup.string().nullable()
     .required(function() {
         return "CityRequired"
     })
@@ -294,7 +294,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
 
 
 class VehicleDetailsPCV_TP extends Component {
-
+    
     state = {
         insurerList: [],
         showClaim: false,
@@ -327,6 +327,7 @@ class VehicleDetailsPCV_TP extends Component {
         element.classList.add('active');
     }
     onChange = (e, setFieldValue) => {
+        console.log("onchange",e.target.value)
         setFieldValue('location_id', "")
       };
 
@@ -367,7 +368,9 @@ class VehicleDetailsPCV_TP extends Component {
     }
 
       // ----------------AddressId------------
-    onSuggestionsClearRequested = () => {
+    onSuggestionsClearRequested = (setFieldValue,values) => {
+       
+       console.log("clear")
     this.setState({
         suggestions: []   
     });
@@ -420,7 +423,9 @@ class VehicleDetailsPCV_TP extends Component {
     });
   };
 
-   getCustomerIDSuggestionValue = (suggestion) => {
+   getCustomerIDSuggestionValue = (suggestion,setFieldValue) => {
+    //setFieldValue("location_id", suggestion.id)
+    console.log("check",suggestion.id)
     this.setState({
       selectedCustomerRecords: suggestion, changeFlag: 0, 
     });
@@ -428,6 +433,7 @@ class VehicleDetailsPCV_TP extends Component {
   }
   
    renderCustomerIDSuggestion(suggestion) {
+      
     return (
         <span>{suggestion.RTO_LOCATION+" - "+suggestion.RTO_Cluster}</span>
     );
@@ -757,6 +763,7 @@ class VehicleDetailsPCV_TP extends Component {
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
 console.log("errors-------------- ", errors)
+console.log("values==",values)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -785,9 +792,10 @@ console.log("errors-------------- ", errors)
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
-                                                                onChange={(val) => {
+                                                                onChange={async (val) => {
                                                                     setFieldTouched('registration_date');
-                                                                    setFieldValue('registration_date', val); 
+                                                                    await setFieldValue('registration_date', val); 
+                                                                   
 
                                                                     setFieldValue('previous_end_date', ""); 
                                                                     setFieldValue('previous_start_date', "");                                                                    
@@ -815,13 +823,14 @@ console.log("errors-------------- ", errors)
                                                                 <Autosuggest 
                                                                 suggestions={suggestions}
                                                                 onSuggestionsFetchRequested={this.onSuggestionsFetchCustomerID}
-                                                                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                                                                getSuggestionValue={this.getCustomerIDSuggestionValue }
+                                                                onSuggestionsClearRequested={()=>this.onSuggestionsClearRequested(setFieldValue,values)}
+                                                                getSuggestionValue={this.getCustomerIDSuggestionValue}
                                                                 shouldRenderSuggestions={this.customerIDRender}
                                                                 renderSuggestion={this.renderCustomerIDSuggestion}
                                                                 inputProps={inputCustomerID} 
                                                                 onChange={e=>this.onChange(e,setFieldValue)}
                                                                 onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
+                                                                    console.log("change",e,suggestion)
                                                                     this.SuggestionSelected(setFieldTouched,setFieldValue,suggestion)
                                                                     }}
                                                                 />
