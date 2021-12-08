@@ -1000,9 +1000,9 @@ console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                                                 dropdownMode="select"
                                                                 className="datePckr inputfs12"
                                                                 selected={values.registration_date}
-                                                                onChange={(val) => {
+                                                                onChange={async(val) => {
                                                                     setFieldTouched('registration_date');
-                                                                    setFieldValue('registration_date', val); 
+                                                                    await setFieldValue('registration_date', val); 
 
                                                                     setFieldValue('previous_end_date', ""); 
                                                                     setFieldValue('previous_start_date', "");                                                                    
