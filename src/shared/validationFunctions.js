@@ -248,7 +248,7 @@ export const registrationNumberSecondBlock = (value) => {
 export const registrationNumberThirdBlock = (value) => {
     var str = /^[a-zA-Z0-9]*$/;
         if(value) {
-            if(value.match(str) && value.length >= 2 && value.length <= 3) {    
+            if(value.match(str) && value.length <= 3) {    
                 if (value == 0) {
                     return false;
                 }         

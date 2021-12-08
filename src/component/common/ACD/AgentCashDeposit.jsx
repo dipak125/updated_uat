@@ -34,17 +34,23 @@ class AgentCashDeposit extends Component {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
 
             const user_id = user_data.master_user_id ? user_data.master_user_id : null;
-            console.log("User Id", `acd/acd-balance/${user_id}`);
-            axios.get(`acd/acd-balance/${user_id}`)
+            var formObj = {
+                user_id
+            };
+            formData.append('enc_data', encryption.encrypt(JSON.stringify(formObj)))
+            
+            axios.post(`acd/acd-balance`, formData)
                 .then(res => {
-                    console.log(res);
-                    if (res.data.error == true) {
+                    let encryption = new Encryption();
+                    var balanceDetails = JSON.parse(encryption.decrypt(res.data));
+
+                    if (balanceDetails.error == true) {
                         swal("Unable to fetch amount", {
                             icon: "error",
                         })
                     } else {
                         this.setState({
-                            balanceAmount: res.data.data.balanceAmount
+                            balanceAmount: balanceDetails.data.balanceAmount
                         })
                     }
                     this.props.loadingStop();

@@ -184,7 +184,7 @@ const validateAddress =  Yup.object().shape({
                 }).required(function() {
                     return "Please enter height"
                 })
-                .matches(/^[0-9]*\.[0-9]{2}$/, function() {
+                .matches(/^[0-9]*$/, function() {
                     return "Please enter Number"
                 }),
                 weight: Yup.string(function() {
@@ -192,7 +192,7 @@ const validateAddress =  Yup.object().shape({
                 }).required(function() {
                     return "Please enter weight"
                 })
-                .matches(/^[0-9]*\.[0-9]{2}$/, function() {
+                .matches(/^[0-9]*$/, function() {
                     return "Please enter Number"
                 }),
                 dob: Yup.date().when(['looking_for'],{
@@ -619,7 +619,7 @@ class dailycash_Address extends Component {
                 }
                 else
                 {
-                    this.props.history.push(`/dailycash_NomineeDetails/${productId}`);
+                    this.props.history.push(`/dailycash_FullQuote/${productId}`);
                 }
                
            // }        

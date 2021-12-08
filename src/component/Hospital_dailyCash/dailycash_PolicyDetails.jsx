@@ -177,23 +177,25 @@ class dailycash_PolicyDetails extends Component {
     axios
       .post(`/daily-cash/full-quote`, formData)
       .then((res) => {
-        if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+        let decryptResp = JSON.parse(encryption.decrypt(res.data))
+
+        if (!decryptResp.error) {
           this.setState({
-            fulQuoteResp: res.data.PolicyObject,
+            fulQuoteResp: decryptResp.data,
             serverResponse: true,
             error: [],
           });
-        } else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
+        } else if (decryptResp.error) {
           this.setState({
-            fulQuoteResp: res.data.PolicyObject,
-            error: {"message": 1},
+            fulQuoteResp: decryptResp.data,
+            error: {"message": decryptResp.msg},
             serverResponse: false,
           });
         }
         else {
           this.setState({
             fulQuoteResp: [],
-            error: res.data,
+            error: decryptResp.data,
             serverResponse: false,
           });
         }
@@ -281,7 +283,7 @@ sendPaymentLink = () => {
                       <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.first_name +" "+member.last_name}</FormGroup>
+                      <FormGroup>{member.first_name}</FormGroup>
                     </Col>
                   </Row>
 
@@ -541,7 +543,7 @@ sendPaymentLink = () => {
                                             </div>
                                         
                                           <div className="rghtsideTrigr">
-                                            <Collapsible trigger="Arogya Top Up Policy, SBI General Insurance Company Limited"  open= {true}>
+                                            <Collapsible trigger="Hospital Daily Cash, SBI General Insurance Company Limited"  open= {true}>
                                               <div className="listrghtsideTrigr">
                                                 <Row>
                                                  <Col sm={12} md={6} lg={3}>
@@ -595,7 +597,7 @@ sendPaymentLink = () => {
                                             <Collapsible trigger=" Contact information">
                                               <div className="listrghtsideTrigr">
                                                 <div className="d-flex justify-content-end carloan">
-                                                  <Link to ={`/arogya_Address/${productId}`}> Edit</Link>
+                                                  <Link to ={`/dailycash_Address/${productId}`}> Edit</Link>
                                                 </div>
                                                 <Row>
                                                   <Col sm={12} md={12}>
@@ -713,6 +715,7 @@ sendPaymentLink = () => {
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
+                                          {console.log('fulQuoteResp=====',fulQuoteResp)}  
                                           {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse ? 
                                            <Button type="submit"
                                               className="proceedBtn"

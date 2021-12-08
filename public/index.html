@@ -31,6 +31,9 @@
     window.history.pushState(null, document.title, window.location.href);
   });
 });
+    if ( window.self !== window.top ) {
+        window.top.location.href=window.location.href;
+    }
     </script>
     
     <title>SBIG</title>

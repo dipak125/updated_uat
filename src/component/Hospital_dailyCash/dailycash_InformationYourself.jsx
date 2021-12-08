@@ -83,63 +83,64 @@ const validateFamilyMembers = Yup.object().shape({
 
     looking_for_1: Yup.string(),
     looking_for_6: Yup.string(),
-    looking_for_0: Yup.string().when(['looking_for_2', 'cover_type_id'], {
-        is: (looking_for_2, cover_type_id) => (looking_for_2 == 'child1' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_3', 'cover_type_id'], {
-        is: (looking_for_3, cover_type_id) => (looking_for_3 == 'child2' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_4', 'cover_type_id'], {
-        is: (looking_for_4, cover_type_id) => (looking_for_4 == 'child3' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_5', 'cover_type_id'], {
-        is: (looking_for_5, cover_type_id) => (looking_for_5 == 'child4' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1', 'looking_for_6', 'cover_type_id'], {
-        is: (looking_for_1, looking_for_6, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_6 == 'father' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1', 'looking_for_7', 'cover_type_id'], {
-        is: (looking_for_1, looking_for_7, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_7 == 'mother' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1', 'looking_for_8', 'cover_type_id'], {
-        is: (looking_for_1, looking_for_8, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_1', 'looking_for_9', 'cover_type_id'], {
-        is: (looking_for_1, looking_for_9, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_6', 'looking_for_7', 'cover_type_id'], {
-        is: (looking_for_6, looking_for_7, cover_type_id) => (looking_for_6 == 'father' && looking_for_7 == 'mother' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_6', 'looking_for_8', 'cover_type_id'], {
-        is: (looking_for_6, looking_for_8, cover_type_id) => (looking_for_6 == 'father' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_6', 'looking_for_9', 'cover_type_id'], {
-        is: (looking_for_6, looking_for_9, cover_type_id) => (looking_for_6 == 'father' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_7', 'looking_for_8', 'cover_type_id'], {
-        is: (looking_for_7, looking_for_8, cover_type_id) => (looking_for_7 == 'mother' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_7', 'looking_for_9', 'cover_type_id'], {
-        is: (looking_for_7, looking_for_9, cover_type_id) => (looking_for_7 == 'mother' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }).when(['looking_for_8', 'looking_for_9', 'cover_type_id'], {
-        is: (looking_for_8, looking_for_9, cover_type_id) => (looking_for_8 == 'fatherInLaw' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
-        then: Yup.string().required('Please select self'),
-        othewise: Yup.string()
-    }),
+    looking_for_0: Yup.string().required('Self is Mandatory'),
+    // looking_for_0: Yup.string().when(['looking_for_2', 'cover_type_id'], {
+    //     is: (looking_for_2, cover_type_id) => (looking_for_2 == 'child1' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_3', 'cover_type_id'], {
+    //     is: (looking_for_3, cover_type_id) => (looking_for_3 == 'child2' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_4', 'cover_type_id'], {
+    //     is: (looking_for_4, cover_type_id) => (looking_for_4 == 'child3' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_5', 'cover_type_id'], {
+    //     is: (looking_for_5, cover_type_id) => (looking_for_5 == 'child4' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_1', 'looking_for_6', 'cover_type_id'], {
+    //     is: (looking_for_1, looking_for_6, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_6 == 'father' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_1', 'looking_for_7', 'cover_type_id'], {
+    //     is: (looking_for_1, looking_for_7, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_7 == 'mother' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_1', 'looking_for_8', 'cover_type_id'], {
+    //     is: (looking_for_1, looking_for_8, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_1', 'looking_for_9', 'cover_type_id'], {
+    //     is: (looking_for_1, looking_for_9, cover_type_id) => (looking_for_1 == 'spouse' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_6', 'looking_for_7', 'cover_type_id'], {
+    //     is: (looking_for_6, looking_for_7, cover_type_id) => (looking_for_6 == 'father' && looking_for_7 == 'mother' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_6', 'looking_for_8', 'cover_type_id'], {
+    //     is: (looking_for_6, looking_for_8, cover_type_id) => (looking_for_6 == 'father' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_6', 'looking_for_9', 'cover_type_id'], {
+    //     is: (looking_for_6, looking_for_9, cover_type_id) => (looking_for_6 == 'father' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_7', 'looking_for_8', 'cover_type_id'], {
+    //     is: (looking_for_7, looking_for_8, cover_type_id) => (looking_for_7 == 'mother' && looking_for_8 == 'fatherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_7', 'looking_for_9', 'cover_type_id'], {
+    //     is: (looking_for_7, looking_for_9, cover_type_id) => (looking_for_7 == 'mother' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }).when(['looking_for_8', 'looking_for_9', 'cover_type_id'], {
+    //     is: (looking_for_8, looking_for_9, cover_type_id) => (looking_for_8 == 'fatherInLaw' && looking_for_9 == 'motherInLaw' && cover_type_id == '3'),
+    //     then: Yup.string().required('Please select self'),
+    //     othewise: Yup.string()
+    // }),
 
     dob_0: Yup.string().when(['looking_for_0'], {
         is: looking_for_0 => looking_for_0 == 'self',
@@ -1260,6 +1261,7 @@ class dailycash_InformationYourself extends Component {
 
             });
             this.handleClose()
+
         }
         else {
             swal('Please select at least one option');
@@ -1356,6 +1358,8 @@ class dailycash_InformationYourself extends Component {
 
     setValueData = () => {
         var checkBoxAll = document.getElementsByClassName('user-self');
+        //console.log(looking_for_0)
+        
         for (const a in checkBoxAll) {
             if (checkBoxAll[a].checked) {
                 return true

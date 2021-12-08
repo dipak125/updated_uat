@@ -187,8 +187,8 @@ class dailycash_NomineeDetails extends Component {
         } 
     }
 
-    addressInfo = (productId) => {
-        this.props.history.push(`/dailycash_Address/${productId}`);
+    fullQuoteDetails = (productId) => {
+        this.props.history.push(`/dailycash_FullQuote/${productId}`);
     }
 
     handleSubmit = (values, actions) => {
@@ -532,7 +532,7 @@ class dailycash_NomineeDetails extends Component {
                                                 } 
 
                                                 <div className="d-flex justify-content-left resmb">
-                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.addressInfo.bind(this, productId )}>
+                                                <Button className={`backBtn`} type="button"  disabled={isSubmitting ? true : false} onClick= {this.fullQuoteDetails.bind(this, productId )}>
                                                     {isSubmitting ? 'Wait..' : 'Back'}
                                                 </Button> 
                                                 <Button className={`proceedBtn`} type="submit"  disabled={isSubmitting ? true : false}>
