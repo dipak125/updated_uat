@@ -116,7 +116,7 @@ class Premium_sukhsam extends Component {
 
 
     componentDidMount() {
-        this.fetchPolicyDetails()
+        this.quoteUpdate()
     }
 
     getGender = (gender) => {
@@ -146,6 +146,32 @@ class Premium_sukhsam extends Component {
             this.props.loadingStop();
           });
       };
+
+    quoteUpdate=(values, actions)=>{
+        const {productId} = this.props.match.params 
+        const formData = new FormData();
+        let encryption = new Encryption();
+            
+        let formDataNew = new FormData(); 
+        let post_data_new = {
+            'id': this.props.policy_holder_id,
+            'menumaster_id': this.props.menumaster_id,
+            'page_name': `Premium_Sookshma/${productId}`,
+
+        }
+        formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
+        
+        this.props.loadingStart();
+        axios.post('/sookshama/quote',
+        formDataNew
+        ).then(res=>{
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));   
+                this.fetchPolicyDetails()     
+        })
+        .catch(err=>{
+            this.props.loadingStop();
+        })
+    }
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
