@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import BaseComponent from '.././BaseComponent';
 import { Row, Col, Modal, Button, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
-
+import Swal from "sweetalert2";
 import swal from 'sweetalert';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
@@ -57,6 +57,28 @@ function nameFormatter(cell, row){
     
     
 }
+const share = (refObj)=>(cell,row)=>{
+    return (
+        <Button className="btn btn-sm" onClick={()=>sent(refObj,cell,row)}>Send Quote</Button>
+    )
+ }
+ const sent=(refObj,cell,row)=>{
+     console.log("cell",refObj,cell,row)
+     Swal.fire({
+         input: 'email',
+         inputPlaceholder:"Enter email",
+         showCancelButton: true,
+         cancelButtonColor:"red",
+         confirmButtonColor:"green",
+         confirmButtonText:"Send"        
+     }).then((result) => {
+         if (result.value) {
+            let email=result.value;
+            refObj.shareEmail(email,cell.policy_note.policy_no)
+            
+         }
+     });
+ }
 
 const statusFormatter = (refObj) => (cell,row) => {
     let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -75,6 +97,9 @@ class QuoteSearch extends Component {
         searchValues: {},
         products: []
 
+    }
+    shareEmail=(email,policy_no)=>{
+        console.log("cell",email,policy_no)
     }
 
     redirectLink = (cell,row) => {
@@ -246,7 +271,7 @@ class QuoteSearch extends Component {
                                     <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>{phrases['QuoteIssueDate']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > {phrases['Premium']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={statusFormatter(this)} >{phrases['Status']}</TableHeaderColumn>
-
+                                    <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={share(this)} >Share Quote</TableHeaderColumn>
                                     
 
                                 </BootstrapTable>

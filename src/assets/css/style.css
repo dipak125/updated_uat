@@ -1659,4 +1659,7 @@ li.nav-item.dropdown select.listSelect {
     text-align: center !important;
 }
 
-
+.swal2-popup {
+    font-size: .7rem !important;
+    padding-top: .8rem !important;
+  }

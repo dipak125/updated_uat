@@ -235,7 +235,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,\s]*$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9-/\\a.,\s]*$/, 
         function() {
             return "PleaseValidAddress"
     })
@@ -260,7 +260,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             return true;
         }
     )
-    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s-/]*$/, 
+    .matches(/^[a-zA-Z0-9]*$/, 
         function() {
             return "ValidPolicyNumber"
         }).min(6, function() {

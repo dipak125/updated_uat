@@ -195,9 +195,10 @@ class SelectBrandPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decrypt",decryptResp.data.policyHolder.motorinsurance  )
+                console.log("decrypt",decryptResp.data.policyHolder)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                console.log("vehicle",vehicleDetails)
                 this.setState({
                     motorInsurance, vehicleDetails
                 })
@@ -365,6 +366,7 @@ class SelectBrandPCV extends Component {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,
              selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails, carrying, body_style } = this.state
         const { productId } = this.props.match.params
+        
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),
             selectedModelId:  selectedModelId ? selectedModelId : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel_id ? vehicleDetails.vehiclemodel_id : ""),
@@ -464,10 +466,10 @@ class SelectBrandPCV extends Component {
                                                                             <strong>{body_style ? body_style : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.bodystyle ? vehicleDetails.varientmodel.bodystyle.DESCRIPTION: "")}</strong></div>
                                                                     </div>
 
-                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                    {/* <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['Power']}<br />
                                                                             <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : ""}</strong></div>
-                                                                    </div>
+                                                                    </div> */}
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['carryingCapacity']}<br />
