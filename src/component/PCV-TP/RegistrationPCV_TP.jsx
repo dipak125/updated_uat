@@ -21,7 +21,8 @@ const initialValues = {
     reg_number_part_three: '',
     reg_number_part_four: '',
     check_registration: 2,
-    lapse_duration: ''
+    lapse_duration: '',
+    
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
@@ -385,11 +386,12 @@ class RegistrationPCV_TP extends Component {
     render() {
         const { motorInsurance, subVehicleList } = this.state
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
+        console.log("tempreg",motorInsurance)
         const newInitialValues = Object.assign(initialValues, {
-            reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
-            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
-            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
-            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
+            reg_number_part_one: typeof(tempRegNo) == 'undefined'?"": tempRegNo && tempRegNo.reg_number_part_one,
+            reg_number_part_two: typeof(tempRegNo) == 'undefined'?"": tempRegNo && tempRegNo.reg_number_part_two,
+            reg_number_part_three: typeof(tempRegNo) == 'undefined'?"": tempRegNo && tempRegNo.reg_number_part_three,
+            reg_number_part_four: typeof(tempRegNo) == 'undefined'?"": tempRegNo && tempRegNo.reg_number_part_four,
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "",
@@ -423,7 +425,8 @@ class RegistrationPCV_TP extends Component {
                                                 validationSchema={vehicleRegistrationValidation}
                                             >
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                    // console.log('values',values)
+                                                     console.log('values',values)
+                                                     console.log("errors",errors)
 
                                                     return (
                                                         <Form>

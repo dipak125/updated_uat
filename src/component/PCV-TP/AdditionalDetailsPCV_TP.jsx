@@ -157,12 +157,13 @@ const ownerValidation = Yup.object().shape({
             },
             function (value) {
                 if (value) {
-                    return value <= 100 && value > 0;
+                    return value <= 100 && value >= 3;
                 }
                 return true;
         }),
 
         otherwise: Yup.mixed().nullable()
+       
     }),
 
     pancard: Yup.string().when(['is_eia_account2','net_premium'], {

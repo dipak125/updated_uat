@@ -63,7 +63,7 @@ const share = (refObj)=>(cell,row)=>{
     )
  }
  const sent=(refObj,cell,row)=>{
-     console.log("cell",refObj,cell,row)
+     console.log("cell",refObj,cell,row.reference_no)
      Swal.fire({
          input: 'email',
          inputPlaceholder:"Enter email",
@@ -74,7 +74,7 @@ const share = (refObj)=>(cell,row)=>{
      }).then((result) => {
          if (result.value) {
             let email=result.value;
-            refObj.shareEmail(email,cell.policy_note.policy_no)
+            refObj.shareEmail(email,row.reference_no)
             
          }
      });
@@ -83,7 +83,8 @@ const share = (refObj)=>(cell,row)=>{
 const statusFormatter = (refObj) => (cell,row) => {
     let trans = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     return (
-        cell.payment_link_status == '0' ? <div>{trans['QuoteIssued']}</div> :  <div>Payment link sent</div>
+        // cell.payment_link_status == '0' ? <div>{trans['QuoteIssued']}</div> :  <div>Payment link sent</div>
+        cell.payment_link_status == '0' ? <div>{trans['QuoteIssued']}</div> :  cell.payment_link_status == '4' ? <div>Customer Consent Pending</div> : <div>Payment link sent</div>
     )
 }
 
@@ -98,8 +99,22 @@ class QuoteSearch extends Component {
         products: []
 
     }
-    shareEmail=(email,policy_no)=>{
-        console.log("cell",email,policy_no)
+    shareEmail=(email,policy_ref_no)=>{
+        console.log("cell",email,policy_ref_no);
+        const formData = new FormData();
+        formData.append('email_address',email);
+        formData.append('policy_ref_no',policy_ref_no);
+        this.props.loadingStart();
+        axios.post("policy-download/quotation-share",formData)
+        .then(res=>{
+            swal(res.data.msg)
+            this.props.loadingStop();
+        }).
+        catch(err=>{
+            swal("Unable to share")
+            this.props.loadingStop();
+        })
+        
     }
 
     redirectLink = (cell,row) => {

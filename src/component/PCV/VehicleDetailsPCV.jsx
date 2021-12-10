@@ -705,14 +705,14 @@ class VehicleDetailsPCV extends Component {
         const {productId } = this.props.match.params
         let encryption = new Encryption();
         this.props.loadingStart();
-        axios.get(`gcv/carrying-capacity-list/4 `)
+        axios.get(`gcv/carrying-capacity-list/12 `)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
     
                 let averagemonthlyusages =  decryptResp.data ? decryptResp.data.averagemonthlyusages : []
                 let permittypes =  decryptResp.data ? decryptResp.data.permittypes : []
 
-                console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages)
+                console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages[0].averagemonthlyusage_id)
 
                 this.setState({ 
                     averagemonthlyusages, permittypes
@@ -1085,7 +1085,7 @@ console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                                                 >
                                                                     <option value="">{phrases['GCVMonthlyUse']}</option>
                                                                     {averagemonthlyusages.map((monthlyusages, qIndex) => ( 
-                                                                        <option value= {monthlyusages.id}>{monthlyusages.usage_description}</option>
+                                                                        <option value= {monthlyusages.averagemonthlyusage_id}>{monthlyusages.usage_description}</option>
                                                                     ))}
                                                         
                                                                 </Field>
