@@ -770,7 +770,7 @@ class TwoWheelerSelectBrand extends Component {
                                                             <Col sm={12}>
                                                             
                                                             <div className="row formSection">
-                                                                <label className="col-md-4">{phrases['RegName']} :</label>
+                                                                <label className="col-md-4">{phrases['RegName']}</label>
                                                                 <div className="col-md-1">
 
                                                                     <Field
