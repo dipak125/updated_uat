@@ -59,7 +59,19 @@ const initialValue = {
 }
 
 const ownerValidation = Yup.object().shape({
-    first_name: Yup.string().when(['policy_for'], {
+    first_name: Yup.string()
+            .test("fullnamecheck",function(){
+                return "ValidName"
+            },
+            function(value){
+                if(value)
+                {
+                    let array=value.split(" ");
+                    return array.length>1;
+                }
+                return true;
+            })
+        .when(['policy_for'], {
         is: policy_for => policy_for == '1',       
         then: Yup.string().required('NameRequired')
         .min(3, function() {
@@ -229,7 +241,19 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string().nullable()
     }),
 
-    nominee_first_name: Yup.string().when(['policy_for'], {
+    nominee_first_name: Yup.string()
+        .test("fullnamecheck",function(){
+            return "ValidName"
+        },
+        function(value){
+            if(value)
+            {
+                let array=value.split(" ");
+                return array.length>1;
+            }
+            return true;
+        })
+        .when(['policy_for'], {
         is: policy_for => policy_for == '1',       
         then: Yup.string()
                 .test(
@@ -323,7 +347,19 @@ const ownerValidation = Yup.object().shape({
             return "EIAMax"
         }).matches(/^[1245][0-9]{0,13}$/,'EIAValidReq').notRequired(),
 
-    appointee_name: Yup.string().when(['policy_for'], {
+    appointee_name: Yup.string()
+        .test("fullnamecheck",function(){
+            return "ValidName"
+        },
+        function(value){
+            if(value)
+            {
+                let array=value.split(" ");
+                return array.length>1;
+            }
+            return true;
+        })    
+        .when(['policy_for'], {
         is: policy_for => policy_for == '1',       
         then: Yup.string().notRequired()
                 .min(3, function() {
@@ -873,7 +909,7 @@ class AdditionalDetailsPCV_TP extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                            console.log("values=",values)
                         return (
                         <Form>
                         <Row>
