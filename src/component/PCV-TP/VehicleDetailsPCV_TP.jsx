@@ -34,7 +34,7 @@ const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day
 const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment().subtract(20, 'years').calendar();
 // const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
-const minRegnDateNew = moment().subtract(1, 'months').calendar();
+const minRegnDateNew = moment().subtract(9, 'months').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {

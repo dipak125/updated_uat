@@ -169,7 +169,7 @@ const ownerValidation = Yup.object().shape({
             },
             function (value) {
                 if (value) {
-                    return value <= 100 && value >= 3;
+                    return value <= 100 && value >= 0.3;
                 }
                 return true;
         }),
@@ -178,7 +178,7 @@ const ownerValidation = Yup.object().shape({
        
     }),
 
-    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
+    pancard: Yup.string().required("Required field").when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required("EnterPan").test(
             "1LakhChecking",

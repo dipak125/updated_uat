@@ -285,7 +285,8 @@ class SelectBrandPCV_TP extends Component {
             fuelType: fuelType,
             carrying: carrying,
             body_style: body_style && body_style.DESCRIPTION,
-            wheels_capacity: varient_details.wheels
+            wheels_capacity: varient_details.wheels,
+            power: varient_details.horse_power
         })
     }
 
@@ -475,6 +476,10 @@ class SelectBrandPCV_TP extends Component {
                                                                             <div className="txtRegistr">{phrases['carryingCapacity']}<br />
                                                                                 <strong>{carrying ? carrying : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.carrying ? vehicleDetails.varientmodel.carrying : "")} </strong></div>
                                                                         </div>
+                                                                        <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                        <div className="txtRegistr">{phrases['Power']}<br />
+                                                                            <strong>{ this.state.power? this.state.power+" BHP" : ""}</strong></div>
+                                                                    </div>
 
                                                                         <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                             <div className="txtRegistr">{phrases['Fuel']}<br />

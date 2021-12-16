@@ -247,7 +247,7 @@ class SelectBrandPCV extends Component {
         this.props.loadingStart();
         axios.get(`pcv/vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp', decryptResp)
+            console.log('varient', decryptResp)
 
             let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
             let brandModelList = decryptResp && decryptResp.data.brand_models ? decryptResp.data.brand_models : [];
@@ -275,7 +275,7 @@ class SelectBrandPCV extends Component {
     }
 
     setVarient = (varient, model_Id, modelName, fuelType, body_style, carrying, varient_details) => {     
-        console.log("body_style --------- ", body_style)   
+        console.log("varient1 --------- ", varient_details.horse_power)   
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
@@ -283,7 +283,8 @@ class SelectBrandPCV extends Component {
             fuelType: fuelType,
             carrying : carrying,
             body_style : body_style && body_style.DESCRIPTION,
-            wheels_capacity: varient_details.wheels
+            wheels_capacity: varient_details.wheels,
+            power:varient_details.horse_power
         })
     }
 
@@ -466,10 +467,10 @@ class SelectBrandPCV extends Component {
                                                                             <strong>{body_style ? body_style : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.bodystyle ? vehicleDetails.varientmodel.bodystyle.DESCRIPTION: "")}</strong></div>
                                                                     </div>
 
-                                                                    {/* <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
+                                                                    <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['Power']}<br />
-                                                                            <strong>{ vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power ? vehicleDetails.varientmodel.horse_power+" BHP" : ""}</strong></div>
-                                                                    </div> */}
+                                                                            <strong>{ this.state.power? this.state.power+" BHP" : ""}</strong></div>
+                                                                    </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['carryingCapacity']}<br />
@@ -538,6 +539,7 @@ class SelectBrandPCV extends Component {
                                     (
                                         this.state.searchitem && this.state.searchitem.length > 0 && this.state.searchitem.map((brand, brandIndex) => (
                                             brand.varientmodel && brand.varientmodel.length > 0 && brand.varientmodel.map((varient, varientIndex) => (
+                                                
                                                 <div key= {varientIndex} className="brdrbottom">
                                                     <label className="d-flex justify-content-between">
                                                         <div className="modalboxInfo">{brand.name}

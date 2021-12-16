@@ -144,7 +144,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && !value) {
                     return false;
                 }
                 return true;
@@ -180,7 +180,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && !value) {
                     return false;
                 }
                 return true;
@@ -216,7 +216,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && !value) {
                     return false;
                 }
                 return true;
@@ -246,7 +246,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && !value) {
                     return false;
                 }
                 return true;
@@ -264,7 +264,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && !value) {
                     return false;
                 }
                 return true;
@@ -290,7 +290,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && !value) {
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && !value) {
                     return false;
                 }
                 return true;
@@ -349,7 +349,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             },
             function (value) {
                 const ageObj = new PersonAge();
-                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 0 && this.parent.previous_policy_name == '1' &&
+                if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && this.parent.previous_policy_name == '1' &&
                     Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {
                     return false;
                 }
@@ -510,7 +510,7 @@ class VehicleDetails extends Component {
     handleSubmit = (values, actions) => {
         const { productId } = this.props.match.params
         const { motorInsurance } = this.state
-        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : 1
+        let policy_type = ageObj.whatIsCurrentMonth(values.registration_date) < 6 ? 6 : 1
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
         // let ageDiff = Math.floor(moment().diff(values.registration_date, 'days', true));
@@ -519,7 +519,7 @@ class VehicleDetails extends Component {
         let encryption = new Encryption();
         let post_data = {}
         if(values.policy_type_id == '1' || values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
-            if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '1') {
+            if (ageObj.whatIsCurrentMonth(values.registration_date) > 5 && values.previous_policy_name == '1') {
                 post_data = {
                     'policy_holder_id': localStorage.getItem('policyHolder_id'),
                     'menumaster_id': 1,
@@ -543,7 +543,7 @@ class VehicleDetails extends Component {
                     'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
                 }
             }
-            else if(ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '3')
+            else if(ageObj.whatIsCurrentMonth(values.registration_date) > 5 && values.previous_policy_name == '3')
             {
                 post_data = {
                     'policy_holder_id': localStorage.getItem('policyHolder_id'),
@@ -570,7 +570,7 @@ class VehicleDetails extends Component {
                 } 
             }
 
-            else if (ageObj.whatIsCurrentMonth(values.registration_date) > 0 && values.previous_policy_name == '2') {
+            else if (ageObj.whatIsCurrentMonth(values.registration_date) > 5 && values.previous_policy_name == '2') {
                 post_data = {
                     'policy_holder_id': localStorage.getItem('policyHolder_id'),
                     'menumaster_id': 1,
@@ -593,7 +593,7 @@ class VehicleDetails extends Component {
                     'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")
                 }
             }
-            else if (ageObj.whatIsCurrentMonth(values.registration_date) <= 0) {
+            else if (ageObj.whatIsCurrentMonth(values.registration_date) <= 5) {
                 post_data = {
                     'policy_holder_id': localStorage.getItem('policyHolder_id'),
                     'menumaster_id': 1,
@@ -793,8 +793,8 @@ class VehicleDetails extends Component {
                                             <div className="brand-bg">
                                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                        console.log("errors------------ ", errors)
-                                                        console.log("values===",values)
+                                                        // console.log("errors------------ ", errors)
+                                                        // console.log("values===",values)
                                                         return (
                                                             <Form>
                                                                 <Row>
@@ -832,10 +832,10 @@ class VehicleDetails extends Component {
                                                                                             setFieldValue('previous_end_date', "");
                                                                                             setFieldValue('previous_start_date', "");
                                                                                             if( (motorInsurance && motorInsurance.policytype_id && (motorInsurance.policytype_id == '3' &&
-                                                                                                motorInsurance && motorInsurance.lapse_duration == '2' ) ) || (ageObj.whatIsCurrentMonth(values.registration_date) > 0 ) ){
+                                                                                                motorInsurance && motorInsurance.lapse_duration == '2' ) ) || (ageObj.whatIsCurrentMonth(values.registration_date) > 5 ) ){
                                                                                                     setFieldValue('pol_start_date', addDays(new Date(),1) );
                                                                                             }
-                                                                                            if(ageObj.whatIsCurrentMonth(values.registration_date) <= 0  ){
+                                                                                            if(ageObj.whatIsCurrentMonth(values.registration_date) <= 5  ){
                                                                                                     let date1 = addDays(new Date(),1)
                                                                                                     let date2 = moment(moment(date1).add(12, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
                                                                                                     setFieldValue('pol_start_date', date1 ); 
@@ -886,7 +886,7 @@ class VehicleDetails extends Component {
                                                                         </Row>
                                                                         {/* {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ? */  
                                                                             (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' &&
-                                                                                motorInsurance && motorInsurance.lapse_duration == '2') || (ageObj.whatIsCurrentMonth(values.registration_date) <= 0 ) ? null :
+                                                                                motorInsurance && motorInsurance.lapse_duration == '2') || (ageObj.whatIsCurrentMonth(values.registration_date) <= 5 ) ? null :
                                                                                 <Fragment>
                                                                                     <Row>
                                                                                         <Col sm={12}>
@@ -1290,7 +1290,7 @@ class VehicleDetails extends Component {
 
                                                                                 </Fragment> }
                                                                                 {(motorInsurance && motorInsurance.policytype_id && ((motorInsurance.policytype_id == '3' &&
-                                                                                motorInsurance && motorInsurance.lapse_duration == '2') || (motorInsurance.policytype_id == '2')) ) || (ageObj.whatIsCurrentMonth(values.registration_date) > 0 ) ?
+                                                                                motorInsurance && motorInsurance.lapse_duration == '2') || (motorInsurance.policytype_id == '2')) ) || (ageObj.whatIsCurrentMonth(values.registration_date) > 5 ) ?
                                                                                 <Fragment>
                                                                                     <Row>
                                                                                         <Col sm={12}>

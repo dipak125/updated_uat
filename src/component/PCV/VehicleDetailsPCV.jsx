@@ -38,7 +38,7 @@ const maxDatePYPLapsed = moment().subtract(1, 'years').calendar();
 const startRegnDate = moment().subtract(20, 'years').calendar();
 const minRegnDate = startRegnDate;
 // const minRegnDate = moment(startRegnDate).startOf('year').format('YYYY-MM-DD hh:mm');
-const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
+const minRegnDateNew = moment(moment().subtract(9, 'months').calendar()).add(1, 'day').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
 
 const initialValue = {
