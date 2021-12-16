@@ -34,6 +34,18 @@ const genderArr = {
   f: "Female",
 };
 
+const cashLimit = {
+  1: "500",
+  2: "1000",
+  3: "1500",
+  4: "2000",
+};
+
+const coverDuration = {
+  1: "30",
+  2: "60"
+};
+
 const relationArr = {
 1:"Self",
 2:"Spouse",
@@ -314,31 +326,24 @@ sendPaymentLink = () => {
                     <Col sm={12} md={6}>
                       <FormGroup>{genderArr[member.gender]}</FormGroup>
                     </Col>
-                  </Row>                   
-                  {qIndex == 0 ? 
-                  <Row> 
+                  </Row>
+                  <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>PAN No.</FormGroup>
+                      <FormGroup>Daily Cash Limit</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>
-                      { member.pancard_no }
-                      </FormGroup>
+                      <FormGroup>{cashLimit[member.cash_limit]}</FormGroup>
                     </Col>
                   </Row>
-                    : ''}                                     
-                  {qIndex == 0 ? 
-                  <Row> 
+                  <Row>
                     <Col sm={12} md={6}>
-                      <FormGroup>EIA No.</FormGroup>
+                      <FormGroup>Cover Duration</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>
-                      { policyHolderDetails.eia_no }
-                      </FormGroup>
+                      <FormGroup>{coverDuration[member.cover_duration]} Days</FormGroup>
                     </Col>
-                  </Row>
-                    : ''}
+                  </Row>                    
+                
                 </Col>
               </Row>
               <Row>

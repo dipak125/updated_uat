@@ -44,20 +44,14 @@ const initialValues = {
     gender: "",
     insureList: "",
     cover_type_id: "",
-    occupation_id: "",
+    marital_status_id: "",
     occupation_description: "",
 }
 
 
 
 const vehicleInspectionValidation = Yup.object().shape({
-    gender: Yup.string().required('Please select gender'),
-    occupation_description: Yup.string()
-        .when('occupation_id', {
-            is: 193,
-            then: Yup.string().typeError('Please Specify'),
-            othewise: Yup.string()
-        })
+    gender: Yup.string().required('Please select gender')
 
 });
 
@@ -933,6 +927,7 @@ class dailycash_InformationYourself extends Component {
             display_dob: [],
             display_looking_for: [],
             relationList: [],
+            educationList: [],
             display_gender: [],
             gender_for: [],
             confirm: "",
@@ -1008,7 +1003,7 @@ class dailycash_InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
-        if (values.occupation_id == '193' && (values.occupation_description == null || values.occupation_description == '')) {
+        if (values.marital_status_id == '193' && (values.occupation_description == null || values.occupation_description == '')) {
             swal({
                 text: "Please specify the occupation !",
                 icon: "error",
@@ -1035,8 +1030,7 @@ class dailycash_InformationYourself extends Component {
             post_data['page_name'] = `dailycash_Health/${productId}`
             post_data['proposer_gender'] = values.gender
             post_data['cover_type_id'] = cover_type_id
-            post_data['occupation_id'] = values.occupation_id
-            post_data['occupation_description'] = values.occupation_description
+            post_data['marital_status_id'] = values.marital_status_id
 
             let arr_date = []
             for (let i = 0; i < dob.length; i++) {
@@ -1307,7 +1301,7 @@ class dailycash_InformationYourself extends Component {
 
     fetchRelations = () => {
         this.props.loadingStart();
-        axios.get(`/arogya-topup/relations`)
+        axios.get(`/daily-cash/relations`)
             .then(res => {
                 const relationList = res.data && res.data.data ? res.data.data : []
                 this.setState({
@@ -1320,6 +1314,8 @@ class dailycash_InformationYourself extends Component {
                 this.props.loadingStop();
             })
     }
+
+
 
     fetchInsurance = () => {
         let encryption = new Encryption();
@@ -1403,7 +1399,7 @@ class dailycash_InformationYourself extends Component {
         }
     }
     handleSelectedValChange = (selectedOption, setFieldValue, setFieldTouched) => {
-        setFieldValue('occupation_id', selectedOption.value)
+        setFieldValue('marital_status_id', selectedOption.value)
         this.setState({ selectedOption });
         console.log(`Option selected:`, selectedOption);
     };
@@ -1446,15 +1442,12 @@ class dailycash_InformationYourself extends Component {
             cover_type_id: cover_type_id,
             // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString() : (insureList ? insureList : ''),
-            occupation_id: policyHolder ? policyHolder.occupation_id : "",
+            marital_status_id: policyHolder && policyHolder.marital_status_id ? policyHolder.marital_status_id : "",
             occupation_description: (policyHolder && policyHolder.occupation_description != null) ? policyHolder.occupation_description : ""
         });
-        const options =
-            occupationList && occupationList.length > 0 ? occupationList.map((insurer, qIndex) => (
-                { value: insurer.id, label: insurer.occupation }
-            )) : []
 
-
+        //console.log('newInitialValues',newInitialValues)
+       
         return (
             <>
                 <BaseComponent>
@@ -1508,47 +1501,33 @@ class dailycash_InformationYourself extends Component {
                                                             </div>
 
                                                       
-                                                            {/*<div className="row formSection">
-                                                                <label className="col-md-4">Occupation:</label>
+                                                            <div className="row formSection">
+                                                                <label className="col-md-4">Marital Status:</label>
                                                                 <div className="col-md-4">
-                                                                    <Select
-                                                                        placeholder="Select Occupation"
-                                                                        value={selectedOption ? selectedOption : options ? options.find(option => option.value === values.occupation_id) : ''}
-                                                                        name='occupation_id'
-                                                                        onChange={(e) => this.handleSelectedValChange(e, setFieldValue, setFieldTouched)}
-                                                                        options={options}
-                                                                    />
-                                                                    {errors.occupation_id && touched.occupation_id ? (
-                                                                        <span className="errorMsg">
-                                                                            {errors.occupation_id}
-                                                                        </span>
+                                                                    <Field
+                                                                        name="marital_status_id"
+                                                                        component="select"
+                                                                        autoComplete="off"
+                                                                        value={values.marital_status_id}
+                                                                        className="formGrp"
+                                                                        onChange={(e) => {
+                                                                            setFieldValue('marital_status_id', e.target.value);
+                    
+                                                                        }}
+                                                                    >
+                                                                        <option value="">Select Marital Status</option>
+                                                                        <option value="1">Married</option>
+                                                                        <option value="2">Single</option>
+                                                                        <option value="3">Widow</option>
+                                                                        <option value="4">Divorced</option>
+                                                                    </Field>
+                                                                    {errors.marital_status_id && touched.marital_status_id ? (
+                                                                        <span className="errorMsg">{errors.marital_status_id}</span>
                                                                     ) : null}
                                                                 </div>
                                                             </div>
 
-                                                            {
-                                                                values.occupation_id == '193' ?
-                                                                    <div className="row formSection">
-                                                                        <label className="col-md-4"></label>
-                                                                        <div className="col-md-4">
-                                                                            <Field
-                                                                                name="occupation_description"
-                                                                                type="text"
-                                                                                placeholder='Please mention your occupation here.'
-                                                                                autoComplete="off"
-                                                                                value={values.occupation_description}
-                                                                                maxLength="256"
-                                                                                onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                            />
-                                                                            {errors.occupation_description && touched.occupation_description ? (
-                                                                                <span className="errorMsg">
-                                                                                    {errors.occupation_description}
-                                                                                </span>
-                                                                            ) : null}
-                                                                        </div>
-                                                                    </div> : ''
-                                                            }*/}
+                                                         
 
                                                             <div className="row formSection m-b-30">
                                                                 <label className="col-md-4">Looking to Insure: <br /><span className="small">(Add Family Members to be Insured)</span></label>

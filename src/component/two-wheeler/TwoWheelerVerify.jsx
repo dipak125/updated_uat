@@ -1186,6 +1186,9 @@ class TwoWheelerVerify extends Component {
                                         </FormGroup>
                                     </Col>   
                                 </Row>
+                                </Fragment> 
+                              : null}
+
                                 {values.policy_type_id == '2' || values.policy_type_id == '3' ?
                                     <Fragment>
                                         <Row>
@@ -1300,19 +1303,17 @@ class TwoWheelerVerify extends Component {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+                                        <Row>
+                                            <Col sm={12}>
+                                                <FormGroup>
+                                                    <div className="carloan">
+                                                        <h4> </h4>
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
                                     </Fragment>
                                     : null}
-                                <Row>
-                                <Col sm={12}>
-                                        <FormGroup>
-                                            <div className="carloan">
-                                                <h4> </h4>
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                </Fragment> 
-                              : null}
                               
                                 <Row>
                                     <Col sm={12}>

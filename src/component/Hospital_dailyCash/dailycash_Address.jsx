@@ -29,6 +29,7 @@ const initialFamilyDetails = {
 	fname: "",
 	cashlimit: "",
     coverduration: "",
+    education_id:"",
     height: "",
     weight: "",
 	dob: new Date(),
@@ -54,6 +55,7 @@ const initialValues = {
     proposerName: "",
     proposercashlimit: "",
     proposercoverduration: "",
+    proposereducation_id: "",
     proposerheight: "",
     proposerweight: "",
     proposerDob: "",
@@ -63,7 +65,8 @@ const initialValues = {
     nominee_gender: "",
     nominee_dob: "",
     nominee_relation_with: "",
-	is_eia_account2: ""
+	is_eia_account2: "",
+    educationList:[]
     };
 
 const validateAddress =  Yup.object().shape({
@@ -178,6 +181,11 @@ const validateAddress =  Yup.object().shape({
                     return "Please Select Cover Duration"
                 }).required(function() {
                     return "Please Select Cover Duration"
+                }),
+                education_id: Yup.string(function() {
+                    return "Please Select Education"
+                }).required(function() {
+                    return "Please Select Education"
                 }),
                 height: Yup.string(function() {
                     return "Please enter height"
@@ -353,7 +361,8 @@ class dailycash_Address extends Component {
             pincode_Details: [],
             titleList: [],
 			is_eia_account2: '',
-			tpaInsurance: []
+			tpaInsurance: [],
+            educationList:[]
 		}
 	}
 
@@ -368,6 +377,29 @@ class dailycash_Address extends Component {
     componentDidMount(){       
         this.fetchData();
 		this.tpaInsuranceRepository();
+        this.fetchEducations();
+    }
+
+    fetchEducations = () => {
+        this.props.loadingStart();
+        let encryption = new Encryption();
+        axios.get(`/daily-cash/educations`)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log('education list',decryptResp.data);
+                let educationList = decryptResp && decryptResp.data ? decryptResp.data : []
+
+                this.setState({
+                   educationList
+                })
+             
+            })
+            .catch((err) => {
+                // handle error
+                let decryptErr = JSON.parse(encryption.decrypt(err.data))
+                console.log('education=====',decryptErr)
+                this.props.loadingStop();
+            })
     }
 
 
@@ -521,6 +553,7 @@ class dailycash_Address extends Component {
         let first_name = []
         let cash_limit = []
         let cover_duration = []
+        let education_id = []
         let height = []
         let weight = []
         let dob = []
@@ -534,6 +567,7 @@ class dailycash_Address extends Component {
             first_name.push(family_members[i].fname)
             cash_limit.push(family_members[i].cashlimit)
             cover_duration.push(family_members[i].coverduration)
+            education_id.push(family_members[i].education_id)
             height.push(family_members[i].height)
             weight.push(family_members[i].weight)
             salutation_id.push(family_members[i].salutation_id)
@@ -548,6 +582,7 @@ class dailycash_Address extends Component {
         formArr['first_name'] = first_name
         formArr['cash_limit'] = cash_limit
         formArr['cover_duration'] = cover_duration
+        formArr['education_id'] = education_id
         formArr['height'] = height
         formArr['weight'] = weight
         formArr['dob'] = dob
@@ -582,6 +617,7 @@ class dailycash_Address extends Component {
         formArr['proposerName'] = values.proposerName;
         formArr['proposercashlimit'] = values.proposercashlimit; 
         formArr['proposercoverduration'] = values.proposercoverduration;
+        formArr['proposereducation_id'] = values.proposereducation_id;
         formArr['proposerheight'] = values.proposerheight;
         formArr['proposerweight'] = values.proposerweight;
         formArr['proposerDob'] = moment(values.proposerDob).format("YYYY-MM-DD");
@@ -657,6 +693,7 @@ class dailycash_Address extends Component {
 				fname: resource.first_name ? resource.first_name:'',
 				cashlimit: resource.cash_limit ? resource.cash_limit:'',
                 coverduration: resource.cover_duration ? resource.cover_duration:'',
+                education_id: resource.education_id ? resource.education_id:'',
                 height: resource.height ? resource.height:'',
                 weight: resource.weight ? resource.weight:'',
 				dob: resource.dob,
@@ -737,7 +774,7 @@ class dailycash_Address extends Component {
  
     
     render() {
-        const {policy_holder,familyMembers,is_eia_account2, tpaInsurance, addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA,showEIA2, pincode_Details, netPremiumCheck, titleList} = this.state    
+        const {educationList,policy_holder,familyMembers,is_eia_account2, tpaInsurance, addressDetails,is_eia_account,selfFlag,pinDataArr,stateName,showEIA,showEIA2, pincode_Details, netPremiumCheck, titleList} = this.state    
 		
 		 let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -763,6 +800,7 @@ class dailycash_Address extends Component {
             proposercoverduration : policy_holder && policy_holder.cover_duration ?  policy_holder.cover_duration : '',
             height : policy_holder && policy_holder.height ?  policy_holder.height : '',
             weight : policy_holder && policy_holder.weight ?  policy_holder.weight : '',
+            proposereducation_id : policy_holder && policy_holder.education_id ?  policy_holder.education_id : '',
             proposerDob : policy_holder && policy_holder.dob ?  new Date(policy_holder.dob) : '',
             proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
             netPremiumCheckCount: netPremiumCheck > 100000 ? 1 : 0,
@@ -1108,10 +1146,10 @@ class dailycash_Address extends Component {
                                                                         }}
                                                                     >
                                                                     <option value="">Cash Limit/Day</option>
-                                                                        <option value="500">500</option>
-                                                                        <option value="1000">1000</option>
-                                                                        <option value="1500">1500</option>
-                                                                        <option value="2000">2000</option>
+                                                                        <option value="1">500</option>
+                                                                        <option value="2">1000</option>
+                                                                        <option value="3">1500</option>
+                                                                        <option value="4">2000</option>
                                                                     </Field>     
                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].cashlimit ? (
                                                                     <span className="errorMsg">{errors.family_members[index].cashlimit}</span>
@@ -1140,12 +1178,41 @@ class dailycash_Address extends Component {
                                 
                                                                     >
                                                                     <option value="">Cover Duration</option>
-                                                                        <option value="30">30 Days</option>
-                                                                        <option value="60">60 Days</option>
+                                                                        <option value="1">30 Days</option>
+                                                                        <option value="2">60 Days</option>
                                                 
                                                                     </Field>     
                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].coverduration ? (
                                                                     <span className="errorMsg">{errors.family_members[index].coverduration}</span>
+                                                                ) : null}                   
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col sm={12} md={6} lg={3}>
+                                                            <FormGroup>
+                                                                <div className="formSection">
+                                                                    <Field
+                                                                        name={`family_members.${index}.education_id`}
+                                                                        component="select"
+                                                                        autoComplete="off"                                                                        
+                                                                        className="formGrp"
+                                                                        onChange={(e) => {
+                                                    
+                                                                            setFieldValue(`family_members.${index}.education_id`, e.target.value);
+                            
+                                                                        }}
+                                
+                                                                    >
+                                                                    <option value="">Education</option>    
+                                                                    {educationList && educationList.map((education, qIndex) => (
+                                                                        <option value={education.id} key={qIndex}>{education.descriptions}</option>
+
+                                                                    ))}   
+                                                                    
+                                                
+                                                                    </Field>     
+                                                                    {errors.family_members && errors.family_members[index] && errors.family_members[index].education_id ? (
+                                                                    <span className="errorMsg">{errors.family_members[index].education_id}</span>
                                                                 ) : null}                   
                                                                 </div>
                                                             </FormGroup>

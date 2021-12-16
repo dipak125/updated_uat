@@ -466,6 +466,7 @@ class dailycash_FullQuote extends Component {
                                                                                 showDisabledMonthNavigation
                                                                                 dateFormat="dd MMM yyyy"
                                                                                 placeholderText="Start Date"
+                                                                                disabled={true}
                                                                                 dropdownMode="select"
                                                                                 className="datePckr"
                                                                                 onChange={(value) => {
@@ -504,148 +505,9 @@ class dailycash_FullQuote extends Component {
                                                                     </Col>
 
                                                                 </Row>
-                                                                <Row>
-                                                                    <Col sm={12} md={4} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                Select Sum Insured
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={3} lg={2}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name="select_sum_insured"
-                                                                                    type="text"
-                                                                                    placeholder=""
-                                                                                    autoComplete="off"
-                                                                                    className="premiumslid"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={SliderVal ? SliderVal : defaultSliderVal}
-                                                                                />
-                                                                                {errors.sum_insured_value && touched.sum_insured_value ? (
-                                                                                    <span className="errorMsg">{errors.sum_insured_value}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-
-                                                                    <Col sm={12} md={12} lg={6}>
-                                                                        <FormGroup>
-                                                                            <input type="range" className="W-90 slider-riage"
-                                                                                name='slider_sum_insured'
-                                                                                // defaultValue= {defaultSumSliderValue}
-                                                                                min={minSumInsured}
-                                                                                max={maxSumInsured}
-                                                                                step='100000'
-                                                                                value={values.slider_sum_insured}
-                                                                                onChange={(e) => {
-                                                                                    setFieldTouched("slider_sum_insured");
-                                                                                    setFieldValue("slider_sum_insured", e.target.value);
-                                                                                    this.SliderValue(e.target.value)
-                                                                                }}
-                                                                            />
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row>
-                                                                    <Col sm={12} md={4} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                Select Deductible
-                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={3} lg={2}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name="select_deductible"
-                                                                                    type="text"
-                                                                                    placeholder=""
-                                                                                    autoComplete="off"
-                                                                                    className="premiumslid"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={deductibleSliderVal ? deductibleSliderVal : defaultdeductibleSliderValue}
-                                                                                />
-                                                                                {errors.deductible_value && touched.deductible_value ? (
-                                                                                    <span className="errorMsg">{errors.deductible_value}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-
-                                                                    <Col sm={12} md={12} lg={6}>
-                                                                        <FormGroup>
-                                                                            <input type="range" className="W-90 slider-riage"
-                                                                                name='slider_deductible'
-                                                                                // defaultValue= {defaultdeductibleSliderValue}
-                                                                                min={minSumDeductable}
-                                                                                max={maxSumDeductable}
-                                                                                step='100000'
-                                                                                value={values.slider_deductible}
-                                                                                onChange={(e) => {
-                                                                                    setFieldTouched("slider_deductible");
-                                                                                    setFieldValue("slider_deductible", e.target.value);
-                                                                                    this.deductibleSliderValue(e.target.value)
-                                                                                }}
-                                                                            />
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row>
-                                                                    <Col sm={12} md={4} lg={4}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                Select Tenure (Year)
-                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                    <Col sm={12} md={3} lg={2}>
-                                                                        <FormGroup>
-                                                                            <div className="insurerName">
-                                                                                <Field
-                                                                                    name="w"
-                                                                                    type="text"
-                                                                                    placeholder=""
-                                                                                    autoComplete="off"
-                                                                                    className="premiumslid"
-                                                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                    value={tenureSliderVal ? tenureSliderVal : defaulttenureSliderValue}
-                                                                                />
-                                                                                {errors.select_tenure && touched.select_tenure ? (
-                                                                                    <span className="errorMsg">{errors.select_tenure}</span>
-                                                                                ) : null}
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </Col>
-
-                                                                    <Col sm={12} md={12} lg={6}>
-                                                                        <FormGroup>
-                                                                            <input type="range" className="W-90 slider-riage"
-                                                                                name='slider_tenure'
-                                                                                // defaultValue= {defaulttenureSliderValue}
-                                                                                min={minSumTenure}
-                                                                                max={maxSumTenure}
-                                                                                step='1'
-                                                                                value={values.slider_tenure}
-                                                                                onChange={(e) => {
-                                                                                    setFieldTouched("slider_tenure");
-                                                                                    setFieldValue("slider_tenure", e.target.value);
-                                                                                    setFieldTouched("polStartDate");
-                                                                                    setFieldValue("polStartDate", values.polStartDate);
-                                                                                    setFieldTouched("polEndDate");
-                                                                                    setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * e.target.value) - 1));
-                                                                                    this.tenureSliderValue(e.target.value)
-                                                                                }}
-                                                                            />
-                                                                        </FormGroup>
-                                                                    </Col>
-                                                                </Row>
+                                                               
+                                                             
+                                                            
                                                                 <div className="d-flex justify-content-left carloan m-b-25">
                                                                     <h4> Premium</h4>
                                                                 </div>
@@ -660,14 +522,12 @@ class dailycash_FullQuote extends Component {
 
                                                                     <Col sm={12}>
                                                                         <div className="justify-content-left align-items-center list m-b-30">
-                                                                            <p>Your Health Insurance covers you for following :</p>
+                                                                            <p>Your Hospital Daily Cash you for following :</p>
                                                                             <ul>
-                                                                                <li>Your hospital room rent,boarding expenses and doctor fees</li>
-                                                                                <li>Nursing expenses.Operation theatre and ICU charges</li>
-                                                                                <li>Medicines that you consume during the hospital stay</li>
-                                                                                <li>Road Ambulance Charges</li>
-                                                                                <li>Day Care expenses for 142 daycare procedures</li>
-                                                                                <li>Pre and Post hospitalization expenses up to 60 and 90 days respectively</li>
+                                                                                <li>Daily Hospitalization benefit</li>
+                                                                                <li>ICU benefit in home city</li>
+                                                                                <li>Accident hospital confinement</li>
+                                                                                <li>Convalescence benefit for hospitalization </li>
                                                                             </ul>
                                                                         </div>
                                                                     </Col>

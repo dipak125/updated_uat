@@ -263,6 +263,35 @@ const arogya_PolicyDetails = Loadable({
 
 //=====================================================================================
 
+// =================== Hospital Daily Cash =============================== //
+
+const dailycash_Health = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Hospital_dailyCash/dailycash_InformationYourself"),
+    loading: () => loadingContent
+});
+const dailycash_MedicalDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Hospital_dailyCash/dailycash_MedicalDetails.jsx"),
+    loading: () => loadingContent
+});
+const dailycash_FullQuote = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Hospital_dailyCash/dailycash_FullQuote.jsx"),
+    loading: () => loadingContent
+});
+const dailycash_Address = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Hospital_dailyCash/dailycash_Address"),
+    loading: () => loadingContent
+});
+const dailycash_NomineeDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Hospital_dailyCash/dailycash_NomineeDetails.jsx"),
+    loading: () => loadingContent
+});
+const dailycash_PolicyDetails = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../Hospital_dailyCash/dailycash_PolicyDetails.jsx"),
+    loading: () => loadingContent
+});
+
+//=====================================================================================
+
 // ========== Two-Wheeler TP =============================================
 
 const TwoWheelerSelectBrandTP = Loadable({
@@ -927,6 +956,17 @@ class Routes extends Component {
                         <PrivateRoute exact path="/arogya_NomineeDetails/:productId" component={arogya_NomineeDetails} />
                         <PrivateRoute exact path="/arogya_PolicyDetails/:productId" component={arogya_PolicyDetails} />
 
+                        {/* ********************* Hospital Daily Cash ***************** */}
+
+                        <PrivateRoute exact path="/dailycash_Health/:productId" component={dailycash_Health} />
+                        <PrivateRoute exact path="/dailycash_MedicalDetails/:productId" component={dailycash_MedicalDetails} />
+                        <PrivateRoute exact path="/dailycash_FullQuote/:productId" component={dailycash_FullQuote} />
+                        <PrivateRoute exact path="/dailycash_Address/:productId" component={dailycash_Address} />
+                        <PrivateRoute exact path="/dailycash_NomineeDetails/:productId" component={dailycash_NomineeDetails} />
+                        <PrivateRoute exact path="/dailycash_PolicyDetails/:productId" component={dailycash_PolicyDetails} />
+
+
+                        
 
                         {/************ TwoWheeler ******************/}
                         {/* <PrivateRoute exact path="/two_wheeler_Registration/:productId" component={TwoWheelerRegistration} />  */}

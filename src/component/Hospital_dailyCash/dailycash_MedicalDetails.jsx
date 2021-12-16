@@ -332,13 +332,14 @@ class dailycash_MedicalDetails extends Component {
       return showImage
     }
     
-    setAnswer = (e) =>{
+    setAnswer = (e,question_id) =>{
         let selected_answer = [];
         let selected_question = [];    
         let selected_family_members = [];   
         const formData = new FormData(); 
-
-        let classId = e.target.className[e.target.className.length-1]
+        //console.log(question_id);
+        //let classId = e.target.className[e.target.className.length-1]
+        let classId = question_id
         
         selected_family_members = this.state.selected_family_members
         const index = selected_family_members.indexOf(`${classId}~${e.target.value}`);
@@ -471,7 +472,7 @@ class dailycash_MedicalDetails extends Component {
                            //  validationSchema={validatearogya_MedicalDetails}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                          
+                         
                             return (
                             <Form>
                             <Row>
@@ -557,7 +558,7 @@ class dailycash_MedicalDetails extends Component {
                                                 setFieldValue(`family_members.${question.id}.${index}.${resource.relation_with}`, e.target.value);
                                                 //alert(e.target.checked)
                                                // e.target.checked  ? e.target.checked = '':e.target.checked='checked'
-                                                this.setAnswer(e)
+                                                this.setAnswer(e,question.id)
                                             }}
                                             />
                                          {resource.gender == 'm' ? <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>:
@@ -574,7 +575,7 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')} 
                                             onClick = {(e) => {
-                                                this.setAnswer(e)
+                                                this.setAnswer(e,question.id)
                                             }}
                                             />
                                            {resource.gender == 'm' ? 
@@ -590,7 +591,7 @@ class dailycash_MedicalDetails extends Component {
                                             checked = {this.state.selected_family_members.includes(`${question.id}~${resource.id}`)}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
-                                                this.setAnswer(e)
+                                                this.setAnswer(e,question.id)
                                             }}
                                             />
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> 
@@ -610,7 +611,7 @@ class dailycash_MedicalDetails extends Component {
                                            // checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
-                                                this.setAnswer(e)
+                                                this.setAnswer(e,question.id)
                                             }}
                                             />
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
@@ -625,7 +626,7 @@ class dailycash_MedicalDetails extends Component {
                                            // checked = {values[`question_id_${question.id}`] =='y' ? (values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id.toString())?'checked':''):''}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
-                                                this.setAnswer(e)
+                                                this.setAnswer(e,question.id)
                                             }}
                                             />
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
