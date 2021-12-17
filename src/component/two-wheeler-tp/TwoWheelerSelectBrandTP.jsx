@@ -606,10 +606,10 @@ class TwoWheelerSelectBrand extends Component {
             policy_type: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             regNumber: motorInsurance && motorInsurance.registration_no ? motorInsurance.registration_no : "",
             policy_for: motorInsurance && motorInsurance.policy_for ? motorInsurance.policy_for : "1",
-	        reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,
-            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two,
-            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three,
-            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four,
+            reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
+            reg_number_part_two: tempRegNo && tempRegNo.reg_number_part_two ? tempRegNo.reg_number_part_two : "",
+            reg_number_part_three: tempRegNo && tempRegNo.reg_number_part_three ? tempRegNo.reg_number_part_three : "",
+            reg_number_part_four: tempRegNo && tempRegNo.reg_number_part_four ? tempRegNo.reg_number_part_four : "",
         })
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -636,7 +636,7 @@ class TwoWheelerSelectBrand extends Component {
                                     validationSchema={vehicleValidation}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                      console.log("newInitialValues===== ", values)
+                                    //   console.log("newInitialValues===== ", values)
                                         return (
                                             <Form>
                                                 <section className="brand">
