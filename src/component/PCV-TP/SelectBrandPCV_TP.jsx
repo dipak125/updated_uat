@@ -62,7 +62,8 @@ class SelectBrandPCV_TP extends Component {
             vehicleDetails: [],
             carrying: '',
             body_style: '',
-            searchText: ""
+            searchText: "",
+            power:""
         };
     }
 
@@ -253,7 +254,7 @@ class SelectBrandPCV_TP extends Component {
 
             let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
             let brandModelList = decryptResp && decryptResp.data.brand_models ? decryptResp.data.brand_models : [];
-
+           
             this.setState({
                 selectedBrandDetails,
                 brandModelList,
@@ -301,7 +302,8 @@ class SelectBrandPCV_TP extends Component {
             fuelType: fuelType,
             carrying: carrying,
             body_style: body_style && body_style.DESCRIPTION,
-            wheels_capacity: varient_details.wheels
+            wheels_capacity: varient_details.wheels,
+            power: varient_details.horse_power
         })
     }
 
@@ -478,7 +480,7 @@ class SelectBrandPCV_TP extends Component {
                                                                         </div>
                                                                         <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['Power']}<br />
-                                                                            <strong>{ this.state.power? this.state.power+" BHP" : ""}</strong></div>
+                                                                            <strong>{ this.state.power? this.state.power+" BHP" : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power? vehicleDetails.varientmodel.horse_power+ " BHP":"" )}</strong></div>
                                                                     </div>
 
                                                                         <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

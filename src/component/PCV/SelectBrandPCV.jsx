@@ -469,7 +469,7 @@ class SelectBrandPCV extends Component {
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr">{phrases['Power']}<br />
-                                                                            <strong>{ this.state.power? this.state.power+" BHP" : ""}</strong></div>
+                                                                        <strong>{ this.state.power? this.state.power+" BHP" : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.horse_power? vehicleDetails.varientmodel.horse_power+ " BHP":"" )}</strong></div>
                                                                     </div>
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
