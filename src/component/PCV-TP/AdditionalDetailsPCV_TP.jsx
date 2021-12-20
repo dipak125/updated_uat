@@ -178,7 +178,7 @@ const ownerValidation = Yup.object().shape({
        
     }),
 
-    pancard: Yup.string().required("Required field").when(['is_eia_account2','net_premium'], {
+    pancard: Yup.string().when(['is_eia_account2','net_premium'], {
         is: (is_eia_account2,net_premium) => (is_eia_account2=='1') || (net_premium >= 100000), 
         then: Yup.string().required("EnterPan").test(
             "1LakhChecking",
@@ -417,7 +417,7 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string()
     }), 
 
-    gstn_no: Yup.string()
+    gstn_no: Yup.string().required("Required Field")
     // .matches(/^[0-9]{2}[A,B,C,F,G,H,L,J,P,T]{4}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/,'Invalid GSTIN')
     .test(
         "first2digitcheck",
@@ -582,6 +582,7 @@ class AdditionalDetailsPCV_TP extends Component {
 
 
     handleSubmit = (values, actions) => {
+        console.log("hello")
         const {productId} = this.props.match.params 
         const {motorInsurance, request_data} = this.state
         const formData = new FormData(); 
@@ -910,6 +911,7 @@ class AdditionalDetailsPCV_TP extends Component {
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                             console.log("values=",values)
+                            console.log("error",errors)
                         return (
                         <Form>
                         <Row>
