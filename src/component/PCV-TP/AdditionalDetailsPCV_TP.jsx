@@ -417,7 +417,7 @@ const ownerValidation = Yup.object().shape({
         otherwise: Yup.string()
     }), 
 
-    gstn_no: Yup.string().required("Required Field")
+    gstn_no: Yup.string()
     // .matches(/^[0-9]{2}[A,B,C,F,G,H,L,J,P,T]{4}[A-Z]{1}[0-9]{4}[A-Z]{1}[0-9]{1}[Z]{1}[A-Z0-9]{1}$/,'Invalid GSTIN')
     .test(
         "first2digitcheck",
