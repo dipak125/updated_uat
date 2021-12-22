@@ -930,7 +930,7 @@ class VehicleDetailsMISCD extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors-------------- ", errors)
+
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>

@@ -128,7 +128,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
         ).test(
           "checkStartDate",
-          "Enter Start Date",
+      "PleaseESD",
           function (value) {       
               if ( this.parent.previous_end_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                   return false;
@@ -165,7 +165,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         }
         ).test(
         "checkEndDate",
-        "Enter End Date",
+        "PleaseEED",
         function (value) {     
             if ( this.parent.previous_start_date != undefined && value == undefined && this.parent.policy_type_id == '2'  && this.parent.valid_previous_policy == '1') {
                 return false;
@@ -270,11 +270,11 @@ const vehicleRegistrationValidation = Yup.object().shape({
         })
     }),
 
-    previous_claim_bonus:Yup.mixed()
+    previous_claim_bonus:Yup.string()
     .when(['policy_type_id','lapse_duration'], {
         is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
-    then: Yup.mixed(),
-    otherwise: Yup.mixed().test(
+    then: Yup.string(),
+    otherwise: Yup.string().test(
         "currentMonthChecking",
         function() {
             return "PleaseEPCB"
@@ -285,19 +285,20 @@ const vehicleRegistrationValidation = Yup.object().shape({
             }
             return true;
         }
-        )
-        .test(
-            "previousClaimChecking",
-            function() {
-                return "PleaseEPCB"
-            },
-            function (value) {
-                if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2') {   
-                    return false;    
-                }
-                return true;
+    )
+    .test(
+        "previousClaimChecking",
+        function() {
+            return "PleaseEPCB"
+        },
+        function (value) {
+            if (this.parent.previous_is_claim == '1' && !value && this.parent.no_of_claim == '2' &&
+            Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90) {   
+                return false;    
             }
-        )
+            return true;
+        }
+    )
     }),
     previous_is_claim:Yup.string()
     .when(['policy_type_id','lapse_duration'], {
@@ -703,7 +704,7 @@ class VehicleDetailsGCV extends Component {
                  console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
-                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
+                 let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
@@ -900,7 +901,7 @@ class VehicleDetailsGCV extends Component {
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
             previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             previous_is_claim: previous_is_claim,
-            previous_claim_bonus: previousPolicy && previousPolicy.claim_bonus ? Math.floor(previousPolicy.claim_bonus) : "1",
+            previous_claim_bonus: previousPolicy && (previousPolicy.claim_bonus || previousPolicy.claim_bonus == 0) ? previousPolicy.claim_bonus.toString() : "1",
             no_of_claim: previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : "",
             goodscarriedtypes_id: motorInsurance && motorInsurance.goodscarriedtype_id ? motorInsurance.goodscarriedtype_id : "",
             averagemonthlyusages_id: motorInsurance && motorInsurance.averagemonthlyusage_id ? motorInsurance.averagemonthlyusage_id : "",
@@ -949,8 +950,7 @@ class VehicleDetailsGCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-// console.log("values------------ ", values)
-console.log("errors------------ ", errors)
+
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -1435,6 +1435,7 @@ console.log("errors------------ ", errors)
                                                                                 setFieldTouched('previous_is_claim')
                                                                                 setFieldValue(`previous_is_claim`, e.target.value);
                                                                                 setFieldValue('no_of_claim', "")
+                                                                                setFieldValue('claim_array', [])                                           
                                                                                 this.showClaimText(0, values);
                                                                             }}
                                                                             checked={values.previous_is_claim == '0' ? true : false}
@@ -1453,7 +1454,7 @@ console.log("errors------------ ", errors)
                                                                             onChange={(e) => {
                                                                                 setFieldTouched('previous_is_claim')
                                                                                 setFieldValue(`previous_is_claim`, e.target.value);
-                                                                                setFieldValue('no_of_claim', "")
+                                                                                setFieldValue('previous_claim_bonus', '1')
                                                                                 this.showClaimText(1, values);
                                                                             }}
                                                                             checked={values.previous_is_claim == '1' ? true : false}

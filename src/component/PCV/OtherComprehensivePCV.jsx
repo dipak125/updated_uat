@@ -175,9 +175,21 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string().required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
+        then: Yup.string()
+        .test("minimumValue",function(){
+            return "PleaseProvideValidIDV"
+        },
+        function(value){
+            if(value)
+            {
+                return value>=1000;
+            }
+            else return true;
+        })
+        .required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
             return "valueMax8Char"
         }),
+       
         otherwise: Yup.string()
     }),
 
@@ -189,7 +201,18 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string().required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
+        then: Yup.string()
+        .test("minimumValue",function(){
+            return "PleaseProvideValidIDV"
+        },
+        function(value){
+            if(value)
+            {
+                return value>=1000;
+            }
+            else return true;
+        })
+        .required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
             return "valueMax8Char"
         }),
         otherwise: Yup.string()
