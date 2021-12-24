@@ -529,7 +529,7 @@ class Premium_sukhsam extends Component {
                                                                                                 <FormGroup>Date Of Birth:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>{moment(new Date(this.props.date_of_birth)).format('LL')}</FormGroup>
+                                                                                                <FormGroup>{moment(new Date(this.props.date_of_birth)).format("DD-MM-YYYY")}</FormGroup>
                                                                                             </Col>
                                                                                         </Row>
 
