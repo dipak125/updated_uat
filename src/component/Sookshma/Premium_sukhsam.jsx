@@ -29,6 +29,7 @@ const validatePremium = Yup.object().shape({
     }),
     })
 
+
 class Premium_sukhsam extends Component {
 
     constructor(props) {
@@ -147,43 +148,75 @@ class Premium_sukhsam extends Component {
           });
       };
 
+    // quoteUpdate=(values, actions)=>{
+    //     const {productId} = this.props.match.params 
+    //     const formData = new FormData();
+    //     let encryption = new Encryption();
+            
+    //     let formDataNew = new FormData(); 
+    //     let post_data_new = {
+    //         'id': this.props.policy_holder_id,
+    //         'menumaster_id': this.props.menumaster_id,
+    //         'page_name': `Premium_Sookshma/${productId}`,
+
+    //     }
+    //     formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
+        
+    //     this.props.loadingStart();
+    //     axios.post('/sookshama/quote',
+    //     formDataNew
+    //     ).then(res=>{
+    //             let decryptResp = JSON.parse(encryption.decrypt(res.data));   
+    //             this.fetchPolicyDetails()     
+    //     })
+    //     .catch(err=>{
+    //         this.props.loadingStop();
+    //         let decryptErr = JSON.parse(encryption.decrypt(err.data));  
+    //         console.log("decryptErr --------------- ", decryptErr)
+    //     })
+    // }
+
     quoteUpdate=(values, actions)=>{
         const {productId} = this.props.match.params 
-        const formData = new FormData();
-        let encryption = new Encryption();
-            
-        let formDataNew = new FormData(); 
-        let post_data_new = {
-            'id': this.props.policy_holder_id,
-            'menumaster_id': this.props.menumaster_id,
-            'page_name': `Premium_Sookshma/${productId}`,
-
-        }
-        formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
+        let promiseReturn = this.fetchPolicyDetails()
         
-        this.props.loadingStart();
-        axios.post('/sookshama/quote',
-        formDataNew
-        ).then(res=>{
-                let decryptResp = JSON.parse(encryption.decrypt(res.data));   
-                this.fetchPolicyDetails()     
-        })
-        .catch(err=>{
-            this.props.loadingStop();
+        promiseReturn.then((value)=> {
+            let encryption = new Encryption(); 
+            let formDataNew = new FormData(); 
+            let post_data_new = {
+                'id': this.props.policy_holder_id,
+                'menumaster_id': this.props.menumaster_id,
+                'page_name': `Premium_Sookshma/${productId}`,
+    
+            }
+            formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
+            
+            this.props.loadingStart();
+            axios.post('/sookshama/quote',
+            formDataNew
+            ).then(res=>{
+                    let decryptResp = JSON.parse(encryption.decrypt(res.data));   
+                    this.props.loadingStop();  
+            })
+            .catch(err=>{
+                this.props.loadingStop();
+                let decryptErr = JSON.parse(encryption.decrypt(err.data));  
+                console.log("decryptErr --------------- ", decryptErr)
+            })
         })
     }
 
     fetchPolicyDetails=()=>{
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
         let encryption = new Encryption();
-  
+        return new Promise((resolve, reject) => {
             this.props.loadingStart();
             axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decryptResp -------->",decryptResp)
                 if(decryptResp.data.policyHolder.step_no > 0){
-
+    
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
                         end_date:decryptResp.data.policyHolder.request_data.end_date,
@@ -196,13 +229,13 @@ class Premium_sukhsam extends Component {
                         paymentgateway: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment,
                         payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
                     });
-
+    
                 }
-
+    
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
-
+    
                     let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
-
+    
                     this.props.setRiskData(
                         {
                             shop_building_name:risk_arr.shop_building_name,
@@ -212,7 +245,7 @@ class Premium_sukhsam extends Component {
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
-
+    
                             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
                             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
                             furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
@@ -224,9 +257,9 @@ class Premium_sukhsam extends Component {
                         }
                     );
                 }
-
+    
                 if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
-
+    
                     this.props.setSmeOthersDetails({
                     
                         // previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
@@ -237,19 +270,19 @@ class Premium_sukhsam extends Component {
                         // address:decryptResp.data.policyHolder.previouspolicy.address,
                         // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
                         // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
-
+    
                         financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party ? decryptResp.data.policyHolder.sookshamainfo.financial_party : "",
                         financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged ? decryptResp.data.policyHolder.sookshamainfo.financial_modgaged : "",
                         financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name ? decryptResp.data.policyHolder.sookshamainfo.financer_name : ""
         
                     });
-
+    
                 }
-
+    
                 if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
-
+    
                     let address = JSON.parse(decryptResp.data.policyHolder.address);
-
+    
                     this.props.setSmeProposerDetails(
                         {
                             first_name:decryptResp.data.policyHolder.first_name,
@@ -261,7 +294,7 @@ class Premium_sukhsam extends Component {
                             gender:decryptResp.data.policyHolder.gender,
                             pan_no:decryptResp.data.policyHolder.pancard,
                             gstn_no:decryptResp.data.policyHolder.gstn_no,
-
+    
                             com_street_name:address.street_name,
                             com_plot_no:address.plot_no,
                             com_building_name:address.house_building_name,
@@ -272,7 +305,7 @@ class Premium_sukhsam extends Component {
                         }
                     );
                 }
-
+    
                 let pincode_area_arr = JSON.parse(decryptResp.data.policyHolder.pincode_response);
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 
@@ -291,18 +324,21 @@ class Premium_sukhsam extends Component {
                         vehicleDetails
                     }
                 );
-
+                resolve("Promise resolved successfully");
                 this.props.loadingStop();
             })
             .catch(err => {
                 this.props.loadingStop();
                 // let decryptErr = JSON.parse(encryption.decrypt(err.data));
-                console.log("decryptErr --------> ",err.data)
+                //console.log("decryptErr --------> ",err.data)
                 swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-                return false;
-            })
-        
-        
+                reject(Error("Promise rejected"));
+               // return false;
+            })        
+
+        })
+       
+      
     }
 
     render() {
@@ -424,13 +460,13 @@ class Premium_sukhsam extends Component {
                                                                         <Row>
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                {phrases['Premium']}:
+                                                                                    Net Premium:
                                                                                 </div>
                                                                             </Col>
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {this.state.payablePremium}
+                                                                                    ₹ {this.state.grossPremium}
                                                                                 </div>
                                                                             </Col>
                                                                             
@@ -448,14 +484,14 @@ class Premium_sukhsam extends Component {
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="motopremium">
-                                                                                {phrases['GrossPremium']}:
+                                                                                    Final Premium:
                                                                                 </div>
                                                                             </Col>
 
 
                                                                             <Col sm={12} md={3}>
                                                                                 <div className="premamount">
-                                                                                    ₹ {this.state.grossPremium}
+                                                                                    ₹ {this.state.payablePremium}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>
@@ -677,7 +713,7 @@ class Premium_sukhsam extends Component {
 
                                                                     { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
                                                                         gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
-                                                                        <div>
+                                                                        <div key = {index}>
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
