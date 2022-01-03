@@ -93,6 +93,22 @@ class Premium extends Component {
         const { productId } = this.props.match.params
         paymentGateways(values, policyHolder, refNumber, productId)
     }
+    dateDiffrence=(start,end)=>{
+        const {vehicleDetails}=this.state
+        let date1=new Date(start);
+        let date2=new Date(end);
+        
+
+        let date=Math.floor((date2-date1)/(1000*60*60*24))
+         
+         console.log("diff",Math.floor((date2-date1)/(1000*60*60*24)));
+        this.setState({
+            ...this.state,
+            product_name:date>=360 ?vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.description:"M2W - SHORT TERM"
+        })
+
+
+    }
 
     fetchData = () => {
         const { productId } = this.props.match.params
@@ -175,6 +191,10 @@ class Premium extends Component {
 
         axios.post('fullQuotePM2W', formData)
             .then(res => {
+                if(res.data.PolicyObject && res.data.PolicyObject.EffectiveDate && res.data.PolicyObject && res.data.PolicyObject.ExpiryDate)
+                {
+                    this.dateDiffrence(res.data.PolicyObject.EffectiveDate ,res.data.PolicyObject.ExpiryDate )
+                }
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
@@ -343,7 +363,7 @@ class Premium extends Component {
                                                                             </Col>
                                                                             <Col sm={12} md={6}>
                                                                                 <div className="premamount">
-                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
+                                                                                {this.state.product_name}
                                                                                 </div>
                                                                             </Col>
                                                                         </Row>

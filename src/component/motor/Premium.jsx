@@ -97,6 +97,21 @@ class Premium extends Component {
         const { productId } = this.props.match.params
         paymentGateways(values, policyHolder, refNumber, productId)
     }
+    dateDiffrence=(value)=>
+    {
+        const {vehicleDetails}=this.state
+          let date1=moment(new Date(value.EffectiveDate))
+          let date2=moment(new Date(value.ExpiryDate))
+        //  let date=date1.diff(date2,"months");
+        let date=Math.floor((date2-date1)/(1000*60*60*24))
+         
+         console.log("diff",Math.floor((date2-date1)/(1000*60*60*24)));
+        this.setState({
+            ...this.state,
+            product_name:date>=360 ?vehicleDetails && vehicleDetails.vehicletype && vehicleDetails.vehicletype.description:"M4W - SHORT TERM"
+        })
+
+    }
 
     fetchData = () => {
         const { productId } = this.props.match.params
@@ -225,13 +240,21 @@ class Premium extends Component {
         console.log("post_data--fullQuotePMCAR- ", post_data)
         axios.post('fullQuotePMCAR', formData)
             .then(res => {
+                if(res.data.PolicyObject )
+                {
+                    this.dateDiffrence(res.data.PolicyObject)
+                }
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                   
                     this.setState({
                         fulQuoteResp: res.data.PolicyObject,
                         PolicyArray: res.data.PolicyObject.PolicyLobList,
                         error: [],
+                        startDate:res.data.PolicyObject && res.data.PolicyObject.EffectiveDate,
+                        endDate:res.data.PolicyObject && res.data.PolicyObject.ExpiryDate
                     });
                     this.fetchRequestData()
+                    
                 } else {
                     this.setState({
                         fulQuoteResp: [],
@@ -346,6 +369,7 @@ sendPaymentLink = () => {
         const { policyHolder, paymentgateway, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, 
             memberdetails,nomineedetails, vehicleDetails, breakin_flag, request_data, bcMaster, step_completed } = this.state
         const { productId } = this.props.match.params
+        console.log("product name",vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null)
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         const errMsg =
@@ -445,7 +469,7 @@ sendPaymentLink = () => {
                                                                                 </Col>
                                                                                 <Col sm={12} md={6}>
                                                                                 <div className="premamount">
-                                                                                {vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null}
+                                                                                {this.state.product_name}
                                                                                 </div>
                                                                                 </Col>
                                                                             </Row>
