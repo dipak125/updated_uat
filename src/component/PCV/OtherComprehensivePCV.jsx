@@ -175,9 +175,29 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00004_value: Yup.string().when(['electric_flag'], {
         is: electric_flag => electric_flag == '1',
-        then: Yup.string()
+        then: Yup.string().required("Please provide IDV")
+        // .required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
+        //     return "valueMax8Char"
+        // })
+        .test("checkCharacter",function(){
+            return "Please provide valid IDV"
+        },
+        function(value){
+            if(value)
+            {
+                let str = /^[0-9]*$/
+                console.log("checkb",value.match(str))
+                if(value.match(str))
+                {
+                    return true;
+                }
+                else return false;
+                
+            }
+            else return true;
+        })
         .test("minimumValue",function(){
-            return "PleaseProvideValidIDV"
+            return "Minimum IDV should be 1000"
         },
         function(value){
             if(value)
@@ -185,10 +205,8 @@ const ComprehensiveValidation = Yup.object().shape({
                 return value>=1000;
             }
             else return true;
-        })
-        .required('pleaseProvideElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
-            return "valueMax8Char"
         }),
+       
        
         otherwise: Yup.string()
     }),
@@ -201,9 +219,26 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00003_value: Yup.string().when(['nonElectric_flag'], {
         is: nonElectric_flag => nonElectric_flag == '1',
-        then: Yup.string()
+        then: Yup.string().required("Please provide IDV")
+        .test("checkCharacter",function(){
+            return "Please provide valid IDV"
+        },
+        function(value){
+            if(value)
+            {
+                let str = /^[0-9]*$/
+                console.log("checkb",value.match(str))
+                if(value.match(str))
+                {
+                    return true;
+                }
+                else return false;
+                
+            }
+            else return true;
+        })
         .test("minimumValue",function(){
-            return "PleaseProvideValidIDV"
+            return "Minimum IDV should be 1000"
         },
         function(value){
             if(value)
@@ -211,10 +246,10 @@ const ComprehensiveValidation = Yup.object().shape({
                 return value>=1000;
             }
             else return true;
-        })
-        .required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
-            return "valueMax8Char"
         }),
+        // .required('pleaseProvideNonElecIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV').max(8, function () {
+        //     return "valueMax8Char"
+        // }),
         otherwise: Yup.string()
     }),
 
@@ -2073,7 +2108,7 @@ class OtherComprehensivePCV extends Component {
                                                                                             >
                                                                                             </Field>
                                                                                             {errors.B00003_value ? (
-                                                                                                <span className="errorMsg">{phrases[errors.B00003_value]}</span>
+                                                                                                <span className="errorMsg">{errors.B00003_value}</span>
                                                                                             ) : null}
                                                                                         </div>
                                                                                     </FormGroup>
@@ -2124,7 +2159,7 @@ class OtherComprehensivePCV extends Component {
                                                                                             >
                                                                                             </Field>
                                                                                             {errors.B00004_value ? (
-                                                                                                <span className="errorMsg">{phrases[errors.B00004_value]}</span>
+                                                                                                <span className="errorMsg">{errors.B00004_value}</span>
                                                                                             ) : null}
                                                                                         </div>
                                                                                     </FormGroup>
