@@ -1149,7 +1149,7 @@ class VehicleDetails extends Component {
                                                                                         </FormGroup>
                                                                                     </Col>
                                                                                 </Row>
-                                                                                {values.previous_policy_name == '1' && Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
+                                                                                {(values.previous_policy_name == '1' || values.previous_policy_name == '3')&& Math.floor(moment().diff(values.previous_end_date, 'days', true)) <= 90 ?
                                                                                     <Fragment>
                                                                                         <Row>
                                                                                             <Col sm={12}>
