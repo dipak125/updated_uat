@@ -149,12 +149,15 @@ class OtherDetails_sukhsam extends Component {
             axios.post('/sookshama/quote',
             formDataNew
             ).then(res=>{
-                // let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                let decryptResp = res.data;
-                console.log("decryptResp-------->",decryptResp)
-                this.props.history.push(`/Summary_Sookshma/${productId}`);
-                
-                }).
+                let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decryptRespQuote-------->",decryptResp)
+                if(decryptResp.error == false && decryptResp.data && decryptResp.data.QuotationNo) {
+                    this.props.history.push(`/Summary_Sookshma/${productId}`);
+                }
+                else {
+                    swal(decryptResp.msg)
+                }                           
+            }).
             catch(err=>{
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));

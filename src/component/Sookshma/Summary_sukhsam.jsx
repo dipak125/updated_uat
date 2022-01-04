@@ -147,7 +147,6 @@ class Summary_sukhsam extends Component {
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails, nomineedetails, vehicleDetails, breakin_flag, rawData } = this.state
         const { productId } = this.props.match.params
-        console.log("rawData-----",rawData)
         // console.log("data------",rawData.policyHolder.smeinfo)
         const errMsg =
             error && error.message ? (

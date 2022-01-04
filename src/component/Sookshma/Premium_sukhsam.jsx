@@ -196,6 +196,11 @@ class Premium_sukhsam extends Component {
             formDataNew
             ).then(res=>{
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));   
+                    console.log("decryptRespQuote --------------- ", decryptResp)
+                    if(decryptResp.error == true) {
+                        this.setState({paymentgateway: [], quoteId: ""})
+                        swal(decryptResp.msg)
+                    }                 
                     this.props.loadingStop();  
             })
             .catch(err=>{
