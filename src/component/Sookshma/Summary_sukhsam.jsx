@@ -110,6 +110,101 @@ class Summary_sukhsam extends Component {
                         rawData: rawData.policyHolder.sookshamainfo.sookshama_coverages != null ? rawData.policyHolder.sookshamainfo.sookshama_coverages : 0,
                     }
                 );
+                if(decryptResp.data.policyHolder.step_no > 0){
+
+                    this.props.setData({
+                        start_date:decryptResp.data.policyHolder.request_data.start_date,
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,
+                        
+                        policy_holder_id:decryptResp.data.policyHolder.id,
+                        policy_holder_ref_no:policy_holder_ref_no,
+                        request_data_id:decryptResp.data.policyHolder.request_data.id,
+                        completed_step:decryptResp.data.policyHolder.step_no,
+                        menumaster_id:decryptResp.data.policyHolder.menumaster_id,
+                        payment_link_status: decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster ? decryptResp.data.policyHolder.bcmaster.eligible_for_payment_link : 0
+                    });
+                
+                }
+
+                if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
+
+                    let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
+
+                    this.props.setRiskData(
+                        {
+                            shop_building_name:risk_arr.shop_building_name,
+                            block_no:risk_arr.block_no,
+                            street_name:risk_arr.street_name,
+                            plot_no:risk_arr.plot_no,
+                            house_flat_no:risk_arr.house_flat_no,
+                            pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
+                            pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
+
+                            buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
+                            plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
+                            furniture_fixture_si:decryptResp.data.policyHolder.sookshamainfo.furniture_fixture_si,
+                            stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
+                            finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
+                            stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.total_sum_insured,
+                            stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
+                        }
+                    );
+
+                }
+
+                if(decryptResp.data.policyHolder.step_no == 2 || decryptResp.data.policyHolder.step_no > 2){
+
+                    this.props.setSmeOthersDetails({
+                    
+                        // previous_start_date:decryptResp.data.policyHolder.previouspolicy.start_date,
+                        // previous_end_date:decryptResp.data.policyHolder.previouspolicy.end_date,
+                        // Commercial_consideration:decryptResp.data.policyHolder.previouspolicy.Commercial_consideration,
+                        // Previous_Policy_No:decryptResp.data.policyHolder.previouspolicy.policy_no,
+                        // insurance_company_id:decryptResp.data.policyHolder.previouspolicy.insurancecompany_id,
+                        // address:decryptResp.data.policyHolder.previouspolicy.address,
+                        // is_claim: decryptResp.data.policyHolder.sookshamainfo.is_claim,
+                        // previous_policy_check: decryptResp.data.policyHolder.previouspolicy.policy_no ? 1 : 0,
+
+                        financial_party: decryptResp.data.policyHolder.sookshamainfo.financial_party ? decryptResp.data.policyHolder.sookshamainfo.financial_party : "",
+                        financial_modgaged : decryptResp.data.policyHolder.sookshamainfo.financial_modgaged ? decryptResp.data.policyHolder.sookshamainfo.financial_modgaged : "",
+                        financer_name: decryptResp.data.policyHolder.sookshamainfo.financer_name ? decryptResp.data.policyHolder.sookshamainfo.financer_name : ""
+        
+                    });
+
+                }
+
+                if(decryptResp.data.policyHolder.step_no == 3 || decryptResp.data.policyHolder.step_no > 3){
+                    
+                    let address = '';
+                    if(decryptResp.data.policyHolder.address == null){
+                        
+                    }else{
+                        address = JSON.parse(decryptResp.data.policyHolder.address);
+
+                        this.props.setSmeProposerDetails(
+                            {
+                                first_name:decryptResp.data.policyHolder.first_name,
+                                last_name:decryptResp.data.policyHolder.last_name,
+                                salutation_id:decryptResp.data.policyHolder.salutation_id,
+                                date_of_birth:decryptResp.data.policyHolder.dob,
+                                email_id:decryptResp.data.policyHolder.email_id,
+                                mobile:decryptResp.data.policyHolder.mobile,
+                                gender:decryptResp.data.policyHolder.gender,
+                                pan_no:decryptResp.data.policyHolder.pancard,
+                                gstn_no:decryptResp.data.policyHolder.gstn_no,
+
+                                com_street_name:address.street_name,
+                                com_plot_no:address.plot_no,
+                                com_building_name:address.house_building_name,
+                                com_block_no:address.block_no,
+                                com_house_flat_no:address.house_flat_no,
+                                com_pincode:decryptResp.data.policyHolder.pincode,
+                                com_pincode_id:decryptResp.data.policyHolder.pincode_id
+                            }
+                        );
+                    }
+                }
                 this.props.loadingStop();
             })
             .catch(err => {

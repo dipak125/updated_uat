@@ -100,16 +100,23 @@ const vehicleRegistrationValidation = Yup.object().shape({
     com_building_name: Yup.string().required("Please enter Building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
         function() {
             return "Please enter valid building name"
+        })
+        .max(50, function() {
+            return "Max 50 characters allowed"
         }).nullable(),
-    // block_no: Yup.string().required("Please enter Plot number").nullable(),
     plot_no: Yup.string().required("Please enter Plot number").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
         function() {
             return "Please enter valid plot number"
+        })
+        .max(50, function() {
+            return "Max 50 characters allowed"
         }).nullable(),
-    // flat_no: Yup.string().required("Please enter Flat number").nullable(),
-    street_name: Yup.string().required("Please enter Dtreet name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
+    street_name: Yup.string().required("Please enter street name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
         function() {
             return "Please enter valid street name"
+        })
+        .max(50, function() {
+            return "Max 50 characters allowed"
         }).nullable(),
     pincode: Yup.string().required('Pincode is required')
     .matches(/^[0-9]{6}$/, function() {
@@ -557,7 +564,7 @@ class AdditionalDetails_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
-                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.total_sum_insured,
                             stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );

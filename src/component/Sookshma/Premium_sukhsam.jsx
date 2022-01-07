@@ -198,7 +198,7 @@ class Premium_sukhsam extends Component {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));   
                     console.log("decryptRespQuote --------------- ", decryptResp)
                     if(decryptResp.error == true) {
-                        this.setState({paymentgateway: [], quoteId: ""})
+                        this.setState({paymentgateway: [], quoteId: "", error: {message : decryptResp.msg}})
                         swal(decryptResp.msg)
                     }                 
                     this.props.loadingStop();  
@@ -257,7 +257,7 @@ class Premium_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
-                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.total_sum_insured,
                             stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );
@@ -361,9 +361,7 @@ class Premium_sukhsam extends Component {
                 <span className="errorMsg">
                     <h6>
                         <strong>
-                            Thank you for showing your interest for buying product.Due to some
-                            reasons, we are not able to issue the policy online.Please call
-                            1800 22 1111
+                        {error.message}
                     </strong>
                     </h6>
                 </span>

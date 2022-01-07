@@ -120,11 +120,11 @@ class OtherDetails_sukhsam extends Component {
         }
         console.log("Post Data------------- ", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        this.props.loadingStart();
         axios.post('sookshama/previous-policy-details',
         formData
         ).then(res=>{       
- 
-            this.props.loadingStop();
+            
             this.props.setSmeOthersDetails({
                 
                 Commercial_consideration:'5',
@@ -144,19 +144,22 @@ class OtherDetails_sukhsam extends Component {
     
             }
             formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
-            
-            this.props.loadingStart();
+                       
             axios.post('/sookshama/quote',
             formDataNew
             ).then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log("decryptRespQuote-------->",decryptResp)
                 if(decryptResp.error == false && decryptResp.data && decryptResp.data.QuotationNo) {
+                    actions.setSubmitting(false);
+                    this.props.loadingStop();
                     this.props.history.push(`/Summary_Sookshma/${productId}`);
                 }
                 else {
-                    swal(decryptResp.msg)
-                }                           
+                    swal(decryptResp.msg)   
+                    this.props.loadingStop();
+                    actions.setSubmitting(false);                 
+                }                                         
             }).
             catch(err=>{
                 this.props.loadingStop();
@@ -164,14 +167,14 @@ class OtherDetails_sukhsam extends Component {
                 // let decryptResp = err.data;
                 console.log("decryptErr -------->",decryptResp)
                 actions.setSubmitting(false);
+                this.props.loadingStop();    
             });
         }).
         catch(err=>{
             let decryptErr = JSON.parse(encryption.decrypt(err.data));
             console.log('decryptResp--err---', decryptErr)
-
-        this.props.loadingStop();
-        actions.setSubmitting(false)
+            this.props.loadingStop();
+            actions.setSubmitting(false)
         })
     // }
     }
@@ -251,7 +254,7 @@ class OtherDetails_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
-                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.total_sum_insured,
                             stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );

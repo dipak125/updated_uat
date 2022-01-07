@@ -302,7 +302,7 @@ class RiskDetails_sukhsam extends Component {
                             stock_raw_mat:decryptResp.data.policyHolder.sookshamainfo.stock_raw_mat,
                             finish_goods:decryptResp.data.policyHolder.sookshamainfo.finish_goods,
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
-                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.fire_content_si,
+                            content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.total_sum_insured,
                             stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
                         }
                     );
@@ -416,14 +416,23 @@ class RiskDetails_sukhsam extends Component {
             shop_building_name: Yup.string().required("Please enter building name").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
                 function() {
                     return "Please enter valid building name"
+                })
+                .max(50, function() {
+                    return "Max 50 characters allowed"
                 }).nullable(),
             block_no: Yup.string().required("Please enter block no.").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
                 function() {
                     return "Please enter valid block no."
+                })
+                .max(50, function() {
+                    return "Max 50 characters allowed"
                 }).nullable(),
             house_flat_no: Yup.string().required("Please enter house/flat no.").matches(/^[a-zA-Z0-9][a-zA-Z0-9-/.,-\s]*$/, 
                 function() {
                     return "Please enter valid house/flat no,"
+                })
+                .max(50, function() {
+                    return "Max 50 characters allowed"
                 }).nullable(),
             pincode: Yup.string().required('Pincode is required')
             .matches(/^[0-9]{6}$/, function() {
