@@ -265,7 +265,7 @@ class PremiumPCV_TP extends Component {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,paymentgateway,
             nomineedetails, vehicleDetails, breakin_flag, step_completed, paymentButton, smsButton, bcMaster,menumaster,request_data } = this.state
         const { productId } = this.props.match.params
-
+            console.log("vehicleDetails",vehicleDetails.varientmodel)
         const errMsg =
             error && error.message ? (
                 <span className="errorMsg">
@@ -491,7 +491,7 @@ class PremiumPCV_TP extends Component {
                                                                                                     <FormGroup>{phrases['BodyStyle']}</FormGroup>
                                                                                                 </Col>
                                                                                                 <Col sm={12} md={6}>
-                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.body_style ? vehicleDetails.varientmodel.body_style : null}</FormGroup>
+                                                                                                    <FormGroup>{vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.bodystyle ? vehicleDetails.varientmodel.bodystyle.DESCRIPTION : null}</FormGroup>
                                                                                                 </Col>
                                                                                             </Row>
 
