@@ -849,6 +849,7 @@ class OtherComprehensiveGCV extends Component {
 
         const post_data = {
             'ref_no': localStorage.getItem('policyHolder_refNo'),
+            //'inspection': 0,
             'access_token': access_token,
             'idv_value': sliderVal ? sliderVal : 0,
             'policy_type': motorInsurance.policy_type,

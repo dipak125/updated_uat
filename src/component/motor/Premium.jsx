@@ -191,14 +191,26 @@ class Premium extends Component {
         formData.append('page_name', `Premium/${this.props.match.params.productId}`)
 
         this.props.loadingStart();
-        axios.post('breakin/create',formData)
-        .then(res=>{
-            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
-            this.props.loadingStop();
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-        })  
+        return new Promise((resolve, reject) => {
+            axios.post('breakin/create',formData)
+            .then(res=>{
+                if(res.data.error == false) {
+                    swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
+                    resolve(res.data.data.inspection_no);
+                    this.props.loadingStop();
+                }
+                else {
+                    swal(`Error: ${res.data.msg}`)
+                    reject(Error("Promise rejected"));
+                    this.props.loadingStop();
+                }
+                
+            }).
+            catch(err=>{
+                reject(Error("Promise rejected"));
+                this.props.loadingStop();
+            })  
+        })
     }
 
     getAccessToken = (motorInsurance) => {
@@ -218,106 +230,132 @@ class Premium extends Component {
             });
     };
 
+    breakinService = (motorInsurance,previousPolicy, request_data, policyHolder) => {
+        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+        let dateDiff = 0
+        return new Promise((resolve, reject) => {
+            if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
+                dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
+                let previousPolicyName = previousPolicy ? previousPolicy.name : ""
+
+                if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {                
+                    const formData1 = new FormData();
+                    let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
+                    formData1.append('policy_ref_no',policyHolder_id)
+                    axios.post('breakin/checking', formData1)
+                    .then(res => {	
+                        let break_in_checking = res.data.data.break_in_checking	
+                        let break_in_inspection_no = res.data.data.break_in_inspection_no
+                        let break_in_status = res.data.data.break_in_status
+                        if( break_in_checking == true) {
+                            this.setState({breakin_flag: 1})
+                            if(break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
+                                swal({
+                                    title: "Breakin",
+                                    text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
+                                    icon: "warning",
+                                    buttons: true,
+                                    dangerMode: true,
+                                })
+                                .then((willCreate) => {
+                                    if (willCreate) {
+                                        let breakinResponse = this.callBreakin(motorInsurance && motorInsurance.registration_no)
+                                        breakinResponse.then((value)=> {
+                                            resolve({'inspectionNumber' :value , 'inspection' : 1})
+                                        })
+                                        .catch((err)=>{
+                                            reject(err)
+                                        })
+                                    }
+                                    else {
+                                        this.props.loadingStop();
+                                    }
+                                })
+                            }
+                            else {
+                                resolve({'inspectionNumber' : break_in_inspection_no, 'inspection' : 1})
+                                swal({
+                                    title: "Breakin",
+                                    text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
+                                    icon: "warning",
+                                })
+                            }
+                        }
+                        
+                    })
+                    .catch(err => {
+                        this.setState({breakin_flag: 1})
+                        this.props.loadingStop();
+                    })
+                }
+                else {
+                    resolve({'inspectionNumber' :"" , 'inspection' : 0})
+                }
+            }
+            else {
+                resolve({'inspectionNumber' :"" , 'inspection' : 0})
+            }
+        })
+    }
+
     fullQuote = (access_token, motorInsurance) => {
         const formData = new FormData();
         let encryption = new Encryption();
         let dateDiff = 0
         let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
         const {previousPolicy, request_data, policyHolder} = this.state
-        const post_data = {
-            'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
-            'access_token':access_token,
-            'idv_value': motorInsurance.idv_value,
-            'policy_type':  motorInsurance.policy_type,
-            'add_more_coverage': motorInsurance.add_more_coverage,
-            'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",	
-            'cng_kit': motorInsurance.cng_kit,
-            'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
-            'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
-        }
 
-        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
-        console.log("post_data--fullQuotePMCAR- ", post_data)
-        axios.post('fullQuotePMCAR', formData)
-            .then(res => {
-                if(res.data.PolicyObject )
-                {
-                    this.dateDiffrence(res.data.PolicyObject)
-                }
-                if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
-                   
-                    this.setState({
-                        fulQuoteResp: res.data.PolicyObject,
-                        PolicyArray: res.data.PolicyObject.PolicyLobList,
-                        error: [],
-                        startDate:res.data.PolicyObject && res.data.PolicyObject.EffectiveDate,
-                        endDate:res.data.PolicyObject && res.data.PolicyObject.ExpiryDate
-                    });
-                    this.fetchRequestData()
-                    
-                } else {
-                    this.setState({
-                        fulQuoteResp: [],
-                        error: res.data,
-                    });
-                }
-                this.props.loadingStop();
+        let breakInService = this.breakinService(motorInsurance, previousPolicy, request_data, policyHolder)
+        breakInService.then((value)=> {
+            const post_data = {
+                'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
+                'access_token':access_token,
+                'idv_value': motorInsurance.idv_value,
+                'policy_type':  motorInsurance.policy_type,
+                'add_more_coverage': motorInsurance.add_more_coverage,
+                'coverage_data': motorInsurance && motorInsurance.add_more_coverage_request_json != null ? motorInsurance.add_more_coverage_request_json : "",	
+                'cng_kit': motorInsurance.cng_kit,
+                'cngKit_Cost': Math.floor(motorInsurance.cngkit_cost),
+                'PA_Cover': motorInsurance && motorInsurance.pa_cover ? motorInsurance.pa_cover : '0',
+            }
 
-                 if((previousPolicy && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
-                    dateDiff = previousPolicy ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : "";
-                    let previousPolicyName = previousPolicy ? previousPolicy.name : ""
-
-                    if(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3") {                
-                        const formData1 = new FormData();
-                        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-                        formData1.append('policy_ref_no',policyHolder_id)
-                        axios.post('breakin/checking', formData1)
-                        .then(res => {	
-                            let break_in_checking = res.data.data.break_in_checking	
-                            let break_in_inspection_no = res.data.data.break_in_inspection_no
-                            let break_in_status = res.data.data.break_in_status
-                            if( break_in_checking == true) {
-                                this.setState({breakin_flag: 1})
-                                if(break_in_inspection_no == "" && (break_in_status == null || break_in_status == "0")) {
-                                    swal({
-                                        title: "Breakin",
-                                        text: `Your Quotation number is ${request_data.quote_id}. Your vehicle needs inspection. Do you want to raise inspection.`,
-                                        icon: "warning",
-                                        buttons: true,
-                                        dangerMode: true,
-                                    })
-                                    .then((willCreate) => {
-                                        if (willCreate) {
-                                            this.callBreakin(motorInsurance && motorInsurance.registration_no)
-                                        }
-                                        else {
-                                            this.props.loadingStop();
-                                        }
-                                    })
-                                }
-                                else {
-                                    swal({
-                                        title: "Breakin",
-                                        text: `Breakin already raised. \nBreaking number ${break_in_inspection_no}.`,
-                                        icon: "warning",
-                                    })
-                                }
-                            }
-                            
-                        })
-                        .catch(err => {
-                            this.setState({breakin_flag: 1})
-                            this.props.loadingStop();
-                        })
+            formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+            console.log("post_data--fullQuotePMCAR- ", post_data)
+            axios.post('fullQuotePMCAR', formData)
+                .then(res => {
+                    if(res.data.PolicyObject )
+                    {
+                        this.dateDiffrence(res.data.PolicyObject)
                     }
-                }                     
-            })
-            .catch(err => {
-                this.setState({
-                    serverResponse: [],
-                });
-                this.props.loadingStop();
-            })
+                    if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    
+                        this.setState({
+                            fulQuoteResp: res.data.PolicyObject,
+                            PolicyArray: res.data.PolicyObject.PolicyLobList,
+                            error: [],
+                            startDate:res.data.PolicyObject && res.data.PolicyObject.EffectiveDate,
+                            endDate:res.data.PolicyObject && res.data.PolicyObject.ExpiryDate
+                        });
+                        this.fetchRequestData()
+                        
+                    } else {
+                        this.setState({
+                            fulQuoteResp: [],
+                            error: res.data,
+                        });
+                    }
+                    this.props.loadingStop();                    
+                })
+                .catch(err => {
+                    this.setState({
+                        serverResponse: [],
+                    });
+                    this.props.loadingStop();
+                })
+        })
+        .catch((err)=> {
+            swal(err)
+        })
     }
 
 

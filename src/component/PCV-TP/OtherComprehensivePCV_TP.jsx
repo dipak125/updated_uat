@@ -1262,6 +1262,7 @@ class OtherComprehensivePCV_TP extends Component {
         const { showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
         const { productId } = this.props.match.params
+        console.log("coverage",moreCoverage)
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));
@@ -1729,8 +1730,10 @@ class OtherComprehensivePCV_TP extends Component {
                                                                 ) : null}
 
                                                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
+                                                                    
                                                                     <Row key={qIndex}>
-                                                                        {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' || motorInsurance && motorInsurance.policy_for == '1' ?
+                                                                        {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018'   || motorInsurance && motorInsurance.policy_for == '1' ?
+                                                                          coverage.code == 'B00069' || coverage.code == 'B00013' ? null:
                                                                             <Col sm={12} md={11} lg={5} key={qIndex + "a"} >
                                                                                 <label className="customCheckBox formGrp formGrp">{coverage.name}
 
