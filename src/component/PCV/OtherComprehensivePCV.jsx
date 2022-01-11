@@ -279,7 +279,17 @@ const ComprehensiveValidation = Yup.object().shape({
 
     B00007_description: Yup.string().when(['trailer_flag'], {
         is: trailer_flag => trailer_flag == '1',
-        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV'),
+        then: Yup.string().required('pleaseProvideTrailerIDV').matches(/^[0-9]*$/, 'PleaseProvideValidIDV')
+        .test("minimumValue",
+        function(){
+            return "Trailer IDV should be minimum 3000 "
+        },
+        function(value){
+            if(value)
+            {
+                return 3000<=value
+            }
+        }),
         otherwise: Yup.string()
     }),
     // B00011_value: Yup.string().when(['trailer_flag_TP'], {
@@ -1968,7 +1978,7 @@ class OtherComprehensivePCV extends Component {
                                                                                             >
                                                                                             </Field>
                                                                                             {errors.B00007_description ? (
-                                                                                                <span className="errorMsg">{phrases[errors.B00007_description]}</span>
+                                                                                                <span className="errorMsg">{phrases[errors.B00007_description]}{errors.B00007_description}</span>
                                                                                             ) : null}
                                                                                         </div>
                                                                                     </FormGroup>
