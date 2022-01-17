@@ -281,6 +281,9 @@ class Premium extends Component {
                                 })
                             }
                         }
+                        else {
+                            resolve({'inspectionNumber' :"" , 'inspection' : 2})
+                        }  
                         
                     })
                     .catch(err => {

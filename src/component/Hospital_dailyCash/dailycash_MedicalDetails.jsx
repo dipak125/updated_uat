@@ -60,7 +60,8 @@ class dailycash_MedicalDetails extends Component {
         selectedQuestion:[],
         famArr:[],
         clickCheckbox:false,
-        selected_family_members:[]
+        selected_family_members:[],
+        true_family_member_id:0
       };
 
     sumInsured = (productId) => {
@@ -211,17 +212,17 @@ class dailycash_MedicalDetails extends Component {
         }    
         else {
             let q = questionClass.length/2
-            // console.log("selectCheck------------- ", selectCheck) 
-            // console.log("checkFamily------------- ", checkFamily)
-            // console.log("checkFamily----q--------- ", q)
-            // console.log("count----q--------- ", count)
+            //console.log("selectCheck------------- ", selectCheck) 
+            //console.log("checkFamily------------- ", checkFamily)
+            //console.log("checkFamily----q--------- ", q)
+            //console.log("count----q--------- ", count)
             
-            if(count == q && checkFamily.length == selectCheck.length){
+            if(count == q){
                 if(this.state.isForwarded){
                     this.props.history.push(`/dailycash_Address/${productId}`);
                 }            
             }
-            else if(count == q && checkFamily.length < selectCheck.length){
+            else if(count != q){
                 swal('Please select family members');        
             }
             else{
@@ -332,6 +333,39 @@ class dailycash_MedicalDetails extends Component {
       return showImage
     }
     
+
+    setQuestionStatus = (question_value,question_id) =>{
+      const formData = new FormData(); 
+       let true_family_member_id = this.state.true_family_member_id
+       console.log(true_family_member_id)
+       let policy_holder_id = localStorage.getItem('policyHolder_id') ? localStorage.getItem('policyHolder_id') : 0
+         const post_data = {            
+            'policy_holder_id':policy_holder_id,
+            'family_member_id':true_family_member_id,
+            'question_id':question_id,
+            'question_value':question_value
+         } 
+
+         let encryption = new Encryption();
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))   
+        console.log("post_data---setQuestion Value------- ", post_data)
+        this.props.loadingStart();
+            axios
+                .post(`/daily-cash/question-value`, formData)
+                .then(res => {
+                this.setState({
+                    message: res.data.msg
+                });  
+                this.props.loadingStop();
+                })
+                .catch(err => {
+                this.setState({
+                    message: ""
+                });
+                this.props.loadingStop();
+                });
+    }
+
     setAnswer = (e,question_id) =>{
         let selected_answer = [];
         let selected_question = [];    
@@ -343,15 +377,15 @@ class dailycash_MedicalDetails extends Component {
         
         selected_family_members = this.state.selected_family_members
         const index = selected_family_members.indexOf(`${classId}~${e.target.value}`);
+        
         if (index > -1) {
             selected_family_members.splice(index, 1);                
         }  
         else{
             selected_family_members.push(`${classId}~${e.target.value}`)
             selected_family_members = [...new Set(selected_family_members)];
-        }       
-        
-        
+        } 
+         
        // let fselected_family_members = selected_family_members.filter(function(value, index, arr){ return value == `${classId}~${e.target.value}`});//filtered => [6, 7, 8, 9]//array => [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 
         selected_answer.push('y');
@@ -383,7 +417,7 @@ class dailycash_MedicalDetails extends Component {
             'question_id':classId,
             'answer':'y'
          }
-         let encryption = new Encryption();
+        let encryption = new Encryption();
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))   
         console.log("post_data---setAnswer------- ", post_data)
         this.props.loadingStart();
@@ -419,11 +453,19 @@ class dailycash_MedicalDetails extends Component {
         
         let initialValues = {}
         let selectedQuestion = [];
+        //initialValues[`smoker_flag`]=0
+
         if(questionList && flag && questionList.length > 0) {
             questionList.map((question, qIndex) => {
             if(question_answer && question_answer.length > 0) {
                 question_answer.map((answer, aIndex) => {
                 initialValues[`question_id_${answer.question_id}`] = answer.response;
+                if(answer.question_id == 11)
+                {
+                    initialValues[`smoker_flag`] = 1;
+                    initialValues['smoker_flag_status'] = answer.question_value;
+                }
+                
                 initialValues[`family_members_${answer.question_id}`] = answer.family_members;
                 selectedQuestion[answer.question_id] = answer.response == 'y' ? answer.family_members.split(' ') : null                               
             })
@@ -435,6 +477,7 @@ class dailycash_MedicalDetails extends Component {
             }    
             initialValues[`show_question_id_${question.id}`]=false
             initialValues[`famArr`]=famArr
+            
         })
     }
 
@@ -472,7 +515,7 @@ class dailycash_MedicalDetails extends Component {
                            //  validationSchema={validatearogya_MedicalDetails}
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                         
+                            
                             return (
                             <Form>
                             <Row>
@@ -505,6 +548,7 @@ class dailycash_MedicalDetails extends Component {
                                                         //     this.showRestriction('y');
                                                         // } 
                                                     }}
+                                                    
                                                     checked={values[`question_id_${question.id}`] == 'y' ? true : false}
                                                 />
                                                     <span className="checkmark " /><span className="fs-14" > Yes</span>                      
@@ -526,6 +570,11 @@ class dailycash_MedicalDetails extends Component {
                                                         if(qIndex == qlength -1){
                                                             this.showRestriction('n');
                                                         } 
+
+                                                        if(question.id == '11')
+                                                        {
+                                                            setFieldValue(`smoker_flag`, 0);
+                                                        }
                                                     }}
                                                     checked={values[`question_id_${question.id}`] == 'n' ? true : false}
                                                    // validation = {checkValidation}
@@ -537,6 +586,9 @@ class dailycash_MedicalDetails extends Component {
                                                     ) : null*/}
                                                 </label>
                                             </div>
+
+                                            
+                                            
                                         </div>
                                         </FormGroup>
 
@@ -559,6 +611,11 @@ class dailycash_MedicalDetails extends Component {
                                                 //alert(e.target.checked)
                                                // e.target.checked  ? e.target.checked = '':e.target.checked='checked'
                                                 this.setAnswer(e,question.id)
+                                                //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
+                                                if(question.id == '11')
+                                                {
+                                                    setFieldValue(`smoker_flag`, 1);
+                                                }
                                             }}
                                             />
                                          {resource.gender == 'm' ? <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>:
@@ -576,6 +633,11 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')} 
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
+                                                if(question.id == '11')
+                                                {
+                                                    setFieldValue(`smoker_flag`, 1);
+                                                }
                                             }}
                                             />
                                            {resource.gender == 'm' ? 
@@ -592,6 +654,11 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                               // this.setState({true_family_member_id:values[`family_members_${question.id}`]})
+                                                if(question.id == '11')
+                                                {
+                                                    setFieldValue(`smoker_flag`, 1);
+                                                }
                                             }}
                                             />
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> 
@@ -612,6 +679,11 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
+                                                if(question.id == '11')
+                                                {
+                                                    setFieldValue(`smoker_flag`, 1);
+                                                }
                                             }}
                                             />
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/self.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
@@ -627,6 +699,11 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
+                                                if(question.id == '11')
+                                                {
+                                                    setFieldValue(`smoker_flag`, 1);
+                                                }
                                             }}
                                             />
                                              <label for={`family_members.${question.id}.${index}.${resource.relation_with}`}> <img src={require('../../assets/images/Spouse.svg')} alt=""/>{this.capitalize(resource.relation_with)}</label>
@@ -645,7 +722,6 @@ class dailycash_MedicalDetails extends Component {
                             )}}
                             />
                                 
-                                
                                 <div className="d-flex justify-content-left resmb">
                                 <Button className={`backBtn`} type="button"  onClick= {this.buy_policy.bind(this, productId )} >
                                     Back
@@ -657,6 +733,30 @@ class dailycash_MedicalDetails extends Component {
                             </Col>
 
                             <Col sm={12} md={3}>
+                               {values.smoker_flag=='1' ? <div>
+                               <FormGroup>
+                                    <div className="formSection">
+                                        <Field
+                                            name="smoker_flag_status"
+                                            component="select"
+                                            autoComplete="off"                                                                        
+                                            className="formGrp"
+                                            default = "1"
+                                            onChange={(e) => {
+                                                setFieldValue(`question_value`, e.target.value);
+                                                this.setQuestionStatus(e.target.value,11)
+                                            }}
+    
+                                        >
+                                        <option value="">Smoker Status</option>
+                                        <option value="1">0 Cig/Day</option>
+                                        <option value="2">1 - 40 Cig/Day</option>
+                                        <option value="3">More Than 40 Cig/Day</option>    
+                                        </Field>     
+                                                           
+                                    </div>
+                                </FormGroup>
+                               </div>:null}
                                 <div className="regisBox medpd">
                                     <h3 className="medihead">No Medical Test upto the Age of 55 for People with No Medical History </h3>
                                 </div>
@@ -683,6 +783,7 @@ class dailycash_MedicalDetails extends Component {
                       </div>      
                       </div>
 					    </div>
+                        
                 </BaseComponent>
             </>
         );

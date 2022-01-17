@@ -104,6 +104,7 @@ class PolicySearch extends Component {
 
         formData.append('bcmaster_id', user_data.bc_master_id )
         formData.append('page_no', page_no)   
+        formData.append('policy_status', 'complete')
         formData.append('bc_agent_id', user_data.master_user_id )
         formData.append('login_type', user_data.login_type )
         
