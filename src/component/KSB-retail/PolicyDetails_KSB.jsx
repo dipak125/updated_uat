@@ -123,6 +123,33 @@ class PolicyDetails extends Component {
       });
   };
 
+  updatePolicyHolderDetails = () => {
+    const policyHolder_refNo = this.state.policyHolder_refNo
+    
+    this.props.loadingStart();
+    axios
+      .get(`ksb/details/${policyHolder_refNo}`)
+      .then((res) => { 
+        let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};  
+        this.setState({
+           request_data       
+        });
+        this.props.loadingStop();
+      })
+      .catch((err) => {
+        if(err.status == 401) {
+          swal("Session out. Please login")
+        }
+        else swal("Something wrong happened. Please try after some")
+
+        this.setState({
+          policyHolderDetails: [],
+        });
+        this.props.loadingStop();
+      });
+  };
+
+
 
   fullQuote = (policyHolderDetails) => {
     let id = policyHolderDetails.id;
@@ -152,6 +179,7 @@ class PolicyDetails extends Component {
             serverResponse: true,
             error: [],
           });
+        this.updatePolicyHolderDetails();
         } else if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Fail") {
           this.setState({
             fulQuoteResp: res.data.PolicyObject,
