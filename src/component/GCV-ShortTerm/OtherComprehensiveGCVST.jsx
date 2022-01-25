@@ -638,7 +638,6 @@ class OtherComprehensiveGCV extends Component {
                 })
                 this.props.loadingStop();
                 this.depreciation(values)
-                this.getAccessToken(values)
             })
             .catch(err => {
                 // handle error

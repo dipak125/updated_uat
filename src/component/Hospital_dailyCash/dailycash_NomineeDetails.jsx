@@ -415,7 +415,7 @@ class dailycash_NomineeDetails extends Component {
                                     return (
                                     <Form>
                                         <Row>
-                                        <Col sm={12} md={9} lg={9}>    
+                                        {/* <Col sm={12} md={9} lg={9}>    
                                             <Fragment>
                                                         <Row>
                                                             <Col sm={12}>
@@ -475,9 +475,9 @@ class dailycash_NomineeDetails extends Component {
                                                         </Row>
                                             </Fragment>
                                            
-                                        </Col>
+                                        </Col> */}
                                         
-                                        {values.valid_previous_policy == '1' ?
+                                        {/* {values.valid_previous_policy == '1' ?
                                          <Col sm={12} md={9} lg={9}>
                                              <Fragment>
                                              <Row>
@@ -713,7 +713,7 @@ class dailycash_NomineeDetails extends Component {
                                                     </Row>
                                              </Fragment>
                                          </Col>
-                                        : null }
+                                        : null } */}
                                         <Col sm={12} md={9} lg={9}>
                                             <Row>
                                                 <Col sm={12}>

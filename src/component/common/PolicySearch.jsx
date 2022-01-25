@@ -167,12 +167,18 @@ class PolicySearch extends Component {
         this.props.loadingStart();
         axios.post('bc/policy-customer',formData)
         .then(res=>{
-            let statusCount = res.data.data ? res.data.data : []   
-            let policyHolder = res.data.data ? res.data.data.policyHolder : []                      
-            this.setState({
-                statusCount, policyHolder
-            });
-            this.props.loadingStop();
+            if(res.data.error == false) {
+                let statusCount = res.data.data ? res.data.data : []   
+                let policyHolder = res.data.data ? res.data.data.policyHolder : []                      
+                this.setState({
+                    statusCount, policyHolder
+                });
+                this.props.loadingStop();
+            }
+            else {
+                swal(res.data.msg)
+                this.props.loadingStop();
+            }   
         }).
         catch(err=>{
             this.props.loadingStop();

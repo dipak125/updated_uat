@@ -1733,7 +1733,7 @@ class OtherComprehensivePCV_TP extends Component {
                                                                     
                                                                     <Row key={qIndex}>
                                                                         {motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018'   || motorInsurance && motorInsurance.policy_for == '1' ?
-                                                                          coverage.code == 'B00069' || coverage.code == 'B00013' ? null:
+                                                                         
                                                                             <Col sm={12} md={11} lg={5} key={qIndex + "a"} >
                                                                                 <label className="customCheckBox formGrp formGrp">{coverage.name}
 

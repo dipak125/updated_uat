@@ -182,11 +182,11 @@ const validateAddress =  Yup.object().shape({
                 }).required(function() {
                     return "Please Select Cover Duration"
                 }),
-                education_id: Yup.string(function() {
-                    return "Please Select Education"
-                }).required(function() {
-                    return "Please Select Education"
-                }),
+                // education_id: Yup.string(function() {
+                //     return "Please Select Education"
+                // }).required(function() {
+                //     return "Please Select Education"
+                // }),
                 height: Yup.string(function() {
                     return "Please enter height"
                 }).required(function() {

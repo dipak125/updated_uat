@@ -16,7 +16,7 @@ import axios from "../../shared/axios"
 import Encryption from '../../shared/payload-encryption';
 import * as Yup from "yup";
 import swal from 'sweetalert';
-import {  userTypes, bcAgreementCodes } from "../../shared/staticValues";
+import {  userTypes } from "../../shared/staticValues";
 
 let encryption = new Encryption()
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -588,9 +588,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                             {motorInsurance && motorInsurance.policy_for == '1' && moreCoverage.map((coverage, qIndex) => (
                                                             <Row key={qIndex}>   
                                                                 <Col sm={12} md={11} lg={6} key={qIndex+"a"} >
-                                                                <div id={coverage.code+"_d"} onClick={(e) =>{if(localStorage.getItem('declinedModel')>0 && bcAgreementCodes.includes(user_data.agreement_code) && values[coverage.code] == 'B00015'){
-                                                                                    swal('PA cover for owner driver with Sum Insured: Rs. 15,00,000 is mandatory for selected Model or Location')
-                                                                                }}}>
+                                                                <div id={coverage.code+"_d"}>
                                                                     <label className="customCheckBox formGrp formGrp">{coverage.name}
                                                                         <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{coverage.description}</Tooltip>}>
                                                                             <a className="infoIcon"><img src={require('../../assets/images/i.svg')} alt="" className="premtool" /></a>
@@ -601,7 +599,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                                                             name={coverage.code}
                                                                             value={coverage.code}
                                                                             className="user-self"
-                                                                            disabled={(localStorage.getItem('declinedModel') > 0 && bcAgreementCodes.includes(user_data.agreement_code) && values[coverage.code] == 'B00015') || (userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
+                                                                            disabled={(userTypes.includes(user_data.login_type) && values[coverage.code] == 'B00015') ? true : false}
                                                                             onClick={(e) =>{
                                                                                 if( e.target.checked == false && values[coverage.code] == 'B00015') {
                                                                                     swal(phrases.SwalIRDAI,

@@ -30,6 +30,7 @@ const ageObj = new PersonAge();
 // const maxDate = moment(minDate).add(30, 'day').calendar();
 const minDate = moment(moment().subtract(20, 'years').calendar()).add(1, 'day').calendar();
 const maxDate = moment(moment().subtract(1, 'years').calendar()).add(0, 'day').calendar();
+const minDatePypLapsed = moment(moment().subtract(1, 'years').calendar()).subtract(89, 'day').calendar();
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment().subtract(20, 'years').calendar();
@@ -1092,7 +1093,7 @@ console.log("values==",values)
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date(minDate)} 
+                                                                minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
                                                                 maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
