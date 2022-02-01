@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import Encryption from "../../../shared/payload-encryption";
 import { withRouter } from "react-router-dom";
 import {logoToggle } from "../../../store/actions/toggle";
+import Idle from "react-idle"
 
 const images = require.context('../../../assets/images', true);
 
@@ -87,6 +88,17 @@ class SideNav extends Component {
 
     return (
       <>
+      <Idle
+        timeout={60000*15}
+        render={({ idle }) =>
+      <h1>
+        {idle
+          ? this.handleLogout()
+          : null
+        }
+      </h1>
+    }
+  />
       {childPhrase && login_type.bc_master_id != '9' ?
         <nav className="flex-fill leftNav">
           <ul className="navPan">
