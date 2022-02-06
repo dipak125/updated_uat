@@ -18,7 +18,7 @@ import * as Yup from "yup";
 import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber,compareStartEndYear } from "../../shared/validationFunctions";
-import {  userTypes } from "../../shared/staticValues";
+import {  userTypes, ncbSlab } from "../../shared/staticValues";
 
 
 
@@ -74,7 +74,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "EngineMin"
     })
-    .max(17, function() {
+    .max(25, function() {
         return "EngineMax"
     }),
 
@@ -547,7 +547,7 @@ class OtherComprehensive extends Component {
 
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, geographical_extension } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, geographical_extension, request_data } = this.state
         // let cng_kit_flag = 0;
         // let cngKit_Cost = 0;
         // if(values.toString()) {            
@@ -604,15 +604,17 @@ class OtherComprehensive extends Component {
                     let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].OD_NCBAmount : 0
                     let IsGeographicalExtension= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].IsGeographicalExtension : 0
                     if(ncbDiscount != '0') {
+          
                         let ncbArr = {}
+                        let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
                         ncbArr.PolicyBenefitList = [{
-                            BeforeVatPremium : 0 - Math.round(ncbDiscount),
+                            BeforeVatPremium : 0 - ncbAmt,
                             ProductElementCode : 'NCB'
                         }]
     
                         let totOD = {}
                         totOD.PolicyBenefitList = [{
-                            BeforeVatPremium : Math.round(policyCoverage[0]['GrossPremium'] + policyCoverage[0]['LoadingAmount']) - Math.round(ncbDiscount),
+                            BeforeVatPremium : Math.round(policyCoverage[0]['GrossPremium'] + policyCoverage[0]['LoadingAmount']) - ncbAmt,
                             ProductElementCode : 'TOTALOD'
                         }]
     
@@ -1450,7 +1452,7 @@ class OtherComprehensive extends Component {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no}
-                                                    maxLength="17"
+                                                    maxLength="25"
                                                     onChange = {(e) => {
                                                         setFieldTouched('engine_no')
                                                         setFieldValue('engine_no', e.target.value.toUpperCase())                       

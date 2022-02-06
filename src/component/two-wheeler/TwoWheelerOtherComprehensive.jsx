@@ -19,7 +19,7 @@ import swal from 'sweetalert';
 import {
     compareStartEndYear
   } from "../../shared/validationFunctions";
-import {  userTypes } from "../../shared/staticValues";
+import {  userTypes, ncbSlab } from "../../shared/staticValues";
 
 let encryption = new Encryption()
 
@@ -267,7 +267,7 @@ class TwoWheelerOtherComprehensive extends Component {
     };
 
     fullQuote = (access_token, values) => {
-        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance } = this.state
+        const { PolicyArray, sliderVal, add_more_coverage, motorInsurance, request_data } = this.state
         let cng_kit_flag = 0;
         let cngKit_Cost = 0;
         if (values.toString()) {
@@ -319,14 +319,15 @@ class TwoWheelerOtherComprehensive extends Component {
                     let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
                     if(ncbDiscount != '0') {
                         let ncbArr = {}
+                        let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
                         ncbArr.PolicyBenefitList = [{
-                            BeforeVatPremium : 0 - Math.round(ncbDiscount),
+                            BeforeVatPremium : 0 - ncbAmt,
                             ProductElementCode : 'NCB'
                         }]
     
                         let totOD = {}
                         totOD.PolicyBenefitList = [{
-                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - Math.round(ncbDiscount),
+                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - ncbAmt,
                             ProductElementCode : 'TOTALOD'
                         }]
     
