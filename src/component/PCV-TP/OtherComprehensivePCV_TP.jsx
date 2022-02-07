@@ -66,7 +66,7 @@ const ComprehensiveValidation = Yup.object().shape({
         .min(5, function () {
             return "EngineMin"
         })
-        .max(17, function () {
+        .max(25, function () {
             return "EngineMax"
         }),
 
@@ -1680,7 +1680,7 @@ class OtherComprehensivePCV_TP extends Component {
                                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                         value={values.engine_no.toUpperCase()}
-                                                                                        maxLength="17"
+                                                                                        maxLength="25"
                                                                                         onChange={(e) => {
                                                                                             setFieldTouched('engine_no')
                                                                                             setFieldValue('engine_no', e.target.value)

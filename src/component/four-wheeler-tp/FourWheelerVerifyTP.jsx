@@ -95,7 +95,7 @@ const ComprehensiveValidation = Yup.object().shape({
     .min(5, function() {
         return "EngineMin"
     })
-    .max(17, function() {
+    .max(25, function() {
         return "EngineMax"
     }),
 
@@ -691,7 +691,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     value= {values.engine_no}
-                                                    maxLength="17"
+                                                    maxLength="25"
                                                     onChange = {(e) => {
                                                         setFieldTouched('engine_no')
                                                         setFieldValue('engine_no', e.target.value.toUpperCase())                       
