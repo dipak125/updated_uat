@@ -37,7 +37,8 @@ class AgentCashDeposit extends Component {
             var formObj = {
                 user_id
             };
-            formData.append('enc_data', encryption.encrypt(JSON.stringify(formObj)))
+            // formData.append('enc_data', encryption.encrypt(JSON.stringify(formObj)))
+            formData.append('user_id', user_id)
             
             axios.post(`acd/acd-balance`, formData)
                 .then(res => {
