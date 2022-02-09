@@ -861,7 +861,11 @@ const PremiumPCVTP = Loadable({
     loader: () => import(/*webpackChunkName: "Products" */"../PCV-TP/PremiumPCV_TP.jsx"),
     loading: () => loadingContent
 });
-
+//================================ACD statement=======================================
+const ACD =Loadable({
+    loader: ()=> import("../common/ACD/ACD.jsx"),
+    loading: ()=> loadingContent
+})
 
 
 
@@ -1157,7 +1161,8 @@ class Routes extends Component {
                         <PrivateRoute exact path="/OtherComprehensive_PCV_TP/:productId" component={OtherComprehensivePCVTP} />
                         <PrivateRoute exact path="/AdditionalDetails_PCV_TP/:productId" component={AdditionalDetailsPCVTP} />
                         <PrivateRoute exact path="/Premium_PCV_TP/:productId" component={PremiumPCVTP} />
-
+                        {/*==================ACD Statement========================*/ }
+                        <PrivateRoute exact path="/Acd" component={ACD}/>
 
 
                         <Redirect from="/" to="/Dashboard" />

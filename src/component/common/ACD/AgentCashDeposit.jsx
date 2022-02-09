@@ -43,7 +43,8 @@ class AgentCashDeposit extends Component {
             axios.post(`acd/acd-balance`, formData)
                 .then(res => {
                     let encryption = new Encryption();
-                    var balanceDetails = JSON.parse(encryption.decrypt(res.data));
+                    // var balanceDetails = JSON.parse(encryption.decrypt(res.data));
+                    var balanceDetails = res.data;
 
                     if (balanceDetails.error == true) {
                         swal("Unable to fetch amount", {
