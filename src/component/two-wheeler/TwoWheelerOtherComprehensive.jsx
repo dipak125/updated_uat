@@ -172,6 +172,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
+                let request_data   = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : "";
                 let vehicleRegDate = motorInsurance &&  motorInsurance.registration_date != null ? motorInsurance.registration_date : ''
                 let policy_for = motorInsurance && motorInsurance.policy_for 
                 let tyre_rim_array = motorInsurance.tyre_rim_array && motorInsurance.tyre_rim_array!=null ? motorInsurance.tyre_rim_array : null
@@ -188,7 +189,7 @@ class TwoWheelerOtherComprehensive extends Component {
                 
                 this.setState({
                     motorInsurance,vehicleDetails,step_completed,tyre_rim_array,vehicleRegDate,policy_for,
-                    add_more_coverage: add_more_coverage, 
+                    add_more_coverage: add_more_coverage, request_data,
                     selectFlag: motorInsurance && motorInsurance.policy_for == '2' ? [] : (motorInsurance.add_more_coverage != null ? '0' : '1') 
                     
                 })
@@ -317,9 +318,10 @@ class TwoWheelerOtherComprehensive extends Component {
                 if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                     let policyCoverage= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : []
                     let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
-                    if(ncbDiscount != '0') {
+                    if(ncbDiscount != 0) {
                         let ncbArr = {}
                         let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
+                        // let ncbAmt = Math.round(ncbDiscount)
                         ncbArr.PolicyBenefitList = [{
                             BeforeVatPremium : 0 - ncbAmt,
                             ProductElementCode : 'NCB'
@@ -328,6 +330,7 @@ class TwoWheelerOtherComprehensive extends Component {
                         let totOD = {}
                         totOD.PolicyBenefitList = [{
                             BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - ncbAmt,
+                            // BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']),
                             ProductElementCode : 'TOTALOD'
                         }]
     
@@ -486,7 +489,7 @@ class TwoWheelerOtherComprehensive extends Component {
             if(value == 'C101110') {
                 var array_length = 2
                 var newTyreMfgYr = new Date(this.state.vehicleRegDate)
-                console.log("new values --------- ", values.tyre_rim_array && values.tyre_rim_array.length < array_length )
+                // console.log("new values --------- ", values.tyre_rim_array && values.tyre_rim_array.length < array_length )
                  if(values.tyre_rim_array && values.tyre_rim_array.length < array_length) {
                     for(var i = values.tyre_rim_array.length ; i < array_length ; i++) {
                         values.tyre_rim_array.push(

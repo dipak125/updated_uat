@@ -53,7 +53,7 @@ const mapStateToProps = state => {
 //    return row[index].prev_balance + row[index].credit;
   }
   const AvilableForamter =(value,row,index,field)=>{
-      console.log("cell1",row.prev_balance + row.credit - row.debit)
+     
     return row.prev_balance + row.credit - row.debit;
   }
 
@@ -84,7 +84,7 @@ const ACD =()=>{
         ...state,
         Account_list:res.data.data
       })
-      console.log("d",state.Account_list)
+      
     }).catch(err=>
         console.log("err")
       )
@@ -117,7 +117,7 @@ const ACD =()=>{
       {
         let start_date=value;
         let end_date=value;
-        console.log("check",start_date,end_date)
+        
         setFieldTouched("start_date");
         setFieldValue("start_date",start_date);
         setFieldTouched("end_date");
@@ -155,7 +155,7 @@ const ACD =()=>{
     }
     
     const renderShowsTotal =(start,to,total)=>{
-      console.log("render",start,to,total);
+     
       start = start ? start : 0;
       to = to ? to : 0;
       total = total ? total : 0;
@@ -169,7 +169,7 @@ const ACD =()=>{
       )
     }
     const onPageChange =(page,sizePerPage)=>{
-      console.log("page",page,sizePerPage)
+      
       let starting_index=page*10-10;
 
      
@@ -198,17 +198,16 @@ const ACD =()=>{
 
   };
      const handleSubmit =(values)=>{
-     console.log("submit",state.user_id);
+    
      
      const formData=new FormData();
      formData.append("user_id",state.user_id)
      formData.append("from_date",moment(values.start_date).format("YYYY-MM-DD"))
      formData.append("to_date",moment(values.end_date).format("YYYY-MM-DD"))
-     console.log("account",values)
-     console.log("formData",formData)
+     
      
      axios.post("http://14.140.119.44/sbig-csc/core/auth/acd/acd-statement",formData).then(res=>{
-       console.log("formData",res.data.data)
+       
        setState({
            ...state,
            total:res.data.data,
@@ -216,10 +215,10 @@ const ACD =()=>{
             policyHolder:res.data.data.slice(0,10)
        })
      }).catch(err=>{
-       console.log("err")
+      
      })
     
-      console.log("policy",state.policyHolder)
+      
      
    }
   
@@ -229,7 +228,8 @@ const ACD =()=>{
                 <div className="container-fluid">
                     <div className="row">
                             <aside className="left-sidebar">
-                            <div className="col-sm-12 col-md-12 col-lg-2 col-xl-2 pd-l-0">
+                            
+                            <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
                                     <SideNav />
                                 </div>
                             </aside>
@@ -244,10 +244,7 @@ const ACD =()=>{
                                 validationSchema={validationSchema}
                                 >
                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched,submitForm }) => {
-                                    console.log("value",values)
-                                    console.log("err",errors)
-                                    console.log("valid",isValid)
-                                    console.log("touched",touched)
+                                    
                                     return(
                                        <Form>
                                         <Row>
