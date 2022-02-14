@@ -34,6 +34,7 @@ const minDatePypLapsed = moment(moment().subtract(1, 'years').calendar()).subtra
 const maxDatePYP = moment(moment().subtract(1, 'years').calendar()).add(30, 'day').calendar();
 const maxDatePYPST = moment(moment().subtract(1, 'month').calendar()).add(1, 'day').calendar();
 const minRegnDate = moment().subtract(20, 'years').calendar();
+const maxDatePYPLapsed = moment().subtract(1, 'years').calendar();
 // const minRegnDateNew = moment(moment().subtract(1, 'months').calendar()).add(1, 'day').calendar();
 const minRegnDateNew = moment().subtract(9, 'months').calendar();
 const maxDateForValidtion = moment(moment().subtract(1, 'years').calendar()).add(31, 'day').calendar();
@@ -1094,7 +1095,7 @@ console.log("values==",values)
                                                             <DatePicker
                                                                 name="previous_start_date"
                                                                 minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth

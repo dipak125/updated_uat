@@ -72,11 +72,19 @@ class renewal extends Component {
         let post_data = {}
         let user_id = ""
         let user_type = ""
-        let csc_data = sessionStorage.getItem('users') ? sessionStorage.getItem('users') : "";
+        let csc_data = sessionStorage.getItem('users') ? (sessionStorage.getItem('users')) : "";
+        let user_data= sessionStorage.getItem('user_data') ? JSON.parse(sessionStorage.getItem('user_data')) : "";
+        
+        console.log("check",user_data.master_user_id,user_data.user_type,user_data.user_type == "Intermidiary")
         let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-
-        if(bc_data) {
+        if(user_data && user_data.user_type && user_data.user_type == "Intermidiary" )
+        {
+            user_id = user_data.master_user_id
+            user_type = "intermidiary";
+        }
+         else if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
+            console.log("bc_data",bc_data)
             user_id = bc_data ? bc_data.agent_id : ""
             user_type = 'bc'
         }
