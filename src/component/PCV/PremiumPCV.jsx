@@ -79,7 +79,6 @@ class PremiumPCV extends Component {
         else {
             this.setState({ show: false, paymentButton: false, smsButton: true});
         }
-
     }
 
     changePlaceHoldClassAdd(e) {
@@ -858,7 +857,7 @@ class PremiumPCV extends Component {
                                                                     </div> : null }
 
                                                                 {smsButton === true && breakin_flag == 0 ?
-                                                                <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                                                    <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 
                                                                 {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" && paymentButton === true ?

@@ -82,6 +82,11 @@ class renewal extends Component {
             user_id = user_data.master_user_id
             user_type = "intermidiary";
         }
+        else if(user_data && user_data.user_type && user_data.user_type == "Micro" )
+        {
+            user_id = user_data.master_user_id
+            user_type = "Micro";
+        }
          else if(bc_data) {
             bc_data = JSON.parse(encryption.decrypt(bc_data));
             console.log("bc_data",bc_data)

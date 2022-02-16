@@ -57,7 +57,8 @@ const mapStateToProps = state => {
     return row.prev_balance + row.credit - row.debit;
   }
 
-const ACD =()=>{
+const ACD =(props)=>{
+  let path="";
     const table=useRef("table");
     const[state,setState]=useState({
       search_flag:1,
@@ -65,7 +66,9 @@ const ACD =()=>{
       user_id:"",
       total:[],
       policyHolder:[],
-      size:""
+      size:"",
+      download:0,
+      download_path:""
   })
     useEffect(()=>{
       const formData = new FormData();
@@ -76,8 +79,8 @@ const ACD =()=>{
      let user_id = user_data ? JSON.parse(encryption.decrypt(user_data.user)) :""
     formData.append("user_id",user_id.master_user_id)
     
-    axios.post("http://14.140.119.44/sbig-csc/core/auth/acd/acd-accounts",formData).then((res)=>{
-      console.log("response", res.data.data);
+    axios.post("acd/acd-accounts",formData).then((res)=>{
+      // console.log("response", res.data.data);
       
       
       setState({
@@ -197,16 +200,59 @@ const ACD =()=>{
       
 
   };
+  const download= async ()=>{
+    
+    if(path)
+    { 
+        const url = `${path}`;
+        props.loadingStart();
+        const anchortag = document.createElement('a');
+        anchortag.style.display = 'none';
+        anchortag.href = url;
+        document.body.appendChild(anchortag);
+        anchortag.click();
+        props.loadingStop();
+    }
+    else{
+      swal("Unable to download")
+    }
+  }
      const handleSubmit =(values)=>{
     
-     
+     if(state.download==1)
+     {
+        // console.log("download",state.download)
+        const formData = new FormData();
+        formData.append("user_id",state.user_id)
+        formData.append("from_date",moment(values.start_date).format("YYYY-MM-DD"));
+        formData.append("to_date",moment(values.end_date).format("YYYY-MM-DD"))
+        
+        
+        axios.post(`acd/acd-statement-download`,formData). then(res=>{
+          // console.log("check",res.data.data.uploded_path)
+          path = res.data.data.uploded_path
+          
+          download();
+
+          
+
+        }).catch(err=>{
+          console.log("error")
+        })
+        setState({
+          ...state,
+          download:0
+        })
+     }
+     else{
+      // console.log("download",state.download)
      const formData=new FormData();
      formData.append("user_id",state.user_id)
      formData.append("from_date",moment(values.start_date).format("YYYY-MM-DD"))
      formData.append("to_date",moment(values.end_date).format("YYYY-MM-DD"))
      
      
-     axios.post("http://14.140.119.44/sbig-csc/core/auth/acd/acd-statement",formData).then(res=>{
+     axios.post("acd/acd-statement",formData).then(res=>{
        
        setState({
            ...state,
@@ -219,7 +265,7 @@ const ACD =()=>{
      })
     
       
-     
+    }
    }
   
     return(
@@ -244,7 +290,7 @@ const ACD =()=>{
                                 validationSchema={validationSchema}
                                 >
                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched,submitForm }) => {
-                                    
+                                    console.log("touched",errors)
                                     return(
                                        <Form>
                                         <Row>
@@ -356,7 +402,8 @@ const ACD =()=>{
                                               )}
                                               
                                             </FormGroup>
-                                            <Button type='submit' >Fetch</Button>
+                                            <Button type='submit' >Fetch</Button> &nbsp;&nbsp;
+                                            <Button type='submit' onClick={()=> state.download=1}>Download</Button>
                                           </Col>
                                           
                                           <Col sm={6} md={5} lg={5}>

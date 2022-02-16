@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-import Otp from "./Otp"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
@@ -17,6 +16,7 @@ import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
 import {registrationNoFormat, paymentGateways} from '../../shared/reUseFunctions';
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 const initialValue = {
     gateway : ""
@@ -894,6 +894,7 @@ class PremiumMISCD extends Component {
                                     <div className="otpmodal">
                                     <Modal.Header closeButton />
                                         <Modal.Body>
+                                            <Suspense fallback={<div>Loading...</div>}>
                                             <Otp
                                                 quoteNo={fulQuoteResp.QuotationNo}
                                                 duePremium={fulQuoteResp.DuePremium}
@@ -901,6 +902,7 @@ class PremiumMISCD extends Component {
                                                 // whatsapp={whatsapp}
                                                 reloadPage={(e) => this.handleOtp(e)}
                                             />
+                                            </Suspense>
                                         </Modal.Body>
                                     </div>
                                 </Modal>

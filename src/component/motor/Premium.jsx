@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-import Otp from "./Otp"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
@@ -17,6 +16,7 @@ import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
 import {registrationNoFormat, paymentGateways} from '../../shared/reUseFunctions';
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 const initialValue = {
     gateway : ""
@@ -41,6 +41,8 @@ class Premium extends Component {
             show: false,
             refNo: "",
             whatsapp: "",
+            paymentButton: false,
+            smsButton: true,
             fulQuoteResp: [],
             motorInsurance: [],
             error: [],
@@ -73,9 +75,16 @@ class Premium extends Component {
     }
 
     handleOtp(e) {
-        console.log("otp", e)
-        this.setState({ show: false, });
-        this.props.history.push(`/ThankYou_motor`)
+        if(e === true) {
+            this.setState({ show: false, paymentButton: true, smsButton: false});
+        }
+        else {
+            this.setState({ show: false, paymentButton: false, smsButton: true});
+        }
+    }
+
+    handleModal = () => {
+        this.setState({ show: true});
     }
 
     changePlaceHoldClassAdd(e) {
@@ -408,7 +417,7 @@ sendPaymentLink = () => {
 
     render() {
         const { policyHolder, paymentgateway, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, 
-            memberdetails,nomineedetails, vehicleDetails, breakin_flag, request_data, bcMaster, step_completed } = this.state
+            memberdetails,nomineedetails, vehicleDetails, breakin_flag, show, bcMaster, step_completed, paymentButton, smsButton } = this.state
         const { productId } = this.props.match.params
         console.log("product name",vehicleDetails && vehicleDetails.vehicletype ? vehicleDetails.vehicletype.description : null)
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -863,11 +872,15 @@ sendPaymentLink = () => {
                                                                 
                                                                 {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
                                                                     <div>
-                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
-                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                        <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
+                                                                        &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
-                                                                
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" ?
+
+                                                                {smsButton === true && breakin_flag == 0 ?
+                                                                    <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                                                : null}
+
+                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" && paymentButton === true?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
@@ -887,21 +900,24 @@ sendPaymentLink = () => {
                                         );
                                     }}
                                 </Formik>
-                                {/* <Modal className="" bsSize="md"
+                                <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>
                                     <div className="otpmodal">
+                                    <Modal.Header closeButton />
                                         <Modal.Body>
+                                            <Suspense fallback={<div>Loading...</div>}>
                                             <Otp
                                                 quoteNo={fulQuoteResp.QuotationNo}
                                                 duePremium={fulQuoteResp.DuePremium}
                                                 refNumber={refNumber}
-                                                whatsapp={whatsapp}
-                                                reloadPage={(e) => this.payment(e)}
+                                                // whatsapp={whatsapp}
+                                                reloadPage={(e) => this.handleOtp(e)}
                                             />
+                                            </Suspense>
                                         </Modal.Body>
                                     </div>
-                                </Modal> */}
+                                </Modal>
 
                             </div>
                             : step_completed == "" ? "Forbidden" : null }

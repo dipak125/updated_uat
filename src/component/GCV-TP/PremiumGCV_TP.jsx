@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component , Suspense} from 'react';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form } from "formik";
 import BaseComponent from '.././BaseComponent';
 import SideNav from '../common/side-nav/SideNav';
 import Footer from '../common/footer/Footer';
-// import Otp from "./Otp"
 import axios from "../../shared/axios";
 import { withRouter, Link, Route } from "react-router-dom";
 import { loaderStart, loaderStop } from "../../store/actions/loader";
@@ -17,6 +16,7 @@ import fuel from '../common/FuelTypes';
 import swal from 'sweetalert';
 import moment from "moment";
 import {registrationNoFormat, paymentGateways} from '../../shared/reUseFunctions';
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 const initialValue = {
     gateway : ""
 }
@@ -40,6 +40,8 @@ class PremiumGCV extends Component {
             show: false,
             refNo: "",
             whatsapp: "",
+            paymentButton: false,
+            smsButton: true,
             fulQuoteResp: [],
             motorInsurance: [],
             error: [],
@@ -65,6 +67,20 @@ class PremiumGCV extends Component {
 
     handleClose(e) {
         this.setState({ show: false, });
+    }
+
+    handleOtp(e) {
+        if(e === true) {
+            this.setState({ show: false, paymentButton: true, smsButton: false});
+        }
+        else {
+            this.setState({ show: false, paymentButton: false, smsButton: true});
+        }
+
+    }
+
+    handleModal = () => {
+        this.setState({ show: true});
     }
 
     changePlaceHoldClassAdd(e) {
@@ -233,7 +249,7 @@ class PremiumGCV extends Component {
 
     render() {
         const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, bcMaster,request_data,menumaster,paymentgateway,
-            paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed } = this.state
+            paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails, step_completed, paymentButton, smsButton } = this.state
         const { productId } = this.props.match.params
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -708,12 +724,17 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
- 								                                    {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                                     <div>
-                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                        <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                        &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
-                                                                {fulQuoteResp.QuotationNo && values.gateway != "" ?
+
+                                                                {smsButton === true ?
+                                                                    <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                                                : null}
+
+                                                                {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
@@ -733,7 +754,24 @@ class PremiumGCV extends Component {
                                         );
                                     }}
                                 </Formik>
-
+                                <Modal className="" bsSize="md"
+                                    show={show}
+                                    onHide={this.handleClose}>
+                                    <div className="otpmodal">
+                                    <Modal.Header closeButton />
+                                        <Modal.Body>
+                                            <Suspense fallback={<div>Loading...</div>}>
+                                            <Otp
+                                                quoteNo={fulQuoteResp.QuotationNo}
+                                                duePremium={fulQuoteResp.DuePremium}
+                                                refNumber={refNumber}
+                                                // whatsapp={whatsapp}
+                                                reloadPage={(e) => this.handleOtp(e)}
+                                            />
+                                            </Suspense>
+                                        </Modal.Body>
+                                    </div>
+                                </Modal>
                             </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
