@@ -23,7 +23,6 @@ import {  userTypes, ncbSlab } from "../../shared/staticValues";
 
 let encryption = new Encryption()
 
-
  let initialValue = {
     // add_more_coverage: "",
     // cng_kit: '0',

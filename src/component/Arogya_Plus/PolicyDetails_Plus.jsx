@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import {
   Row,
   Col,
@@ -24,6 +24,7 @@ import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import { Formik, Field, Form } from "formik";
 import { paymentGateways } from '../../shared/reUseFunctions';
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 
 const genderArr = {
@@ -55,6 +56,8 @@ class PolicyDetails_Plus extends Component {
   state = {
     accessToken: "",
     policyHolderDetails: [],
+    paymentButton: false,
+    smsButton: true,
     familyMember: [],
     fulQuoteResp: [],
     error: [],
@@ -66,17 +69,26 @@ class PolicyDetails_Plus extends Component {
     serverResponse: false,
     paymentgateway: [],
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ?
-      queryString.parse(this.props.location.search).access_id :
-      localStorage.getItem("policyHolder_refNo")
+                        queryString.parse(this.props.location.search).access_id :
+                        localStorage.getItem("policyHolder_refNo")
   };
 
   handleClose = () => {
     this.setState({ show: false });
   }
 
-  handleShow = () => {
+  handleModal = () => {
     this.setState({ show: true });
   };
+
+  handleOtp = (e) => {
+    if(e === true) {
+        this.setState({ show: false, paymentButton: true, smsButton: false});
+    }
+    else {
+        this.setState({ show: false, paymentButton: false, smsButton: true});
+    }
+  }
 
   policySummery = (policyId) => {
     this.props.history.push(`/ThankYou/${policyId}`);
@@ -272,8 +284,9 @@ class PolicyDetails_Plus extends Component {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster,
-      paymentgateway, nomineeDetails, request_data, vehicleDetails } = this.state;
-
+      paymentgateway, nomineeDetails, request_data, vehicleDetails, paymentButton, smsButton, show } = this.state;
+      
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     const items =
       fulQuoteResp &&
         fulQuoteResp.PolicyLobList && fulQuoteResp.PolicyLobList.length > 0 &&
@@ -640,7 +653,11 @@ class PolicyDetails_Plus extends Component {
                                         &nbsp;&nbsp;&nbsp;&nbsp;
                                       </div> : null}
 
-                                    {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse ?
+                                      {smsButton === true ?
+                                          <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                      : null}
+
+                                    {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true ?
                                       <Button type="submit"
                                         className="proceedBtn"
                                       >
@@ -666,6 +683,24 @@ class PolicyDetails_Plus extends Component {
                       );
                     }}
                   </Formik>
+                  <Modal className="" bsSize="md"
+                      show={show}
+                      onHide={this.handleClose}>
+                      <div className="otpmodal">
+                      <Modal.Header closeButton />
+                          <Modal.Body>
+                              <Suspense fallback={<div>Loading...</div>}>
+                              <Otp
+                                  quoteNo={fulQuoteResp.QuotationNo}
+                                  duePremium={fulQuoteResp.DuePremium}
+                                  refNumber={refNumber}
+                                  // whatsapp={whatsapp}
+                                  reloadPage={(e) => this.handleOtp(e)}
+                              />
+                              </Suspense>
+                          </Modal.Body>
+                      </div>
+                  </Modal>
                   <Footer />
                 </div>
               </div>

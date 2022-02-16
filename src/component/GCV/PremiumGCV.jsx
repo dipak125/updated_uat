@@ -64,7 +64,7 @@ class PremiumGCV extends Component {
     handleClose(e) {
         this.setState({ show: false, });
     }
-    handleOtp(e) {
+    handleOtp=(e)=> {
         if(e === true) {
             this.setState({ show: false, paymentButton: true, smsButton: false});
         }

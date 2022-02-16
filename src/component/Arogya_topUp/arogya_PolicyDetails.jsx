@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import {
   Row,
   Col,
@@ -23,6 +23,7 @@ import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { paymentGateways} from '../../shared/reUseFunctions';	
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 
 const initialValue = {
@@ -81,6 +82,8 @@ class arogya_PolicyDetails extends Component {
   state = {
     accessToken: "",
     policyHolderDetails: [],
+    paymentButton: false,
+    smsButton: true,
     familyMember: [],
     fulQuoteResp: [],
     error: [],
@@ -102,9 +105,18 @@ class arogya_PolicyDetails extends Component {
     this.setState({ show: false });
   }
 
-  handleShow = () => {
+  handleModal = () => {
     this.setState({ show: true });
   };
+
+  handleOtp = (e) => {
+    if(e === true) {
+        this.setState({ show: false, paymentButton: true, smsButton: false});
+    }
+    else {
+        this.setState({ show: false, paymentButton: false, smsButton: true});
+    }
+  }
 
   policySummery = (policyId) => {
     this.props.history.push(`/ThankYou/${policyId}`);
@@ -241,7 +253,7 @@ sendPaymentLink = () => {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, addressArray, error, serverResponse, policyHolderDetails, nomineedetails, paymentStatus,
-      paymentgateway, bcMaster, menumaster, request_data } = this.state;
+      paymentgateway, bcMaster, menumaster, request_data, paymentButton, smsButton, show, refNumber } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     const AddressDetails = addressArray ? (
@@ -709,11 +721,15 @@ sendPaymentLink = () => {
                                             </button>
                                           {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                             <div>
-                                            <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                              &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse ? 
+                                          {smsButton === true ?
+                                            <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                          : null}
+
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true ? 
                                            <Button type="submit"
                                               className="proceedBtn"
                                             >
@@ -739,6 +755,24 @@ sendPaymentLink = () => {
                                );
                            }}
                      </Formik>
+                     <Modal className="" bsSize="md"
+                      show={show}
+                      onHide={this.handleClose}>
+                      <div className="otpmodal">
+                      <Modal.Header closeButton />
+                          <Modal.Body>
+                              <Suspense fallback={<div>Loading...</div>}>
+                              <Otp
+                                  quoteNo={fulQuoteResp.QuotationNo}
+                                  duePremium={fulQuoteResp.DuePremium}
+                                  refNumber={refNumber}
+                                  // whatsapp={whatsapp}
+                                  reloadPage={(e) => this.handleOtp(e)}
+                              />
+                              </Suspense>
+                          </Modal.Body>
+                      </div>
+                  </Modal>
                   <Footer />
               </div>
             </div>

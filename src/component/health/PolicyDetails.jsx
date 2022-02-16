@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import {
   Row,
   Col,
@@ -19,12 +19,12 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 // import { Formik, Form, Field, ErrorMessage, FieldArray } from 'formik'
 import moment from "moment";
-import Otp from "./Otp";
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import { Formik, Field, Form } from "formik";
 import { paymentGateways} from '../../shared/reUseFunctions';	
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 
 const genderArr = {
@@ -61,6 +61,8 @@ class PolicyDetails extends Component {
   state = {
     accessToken: "",
     policyHolderDetails: [],
+    paymentButton: false,
+    smsButton: true,
     familyMember: [],
     fulQuoteResp: [],
     error: [],
@@ -81,9 +83,18 @@ class PolicyDetails extends Component {
     this.setState({ show: false });
   }
 
-  handleShow = () => {
-    this.setState({ show: true });
-  };
+  handleOtp = (e) => {
+    if(e === true) {
+        this.setState({ show: false, paymentButton: true, smsButton: false});
+    }
+    else {
+        this.setState({ show: false, paymentButton: false, smsButton: true});
+    }
+  }
+
+  handleModal = () => {
+    this.setState({ show: true});
+  }
 
   policySummery = (policyId) => {
     this.props.history.push(`/ThankYou/${policyId}`);
@@ -302,7 +313,7 @@ class PolicyDetails extends Component {
   render() {
     const { productId } = this.props.match.params;
     const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, 
-      paymentgateway, menumaster, request_data, nomineedetails } = this.state;
+      paymentgateway, menumaster, request_data, nomineedetails, paymentButton, smsButton, show } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
     const items =
@@ -678,13 +689,17 @@ class PolicyDetails extends Component {
                                               Back
                                             </Button>
 
-                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
-                                              <div>
+                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                            <div>
                                               <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
-                                              </div> : null }
+                                            </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse ? 
+                                          {smsButton === true ?
+                                                <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                          : null}
+
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse && paymentButton === true ? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >
@@ -710,6 +725,24 @@ class PolicyDetails extends Component {
                             );
                         }}
                   </Formik>
+                  <Modal className="" bsSize="md"
+                      show={show}
+                      onHide={this.handleClose}>
+                      <div className="otpmodal">
+                      <Modal.Header closeButton />
+                          <Modal.Body>
+                              <Suspense fallback={<div>Loading...</div>}>
+                              <Otp
+                                  quoteNo={fulQuoteResp.QuotationNo}
+                                  duePremium={fulQuoteResp.DuePremium}
+                                  refNumber={refNumber}
+                                  // whatsapp={whatsapp}
+                                  reloadPage={(e) => this.handleOtp(e)}
+                              />
+                              </Suspense>
+                          </Modal.Body>
+                      </div>
+                  </Modal>
                 <Footer />
               </div>
             </div>

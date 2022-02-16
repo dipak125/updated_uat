@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import { Row, Col, Modal, Button, FormGroup } from 'react-bootstrap';
 import Collapsible from 'react-collapsible';
 import { Formik, Field, Form } from "formik";
@@ -16,6 +16,7 @@ import queryString from 'query-string';
 import swal from 'sweetalert';
 import moment from "moment";
 import {paymentGateways} from '../../shared/reUseFunctions';
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 const initialValue = {
     gateway : ""
@@ -41,6 +42,8 @@ class Premium_sukhsam extends Component {
             show: false,
             refNo: "",
             whatsapp: "",
+            paymentButton: false,
+            smsButton: true,
             fulQuoteResp: [],
             motorInsurance: [],
             error: [],
@@ -69,7 +72,18 @@ class Premium_sukhsam extends Component {
         this.setState({ show: false, });
     }
 
-
+    handleOtp = (e) => {
+        if(e === true) {
+            this.setState({ show: false, paymentButton: true, smsButton: false});
+        }
+        else {
+            this.setState({ show: false, paymentButton: false, smsButton: true});
+        }
+      }
+    
+    handleModal = () => {
+        this.setState({ show: true});
+    }
 
     changePlaceHoldClassAdd(e) {
         let element = e.target.parentElement;
@@ -89,30 +103,6 @@ class Premium_sukhsam extends Component {
         const { refNumber , policyHolder} = this.state
         const { productId } = this.props.match.params
         paymentGateways(values, policyHolder, refNumber, productId)
-    }
-
-
-    callBreakin=()=>{
-
-        const formData = new FormData();
-        let encryption = new Encryption();
-        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
-        let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
-        if(bc_data) {
-            bc_data = JSON.parse(encryption.decrypt(bc_data));
-        }
-        formData.append('bcmaster_id', sessionStorage.getItem('csc_id') ? "5" : bc_data ? bc_data.agent_id : "" ) 
-        formData.append('ref_no', policyHolder_id) 
-
-        this.props.loadingStart();
-        axios.post('breakin/create',formData)
-        .then(res=>{
-            swal(`Your breakin request has been raised. Your inspection Number: ${res.data.data.inspection_no}`)
-            this.props.loadingStop();
-        }).
-        catch(err=>{
-            this.props.loadingStop();
-        })  
     }
 
 
@@ -347,7 +337,8 @@ class Premium_sukhsam extends Component {
     }
 
     render() {
-        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, quoteId, paymentStatus, relation, memberdetails,nomineedetails, breakin_flag } = this.state
+        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, quoteId, paymentStatus, 
+            memberdetails,nomineedetails, paymentButton, smsButton, refNumber } = this.state
         const { productId } = this.props.match.params
 
         const policyHolder_refNo = queryString.parse(this.props.location.search).access_id ? 
@@ -748,11 +739,15 @@ class Premium_sukhsam extends Component {
                                                                
                                                                 { this.props.payment_link_status == 1 ?
                                                                     <div>
-                                                                    <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                        <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                                        &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
 
-                                                                {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" ?
+                                                                {smsButton === true ?
+                                                                    <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                                                : null}
+
+                                                                {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" && paymentButton === true ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"  type="submit"  disabled={isSubmitting ? true : false}>
                                                                         Generate Policy
@@ -780,7 +775,22 @@ class Premium_sukhsam extends Component {
                                         );
                                     }}
                                 </Formik>
-
+                                <Modal className="" bsSize="md"
+                                    show={show}
+                                    onHide={this.handleClose}>
+                                    <div className="otpmodal">
+                                    <Modal.Header closeButton />
+                                        <Modal.Body>
+                                            <Suspense fallback={<div>Loading...</div>}>
+                                            <Otp
+                                                refNumber={refNumber}
+                                                // whatsapp={whatsapp}
+                                                reloadPage={(e) => this.handleOtp(e)}
+                                            />
+                                            </Suspense>
+                                        </Modal.Body>
+                                    </div>
+                                </Modal>
                             </div>
                             <Footer />
                         </div>

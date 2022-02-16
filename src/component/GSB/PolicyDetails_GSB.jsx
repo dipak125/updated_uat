@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import {
   Row,
   Col,
@@ -23,7 +23,8 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import queryString from 'query-string';
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { faYelp } from "@fortawesome/free-brands-svg-icons";
+//import { faYelp } from "@fortawesome/free-brands-svg-icons";
+const Otp = React.lazy(() => import('../common/Otp/Otp'));
 
 const initialValue = {
   gateway : ""
@@ -81,6 +82,8 @@ class PolicyDetails_GSB extends Component {
   state = {
     accessToken: "",
     policyHolderDetails: [],
+    paymentButton: false,
+    smsButton: true,
     familyMember: [],
     fulQuoteResp: [],
     error: [],
@@ -103,9 +106,18 @@ class PolicyDetails_GSB extends Component {
     this.setState({ show: false });
   }
 
-  handleShow = () => {
-    this.setState({ show: true });
-  };
+  handleOtp = (e) => {
+    if(e === true) {
+        this.setState({ show: false, paymentButton: true, smsButton: false});
+    }
+    else {
+        this.setState({ show: false, paymentButton: false, smsButton: true});
+    }
+  }
+
+  handleModal = () => {
+    this.setState({ show: true});
+  }
 
 
   nomineeDetails = (productId) => {
@@ -334,10 +346,12 @@ paypoint_payment = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, 
-        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details, vehicleDetails } = this.state;
+    const { fulQuoteResp, addressDetails, error, show, policyHolderDetails, nomineedetails, paymentStatus, policyCoverage, refNumber,
+        bcMaster, NomineeRelationArr, AppointeeRelationArr, location, city, state, gsb_Details, vehicleDetails, paymentButton, smsButton } = this.state;
+
     const Is_appo = policyHolderDetails.request_data ? policyHolderDetails.request_data.nominee[0].is_appointee : null
     const risk_address = gsb_Details && gsb_Details.risk_address ? JSON.parse(gsb_Details.risk_address) : {}
+    let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
     const riskDetails = risk_address ? (
       <div>
@@ -866,11 +880,15 @@ paypoint_payment = () => {
 
                                             {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                               <div>
-                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
-                                              &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" ? 
+                                            {smsButton === true ?
+                                              <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                            : null}
+
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true ? 
                                             < Button type="submit"
                                               className="proceedBtn"   
                                               // onClick={this.handleSubmit.bind(this, values)}                            
@@ -896,6 +914,24 @@ paypoint_payment = () => {
                             );
                           }}
                   </Formik>
+                  <Modal className="" bsSize="md"
+                      show={show}
+                      onHide={this.handleClose}>
+                      <div className="otpmodal">
+                      <Modal.Header closeButton />
+                          <Modal.Body>
+                              <Suspense fallback={<div>Loading...</div>}>
+                              <Otp
+                                  quoteNo={fulQuoteResp.QuotationNo}
+                                  duePremium={fulQuoteResp.DuePremium}
+                                  refNumber={refNumber}
+                                  // whatsapp={whatsapp}
+                                  reloadPage={(e) => this.handleOtp(e)}
+                              />
+                              </Suspense>
+                          </Modal.Body>
+                      </div>
+                  </Modal>
                 <Footer />
               </div>
             </div>
