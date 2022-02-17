@@ -16,6 +16,7 @@ import moment from "moment";
 import Collapsible from "react-collapsible";
 import queryString from 'query-string';
 import { paymentGateways} from '../../../shared/reUseFunctions';	
+ 
 
 
 const initialValue = {
@@ -139,6 +140,7 @@ class HealthSummery extends Component {
 
   componentDidMount() {
     this.fetchData();
+    this.getPolicyHolderDetails()
   }
   
   
@@ -156,6 +158,47 @@ class HealthSummery extends Component {
         this.props.loadingStop();
       })
       .catch((err) => {
+        this.props.loadingStop();
+      });
+  };
+
+  getPolicyHolderDetails = () => {
+    let policyHolder_id = 0
+    
+    this.props.loadingStart();
+    axios
+      .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
+      .then((res) => {
+        // let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
+        // let menumaster = res.data.data.policyHolder ? res.data.data.policyHolder.menumaster : {};
+        // let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
+        // let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
+        let paymentgateway = res.data.data.policyHolder && res.data.data.policyHolder.bcmaster && res.data.data.policyHolder.bcmaster.bcpayment
+        console.log("pay1",paymentgateway)
+         this.setState({
+           paymentgateway:paymentgateway
+        //   policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
+        //   familyMember: res.data.data.policyHolder.request_data.family_members,
+        //   refNumber: res.data.data.policyHolder.reference_no,
+        //   paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
+        //   nomineeDetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],
+        //   bcMaster,  menumaster, request_data,paymentgateway, vehicleDetails
+
+         });
+        // this.getAccessToken(
+        //   res.data.data.policyHolder,
+        //   res.data.data.policyHolder.request_data.family_members
+        // );
+      })
+      .catch((err) => {
+        if(err.status == 401) {
+          swal("Session out. Please login")
+        }
+        else swal("Something wrong happened. Please try after some")
+
+        // this.setState({
+        //   policyHolderDetails: [],
+        // });
         this.props.loadingStop();
       });
   };
@@ -179,9 +222,9 @@ class HealthSummery extends Component {
             let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
             let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []	
             let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.paymentgateway
-
+            console.log("pay")
             this.setState({	
-                policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,paymentgateway,
+                policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,
                 paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                 nomineeDetails: request_data && request_data.nominee ? request_data.nominee[0]:[]	,
                 nomineeLength: request_data && request_data.nominee ? request_data.nominee.length : 0	
@@ -196,10 +239,11 @@ class HealthSummery extends Component {
 }	
 
 
-handleSubmit = (values) => {    
+handleSubmit = (values) => {  
   const { policyHolder_refNo , policyHolder} = this.state
   const { productId } = this.props.match.params
-  paymentGateways(values, policyHolder, policyHolder_refNo, productId)
+  
+  paymentGateways(values, policyHolder, policyHolder_refNo, policyHolder.product_id)
 }
 
 
@@ -584,8 +628,9 @@ handleSubmit = (values) => {
                                                               Select Payment Gateway
                                                               
                                                               { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
-                                                                // gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                                 gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
                                                                   <div>
+                                                                    
                                                                       <label className="customRadio3">
                                                                       <Field
                                                                           type="radio"
@@ -594,19 +639,19 @@ handleSubmit = (values) => {
                                                                           key= {index} 
                                                                           onChange={(e) => {
                                                                               setFieldValue(`gateway`, e.target.value);
-                                                                              setFieldValue(`slug`, gateways.slug);
+                                                                              setFieldValue(`slug`, gateways.paymentgateway.slug);
                                                                           }}
                                                                           checked={values.gateway == `${index+1}` ? true : false}
                                                                       />
                                                                           <span className="checkmark " /><span className="fs-14"> 
                                                                       
-                                                                              { gateways.logo ? <img src={require('../../../assets/images/'+ gateways.logo)} alt="" /> :
+                                                                              { gateways.paymentgateway.logo ? <img src={require('../../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
                                                                               null
                                                                               }
                                                                           </span>
                                                                       </label>
                                                                   </div> 
-                                                                // : null
+                                                                 : null
                                                                 ) : null}	
 
 

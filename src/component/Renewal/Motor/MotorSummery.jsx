@@ -90,12 +90,52 @@ class MotorSummery extends Component {
     }	
     additionalDetails = (productId) => {	
         this.props.history.push(`/AdditionalDetails_GCV/${productId}`);	
-    }	
+    }
+    getPolicyHolderDetails = () => {
+        let policyHolder_id = 0
+        
+        this.props.loadingStart();
+        axios
+          .get(`/policy-holder/${localStorage.getItem("policyHolder_id")}`)
+          .then((res) => {
+            // let bcMaster = res.data.data.policyHolder ? res.data.data.policyHolder.bcmaster : {};
+            // let menumaster = res.data.data.policyHolder ? res.data.data.policyHolder.menumaster : {};
+            // let vehicleDetails = res.data.data.policyHolder ? res.data.data.policyHolder.vehiclebrandmodel : {};
+            // let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
+            let paymentgateway = res.data.data.policyHolder && res.data.data.policyHolder.bcmaster && res.data.data.policyHolder.bcmaster.bcpayment
+            console.log("pay1",paymentgateway)
+             this.setState({
+               paymentgateway:paymentgateway
+            //   policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
+            //   familyMember: res.data.data.policyHolder.request_data.family_members,
+            //   refNumber: res.data.data.policyHolder.reference_no,
+            //   paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
+            //   nomineeDetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],
+            //   bcMaster,  menumaster, request_data,paymentgateway, vehicleDetails
+    
+             });
+            // this.getAccessToken(
+            //   res.data.data.policyHolder,
+            //   res.data.data.policyHolder.request_data.family_members
+            // );
+          })
+          .catch((err) => {
+            if(err.status == 401) {
+              swal("Session out. Please login")
+            }
+            else swal("Something wrong happened. Please try after some")
+    
+            // this.setState({
+            //   policyHolderDetails: [],
+            // });
+            this.props.loadingStop();
+          });
+      };	
 
     handleSubmit = (values) => {    
         const { policyHolder_refNo , policyHolder} = this.state
         const { productId } = this.props.match.params
-        paymentGateways(values, policyHolder, policyHolder_refNo, productId)
+        paymentGateways(values, policyHolder, policyHolder_refNo, policyHolder.product_id)
     }
 
     fetchData = () => {	
@@ -121,7 +161,7 @@ class MotorSummery extends Component {
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.paymentgateway
                 	
                 this.setState({	
-                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	policyCoverage,paymentgateway,
+                    motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,menumaster,step_completed, bcMaster,	policyCoverage,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],	
                     nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]	
@@ -206,6 +246,7 @@ class MotorSummery extends Component {
     componentDidMount() {	
         // this.fetchData()	
         this.fetchRelationships()	
+        this.getPolicyHolderDetails();
     }	
     render() {	
         const { policyHolder, show, paymentgateway, motorInsurance, error, error1, paymentStatus, bcMaster,policyCoverage,	
@@ -667,8 +708,9 @@ class MotorSummery extends Component {
                                                                      <div className="paymntgatway">	
 
                                                                      { paymentgateway && paymentgateway.length > 0 ? paymentgateway.map((gateways,index) =>
-                                                                        // gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
+                                                                         gateways.hasOwnProperty('paymentgateway') && gateways.paymentgateway ? 
                                                                         <div>
+                                                                            {console.log("hi",gateways.paymentgateway.logo)}
                                                                             <label className="customRadio3">
                                                                             <Field
                                                                                 type="radio"
@@ -677,19 +719,19 @@ class MotorSummery extends Component {
                                                                                 key= {index} 
                                                                                 onChange={(e) => {
                                                                                     setFieldValue(`gateway`, e.target.value);
-                                                                                    setFieldValue(`slug`, gateways.slug);
+                                                                                    setFieldValue(`slug`, gateways.paymentgateway.slug);
                                                                                 }}
                                                                                 checked={values.gateway == `${index+1}` ? true : false}
                                                                             />
                                                                                 <span className="checkmark " /><span className="fs-14"> 
                                                                             
-                                                                                    { gateways.logo ? <img src={require('../../../assets/images/'+ gateways.logo)} alt="" /> :
+                                                                                    { gateways.paymentgateway.logo ? <img src={require('../../../assets/images/'+ gateways.paymentgateway.logo)} alt="" /> :
                                                                                     null
                                                                                     }
                                                                                 </span>
                                                                             </label>
                                                                         </div> 
-                                                                        // : null
+                                                                         : null
                                                                         ) : null}	
                                                                         
                                                                     </div>	
