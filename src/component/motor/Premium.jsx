@@ -869,13 +869,13 @@ sendPaymentLink = () => {
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>Back</Button>
                                                                 
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 && fulQuoteResp.QuotationNo ?
                                                                     <div>
                                                                         <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                         &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
 
-                                                                {smsButton === true && breakin_flag == 0 ?
+                                                                {smsButton === true && breakin_flag == 0 && fulQuoteResp.QuotationNo?
                                                                     <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 

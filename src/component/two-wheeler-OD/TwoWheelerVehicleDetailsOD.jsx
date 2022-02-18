@@ -823,8 +823,8 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicyforsaod : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let RTO_location = motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION + " - " + motorInsurance.location.NameCode : ""
-		        let previous_is_claim= previousPolicy && previousPolicy[0] && (previousPolicy[0].is_claim == 0 || previousPolicy[0].is_claim == 1) ? previousPolicy[0].is_claim : "" 
-                let no_of_claim= previousPolicy && previousPolicy[0] && previousPolicy[0].previouspoliciesclaims ? previousPolicy[0].previouspoliciesclaims.length : ""
+		        let previous_is_claim= previousPolicy && previousPolicy[1] && (previousPolicy[1].is_claim == 0 || previousPolicy[1].is_claim == 1) ? previousPolicy[1].is_claim : "" 
+                let no_of_claim= previousPolicy && previousPolicy[1] && previousPolicy[1].previouspoliciesclaims ? previousPolicy[1].previouspoliciesclaims.length : ""
 
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails, RTO_location,  previous_is_claim, no_of_claim
@@ -870,7 +870,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
     }
     initClaimDetailsList = () => {
         const {previousPolicy} = this.state
-        let previous_claims = previousPolicy && previousPolicy[0] && previousPolicy[0].previouspoliciesclaims ? previousPolicy[0].previouspoliciesclaims : []
+        let previous_claims = previousPolicy && previousPolicy[1] && previousPolicy[1].previouspoliciesclaims ? previousPolicy[1].previouspoliciesclaims : []
         let innicialClaimList = []
         for (var i = 0; i < this.state.no_of_claim; i++) {
             innicialClaimList.push(
@@ -987,7 +987,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 previous_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
                 previous_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
                 previous_policy_name: previousPolicy && previousPolicy[1] && previousPolicy[1].name ? previousPolicy[1].name : "",
-                insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany && previousPolicy[1].insurancecompany.Id ? previousPolicy[1].insurancecompany.Id : "",
+                insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany_id ? previousPolicy[1].insurancecompany_id : "",
 
                 previous_city: previousPolicy && previousPolicy[1] && previousPolicy[1].address ? previousPolicy[1].address : "",
                 previous_is_claim: previousPolicy && previousPolicy[1] && (previousPolicy[1].is_claim == 0 || previousPolicy[1].is_claim == 1) ? previousPolicy[1].is_claim : "",
@@ -998,7 +998,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 active_start_date: previousPolicy && previousPolicy[0] && previousPolicy[0].start_date ? new Date(previousPolicy[0].start_date) : "",
                 active_end_date: previousPolicy && previousPolicy[0] && previousPolicy[0].end_date ? new Date(previousPolicy[0].end_date) : "",
                 active_policy_name: '2',
-                active_insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany && previousPolicy[0].insurancecompany.Id ? previousPolicy[0].insurancecompany.Id : "",
+                active_insurance_company_id: previousPolicy && previousPolicy[0] && previousPolicy[0].insurancecompany_id ? previousPolicy[0].insurancecompany_id : "",
                 active_policy_address: previousPolicy && previousPolicy[0] && previousPolicy[0].address ? previousPolicy[0].address : "test",
                 active_policy_no: previousPolicy && previousPolicy[0] && previousPolicy[0].policy_no ? previousPolicy[0].policy_no : "",
                 active_policy_tenure: previousPolicy && previousPolicy[0] && previousPolicy[0].active_policy_tenure ? previousPolicy[0].active_policy_tenure : "",
