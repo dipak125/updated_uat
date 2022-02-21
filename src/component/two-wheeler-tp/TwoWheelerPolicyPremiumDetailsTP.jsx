@@ -267,6 +267,11 @@ sendPaymentLink = () => {
         // this.fetchData()
         this.fetchRelationships()
     }
+    handleSubmit = (values) => {    
+        const { refNumber , policyHolder} = this.state
+        const { productId } = this.props.match.params
+        paymentGateways(values, policyHolder, refNumber, productId)
+    }
     
 
     render() {
