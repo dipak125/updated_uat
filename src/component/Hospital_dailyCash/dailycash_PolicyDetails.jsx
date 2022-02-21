@@ -235,7 +235,7 @@ class dailycash_PolicyDetails extends Component {
   handleSubmit = (values) => {    
     const { refNumber , policyHolderDetails} = this.state
     const { productId } = this.props.match.params
-	console.log('handleSubmit_values', values)
+	console.log('handleSubmit_values', values, policyHolderDetails, refNumber, productId)
     paymentGateways(values, policyHolderDetails, refNumber, productId)
 }
   
@@ -507,7 +507,7 @@ sendPaymentLink = () => {
                     // validationSchema={validatePremium}
                     >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                          console.log("values",values)
                             return (
                                 <Form>
                                   <section className="brand">
@@ -731,8 +731,8 @@ sendPaymentLink = () => {
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
-                                          {smsButton === true ?
-                                            <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                          {values.gateway ?
+                                            <Button className="backBtn" type="submit" >{phrases['MakePayment']}</Button>
                                           : null}
 
                                           {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true ? 
