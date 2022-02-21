@@ -164,6 +164,7 @@ class IPA_Premium extends Component {
         this.setState({
           ipaInfo, policyHolderDetails, bcMaster,menumaster,vehicleDetails,paymentgateway,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
+          refNumber: policyHolderDetails && policyHolderDetails.reference_no,
         });
         this.quote() 
       })
