@@ -840,7 +840,7 @@ class PremiumGCV extends Component {
                                                                         &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
 
-                                                                {smsButton === true && breakin_flag == 0 ?
+                                                                {smsButton === true && breakin_flag == 0 && fulQuoteResp.QuotationNo ?
                                                                     <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                     : null}
 
