@@ -187,21 +187,25 @@ const validateAddress =  Yup.object().shape({
                 // }).required(function() {
                 //     return "Please Select Education"
                 // }),
-                height: Yup.string(function() {
-                    return "Please enter height"
-                }).required(function() {
-                    return "Please enter height"
-                })
-                .matches(/^[0-9]*$/, function() {
-                    return "Please enter Number"
+                height: Yup.string().required("Please enter height")
+                .test("number&flotChecking",function()
+                {return "Valid height"},
+                function(value){
+                    if(value)
+                    {
+                        return !isNaN(value)
+                    }
+                    return true
                 }),
-                weight: Yup.string(function() {
-                    return "Please enter weight"
-                }).required(function() {
-                    return "Please enter weight"
-                })
-                .matches(/^[0-9]*$/, function() {
-                    return "Please enter Number"
+                weight: Yup.string().required("Please enter weight")
+                .test("number&floatChecking",function(){
+                    return "Valid weight"
+                },
+                function(value){
+                    if(value){
+                        return !isNaN(value)
+                    }
+                    return true
                 }),
                 dob: Yup.date().when(['looking_for'],{
                     //is: looking_for => (looking_for == 'self' || looking_for == 'spouse' || looking_for == 'child1') ,
@@ -378,6 +382,7 @@ class dailycash_Address extends Component {
         this.fetchData();
 		this.tpaInsuranceRepository();
         this.fetchEducations();
+        
     }
 
     fetchEducations = () => {
