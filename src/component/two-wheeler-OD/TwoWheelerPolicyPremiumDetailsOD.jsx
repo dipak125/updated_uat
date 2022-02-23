@@ -738,7 +738,7 @@ class TwoWheelerPolicyPremiumDetailsOD extends Component {
                                                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                                             </div> : null }
 
-                                                            {smsButton === true ?
+                                                            {smsButton === true && fulQuoteResp.QuotationNo ?
                                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                             : null}
 

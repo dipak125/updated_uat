@@ -113,7 +113,6 @@ class Premium extends Component {
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
-                console.log("value1 is=======",request_data.start_date,request_data.end_date);
                 let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
@@ -740,7 +739,7 @@ sendPaymentLink = () => {
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                 </div> : null }
 
-                                                                {smsButton === true ?
+                                                                {smsButton === true && fulQuoteResp.QuotationNo ?
                                                                     <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 
