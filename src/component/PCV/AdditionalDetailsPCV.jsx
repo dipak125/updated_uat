@@ -647,14 +647,14 @@ class AdditionalDetailsPCV extends Component {
             post_data['salutation_id'] = '5'
         }
             
-        console.log('post_data', post_data);
+        //console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`pcv/owner-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp-----', decryptResp)
+            //console.log('decryptResp-----', decryptResp)
             this.props.loadingStop();
             if (decryptResp.error == false) {
             this.props.history.push(`/Premium_PCV/${productId}`);
@@ -677,7 +677,7 @@ class AdditionalDetailsPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt---", decryptResp)
+                 //console.log("decrypt---", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -697,7 +697,7 @@ class AdditionalDetailsPCV extends Component {
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
             
-                 console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
+                 //console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
                 //  return false;
                  this.setState({
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
@@ -824,14 +824,14 @@ class AdditionalDetailsPCV extends Component {
             .then(res => {
 					
 					let tpaInsurance = res.data ? res.data : {};
-					console.log("tpaInsuranceRepository===", tpaInsurance);
+					//console.log("tpaInsuranceRepository===", tpaInsurance);
 					
 					//let titleList = decryptResp.data.salutationlist
 					this.setState({
 					  tpaInsurance
 					});
 				});
-			console.log("tpaInsuranceRepository=");	
+			//console.log("tpaInsuranceRepository=");	
 	}
 
     componentDidMount() {

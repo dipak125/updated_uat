@@ -132,9 +132,9 @@ class RegistrationPCV_TP extends Component {
         let encryption = new Encryption();
         axios.get(`pcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
-                console.log("value is=======", res.data)
+              //  console.log("value is=======", res.data)
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt", decryptResp)
+              //  console.log("decrypt", decryptResp)
                 if (decryptResp.data.policyHolder) {
                     var obj = decryptResp.data.policyHolder
                     var i = 0
@@ -165,7 +165,7 @@ class RegistrationPCV_TP extends Component {
         axios.get(`gcv/sub-vehical-list/${menumaster_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt--fetchSubVehicle------ ", decryptResp)
+               // console.log("decrypt--fetchSubVehicle------ ", decryptResp)
 
                 let subVehicleList = decryptResp.data
                 this.setState({
@@ -264,7 +264,7 @@ class RegistrationPCV_TP extends Component {
                 }
             }
 
-            console.log('post_data', post_data)
+           // console.log('post_data', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
 
             this.props.loadingStart();
@@ -272,7 +272,7 @@ class RegistrationPCV_TP extends Component {
                 .post(`pcv-tp/update-registration`, formData)
                 .then(res => {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                    console.log("decrypt", decryptResp)
+                   // console.log("decrypt", decryptResp)
 
                     if (decryptResp.error == false) {
                         this.props.history.push(`/SelectBrand_PCV_TP/${productId}`);
@@ -285,7 +285,7 @@ class RegistrationPCV_TP extends Component {
                 })
                 .catch(err => {
                     let decryptErr = JSON.parse(encryption.decrypt(err.data));
-                    console.log('decryptResp--err---', decryptErr)
+                   // console.log('decryptResp--err---', decryptErr)
                     if (decryptErr && err.data) {
                         swal('Registration number required...');
                     }
@@ -330,14 +330,14 @@ class RegistrationPCV_TP extends Component {
                     'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
                 }
             }
-            console.log('post_data', post_data)
+           // console.log('post_data', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
             axios
                 .post(`pcv-tp/registration`, formData)
                 .then(res => {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                    console.log("decrypt", decryptResp)
+                   // console.log("decrypt", decryptResp)
                     this.props.loadingStop();
 
                     if (decryptResp.error == false) {
@@ -352,7 +352,7 @@ class RegistrationPCV_TP extends Component {
                 .catch(err => {
                     this.props.loadingStop();
                     let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                    console.log("decrypt", decryptResp)
+                   // console.log("decrypt", decryptResp)
                     if (err && err.data) {
                         swal('Please check..something went wrong!!');
                     }
@@ -386,7 +386,7 @@ class RegistrationPCV_TP extends Component {
     render() {
         const { motorInsurance, subVehicleList } = this.state
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
-        console.log("tempreg",motorInsurance)
+       // console.log("tempreg",motorInsurance)
         const newInitialValues = Object.assign(initialValues, {
             reg_number_part_one: typeof(tempRegNo) == 'undefined'?"": tempRegNo && tempRegNo.reg_number_part_one,
             reg_number_part_two: typeof(tempRegNo) == 'undefined'?"": tempRegNo && tempRegNo.reg_number_part_two,
@@ -425,8 +425,8 @@ class RegistrationPCV_TP extends Component {
                                                 validationSchema={vehicleRegistrationValidation}
                                             >
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                                     console.log('values',values)
-                                                     console.log("errors",errors)
+                                                    //  console.log('values',values)
+                                                    //  console.log("errors",errors)
 
                                                     return (
                                                         <Form>

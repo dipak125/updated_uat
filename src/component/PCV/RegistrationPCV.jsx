@@ -132,7 +132,7 @@ fetchData=()=>{
     let encryption = new Encryption();
     axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
         .then(res=>{
-           console.log("checking====",res.data)
+           //console.log("checking====",res.data)
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             
             if(decryptResp.data.policyHolder){
@@ -165,7 +165,7 @@ fetchSubVehicle=()=>{
     axios.get(`gcv/sub-vehical-list/${menumaster_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt--fetchSubVehicle------ ", decryptResp)
+            //console.log("decrypt--fetchSubVehicle------ ", decryptResp)
 
             let subVehicleList = decryptResp.data        
             this.setState({ 
@@ -264,7 +264,7 @@ handleSubmit=(values)=>{
             } 
         }
 
-        console.log('post_data', post_data)
+        //.log('post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
     
         this.props.loadingStart();
@@ -272,7 +272,7 @@ handleSubmit=(values)=>{
         .post(`pcv/update-registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-           console.log("errror ======="/decryptResp.error)
+          // console.log("errror ======="/decryptResp.error)
 
             if(decryptResp.error == false) {
                 this.props.history.push(`/SelectBrand_PCV/${productId}`);
@@ -285,7 +285,7 @@ handleSubmit=(values)=>{
         })
         .catch(err => {
             let decryptErr = JSON.parse(encryption.decrypt(err.data));
-            console.log('decryptResp--err---', decryptErr)
+            //console.log('decryptResp--err---', decryptErr)
             if(decryptErr && err.data){
                 swal('Registration number required...');
             }
@@ -330,14 +330,14 @@ handleSubmit=(values)=>{
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }
-        console.log('post_data', post_data)
+        //console.log('post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`pcv/registration`, formData)
         .then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+           // console.log("decrypt", decryptResp)
             this.props.loadingStop();  
 
             if(decryptResp.error == false) {
@@ -424,7 +424,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         validationSchema={vehicleRegistrationValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                                             console.log('values========',values)
+                                            // console.log('values========',values)
                                             
                                         return (
                                         <Form>                                           

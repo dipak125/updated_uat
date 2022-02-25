@@ -475,7 +475,7 @@ class OtherComprehensivePCV_TP extends Component {
         axios.get(`pcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt--fetchData-- ", decryptResp)
+               // console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previouspolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
@@ -497,7 +497,7 @@ class OtherComprehensivePCV_TP extends Component {
                 else {
                     vehicle_age = moment(previous_end_date).add(1, 'day').diff(registration_date, 'days', true)
                 }
-                console.log("vehicle_age---------- ", vehicle_age)
+               // console.log("vehicle_age---------- ", vehicle_age)
 
                 trailer_array = trailer_array != null ? JSON.parse(trailer_array) : []
                 let values = []
@@ -763,7 +763,7 @@ class OtherComprehensivePCV_TP extends Component {
             'fuel_type': values.fuel_type ? values.fuel_type : (vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype ? vehicleDetails.varientmodel.fueltype.id : ""),
             'idv_value': sliderVal ? sliderVal : 0,          
         }
-        console.log('fullQuote_post_data', post_data)
+       // console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
@@ -822,7 +822,7 @@ class OtherComprehensivePCV_TP extends Component {
                         let str = /blacklisted/gi
                         if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
                         {
-                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            msg = 'This Proposal can not be processed on-line, please contact relationship manager'
                             swal(msg);
                         }
                         else {
@@ -944,7 +944,7 @@ class OtherComprehensivePCV_TP extends Component {
             total_idv = parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         }
 
-        console.log('post_data', post_data)
+       // console.log('post_data', post_data)
 
         if (user_data) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
@@ -965,7 +965,7 @@ class OtherComprehensivePCV_TP extends Component {
                     axios.post('pcv-tp/update-insured-value', formData).then(res => {
                         this.props.loadingStop();
                         let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                        console.log("decrypt--fetchData-- ", decryptResp)
+                       // console.log("decrypt--fetchData-- ", decryptResp)
                         if (decryptResp.error == false) {
                             this.props.history.push(`/AdditionalDetails_PCV_TP/${productId}`);
                         }
@@ -977,7 +977,7 @@ class OtherComprehensivePCV_TP extends Component {
                     .catch(err => {
                         // handle error
                         let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                        console.log("decryptErr--fetchData-- ", decryptResp)
+                       // console.log("decryptErr--fetchData-- ", decryptResp)
                         this.props.loadingStop();
                     })
                 }
@@ -1262,7 +1262,7 @@ class OtherComprehensivePCV_TP extends Component {
         const { showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
         const { productId } = this.props.match.params
-        console.log("coverage",moreCoverage)
+       // console.log("coverage",moreCoverage)
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user) {
             user_data = JSON.parse(encryption.decrypt(user_data.user));

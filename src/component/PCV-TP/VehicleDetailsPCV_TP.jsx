@@ -329,7 +329,7 @@ class VehicleDetailsPCV_TP extends Component {
         element.classList.add('active');
     }
     onChange = (e, setFieldValue) => {
-        console.log("onchange",e.target.value)
+        //console.log("onchange",e.target.value)
         setFieldValue('location_id', "")
       };
 
@@ -372,7 +372,7 @@ class VehicleDetailsPCV_TP extends Component {
       // ----------------AddressId------------
     onSuggestionsClearRequested = (setFieldValue,values) => {
        
-       console.log("clear")
+      // console.log("clear")
     this.setState({
         suggestions: []   
     });
@@ -427,7 +427,7 @@ class VehicleDetailsPCV_TP extends Component {
 
    getCustomerIDSuggestionValue = (suggestion,setFieldValue) => {
     //setFieldValue("location_id", suggestion.id)
-    console.log("check",suggestion.id)
+   // console.log("check",suggestion.id)
     this.setState({
       selectedCustomerRecords: suggestion, changeFlag: 0, 
     });
@@ -534,14 +534,14 @@ class VehicleDetailsPCV_TP extends Component {
         else {
             localStorage.removeItem('registration_number');
         }
-        console.log("post_data", post_data)
+       // console.log("post_data", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`pcv-tp/insert-vehicle-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+           // console.log("decrypt", decryptResp)
 
             this.props.loadingStop();
             if(decryptResp.error == false){
@@ -555,7 +555,7 @@ class VehicleDetailsPCV_TP extends Component {
         .catch(err => {
           this.props.loadingStop();
           let decryptResp = JSON.parse(encryption.decrypt(err.data))
-            console.log("decrypt", decryptResp)
+           // console.log("decrypt", decryptResp)
           actions.setSubmitting(false)
         });
     }
@@ -602,7 +602,7 @@ class VehicleDetailsPCV_TP extends Component {
         axios.post(`pcv-tp/proposed-use`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt--fetchProposedUse------ ", decryptResp)
+               // console.log("decrypt--fetchProposedUse------ ", decryptResp)
     
                 let proposedUse = decryptResp.data        
                 this.setState({ 
@@ -627,7 +627,7 @@ class VehicleDetailsPCV_TP extends Component {
                 let averagemonthlyusages =  decryptResp.data ? decryptResp.data.averagemonthlyusages : []
                 let permittypes =  decryptResp.data ? decryptResp.data.permittypes : []
 
-                console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages)
+               // console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages)
 
                 this.setState({ 
                     averagemonthlyusages, permittypes
@@ -649,12 +649,12 @@ class VehicleDetailsPCV_TP extends Component {
         axios.get(`pcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
+                // console.log("decrypt", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
                  let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 console.log("vehicleDetails",vehicleDetails.varientmodel.horse_power)
+               //  console.log("vehicleDetails",vehicleDetails.varientmodel.horse_power)
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
@@ -765,8 +765,8 @@ class VehicleDetailsPCV_TP extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors-------------- ", errors)
-console.log("values==",values)
+//console.log("errors-------------- ", errors)
+//console.log("values==",values)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -833,7 +833,7 @@ console.log("values==",values)
                                                                 inputProps={inputCustomerID} 
                                                                 onChange={e=>this.onChange(e,setFieldValue)}
                                                                 onSuggestionSelected={(e, {suggestion,suggestionValue}) => {
-                                                                    console.log("change",e,suggestion)
+                                                                    //console.log("change",e,suggestion)
                                                                     this.SuggestionSelected(setFieldTouched,setFieldValue,suggestion)
                                                                     }}
                                                                 />

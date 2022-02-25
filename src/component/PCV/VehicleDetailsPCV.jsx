@@ -619,14 +619,14 @@ class VehicleDetailsPCV extends Component {
         else {
             localStorage.removeItem('registration_number');
         }
-        console.log("post_data", post_data)
+        //console.log("post_data", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`pcv/insert-vehicle-details`, formData)
         .then(res => { 
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+            //console.log("decrypt", decryptResp)
 
             this.props.loadingStop();
             if(decryptResp.error == false){
@@ -640,7 +640,7 @@ class VehicleDetailsPCV extends Component {
         .catch(err => {
           this.props.loadingStop();
           let decryptResp = JSON.parse(encryption.decrypt(err.data))
-            console.log("decrypt", decryptResp)
+           // console.log("decrypt", decryptResp)
           actions.setSubmitting(false)
         });
     }
@@ -687,7 +687,7 @@ class VehicleDetailsPCV extends Component {
         axios.post(`pcv/proposed-use`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt--fetchProposedUse------ ", decryptResp)
+               //console.log("decrypt--fetchProposedUse------ ", decryptResp)
     
                 let proposedUse = decryptResp.data        
                 this.setState({ 
@@ -712,7 +712,7 @@ class VehicleDetailsPCV extends Component {
                 let averagemonthlyusages =  decryptResp.data ? decryptResp.data.averagemonthlyusages : []
                 let permittypes =  decryptResp.data ? decryptResp.data.permittypes : []
 
-                console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages[0].averagemonthlyusage_id)
+               // console.log("decrypt--fetchSubVehicle------ ", averagemonthlyusages[0].averagemonthlyusage_id)
 
                 this.setState({ 
                     averagemonthlyusages, permittypes
@@ -734,13 +734,13 @@ class VehicleDetailsPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt", decryptResp)
-                 console.log("lapseduration===", decryptResp.data.policyHolder.motorinsurance)
+                // console.log("decrypt", decryptResp)
+                // console.log("lapseduration===", decryptResp.data.policyHolder.motorinsurance)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
                  let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                 console.log("vehicleDetails",vehicleDetails)
+                // console.log("vehicleDetails",vehicleDetails)
                  let no_of_claim = previousPolicy && previousPolicy.previouspoliciesclaims ? previousPolicy.previouspoliciesclaims.length : ""
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
@@ -970,9 +970,9 @@ class VehicleDetailsPCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-console.log("errors-------------- ", errors)
-console.log("values======",values)
-console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
+// console.log("errors-------------- ", errors)
+// console.log("values======",values)
+// console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>

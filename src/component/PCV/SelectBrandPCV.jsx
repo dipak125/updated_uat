@@ -123,7 +123,7 @@ class SelectBrandPCV extends Component {
             axios.get(`pcv/vehicle/brand-with-image/${menumaster_id}/${policyHolder_id}`)
                 .then(res => {
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                    console.log('decryptResp', decryptResp)
+                   // console.log('decryptResp', decryptResp)
 
                     let brandList = res && decryptResp.data.list ? decryptResp.data.list : []
                     this.setState({
@@ -140,7 +140,7 @@ class SelectBrandPCV extends Component {
                 })
                 .catch(err => {
                     let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                    console.log('decryptErr-- ', decryptResp)
+                   // console.log('decryptErr-- ', decryptResp)
                     // handle error
                     // console.log(error);
                     this.props.loadingStop();
@@ -155,7 +155,7 @@ class SelectBrandPCV extends Component {
         let encryption = new Encryption();
         axios.get(`pcv/vehicle/brand-without-image/${policyHolder_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp', decryptResp)
+            //console.log('decryptResp', decryptResp)
 
             let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
             let brandModelList = decryptResp && decryptResp.data ? decryptResp.data.list : [];
@@ -179,7 +179,7 @@ class SelectBrandPCV extends Component {
         })
             .catch(err => {
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                    console.log('decryptErr-- ', decryptResp)
+                    //console.log('decryptErr-- ', decryptResp)
                 // handle error
                // console.log(error);
                 this.props.loadingStop();
@@ -195,10 +195,10 @@ class SelectBrandPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decrypt",decryptResp.data.policyHolder)
+               // console.log("decrypt",decryptResp.data.policyHolder)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                console.log("vehicle",vehicleDetails)
+               // console.log("vehicle",vehicleDetails)
                 this.setState({
                     motorInsurance, vehicleDetails
                 })
@@ -206,7 +206,7 @@ class SelectBrandPCV extends Component {
             })
             .catch(err => {
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                console.log('decryptErr-- ', decryptResp)
+                //console.log('decryptErr-- ', decryptResp)
                 // handle error
                 this.props.loadingStop();
             })
@@ -247,7 +247,7 @@ class SelectBrandPCV extends Component {
         this.props.loadingStart();
         axios.get(`pcv/vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('varient', decryptResp)
+            //console.log('varient', decryptResp)
 
             let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
             let brandModelList = decryptResp && decryptResp.data.brand_models ? decryptResp.data.brand_models : [];
@@ -275,7 +275,7 @@ class SelectBrandPCV extends Component {
     }
 
     setVarient = (varient, model_Id, modelName, fuelType, body_style, carrying, varient_details) => {     
-        console.log("varient1 --------- ", varient_details.horse_power)   
+        //console.log("varient1 --------- ", varient_details.horse_power)   
         this.setState({
             selectedVarientId: varient,
             selectedModelId: model_Id,
@@ -331,12 +331,12 @@ class SelectBrandPCV extends Component {
             'page_name': `SelectBrand_PCV/${productId}`
         }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-        console.log("Post Date---------- ", post_data) 
+       // console.log("Post Date---------- ", post_data) 
         this.props.loadingStart();
         axios.post('pcv/insert-brand-model-varient', formData).then(res => {
             this.props.loadingStop();
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decrypt", decryptResp)
+           // console.log("decrypt", decryptResp)
 
             if (decryptResp.error == false) {
                 if(this.state.otherBrands) {
@@ -354,7 +354,7 @@ class SelectBrandPCV extends Component {
             .catch(err => {
                 // handle error
                 let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                console.log("decrypt", decryptResp)
+               //console.log("decrypt", decryptResp)
                 if (err.status == '422') {
                     swal("Please select vehicle model")
                 }
@@ -379,7 +379,7 @@ class SelectBrandPCV extends Component {
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         // console.log("vehicleDetails", newInitialValues)
-        console.log("motor==",this.state.motorInsurance)
+        //console.log("motor==",this.state.motorInsurance)
 
         return (
             <>

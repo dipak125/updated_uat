@@ -582,7 +582,7 @@ class AdditionalDetailsPCV_TP extends Component {
 
 
     handleSubmit = (values, actions) => {
-        console.log("hello")
+       // console.log("hello")
         const {productId} = this.props.match.params 
         const {motorInsurance, request_data} = this.state
         const formData = new FormData(); 
@@ -644,14 +644,14 @@ class AdditionalDetailsPCV_TP extends Component {
             post_data['salutation_id'] = '5'
         }
             
-        console.log('post_data', post_data);
+       // console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
         .post(`pcv-tp/owner-details`, formData)
-        .then(res => { console.log("value is====",res.data)
+        .then(res => { //console.log("value is====",res.data)
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            console.log('decryptResp-----', decryptResp)
+           // console.log('decryptResp-----', decryptResp)
             this.props.loadingStop();
             if (decryptResp.error == false) {
             this.props.history.push(`/Premium_PCV_TP/${productId}`);
@@ -661,7 +661,7 @@ class AdditionalDetailsPCV_TP extends Component {
           this.props.loadingStop();
           actions.setSubmitting(false)
           let decryptErr = JSON.parse(encryption.decrypt(err.data));
-            console.log('decryptErr-----', decryptErr)
+           // console.log('decryptErr-----', decryptErr)
         });
 
     }
@@ -674,7 +674,7 @@ class AdditionalDetailsPCV_TP extends Component {
         axios.get(`pcv-tp/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 console.log("decrypt---", decryptResp)
+                // console.log("decrypt---", decryptResp)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -694,7 +694,7 @@ class AdditionalDetailsPCV_TP extends Component {
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
             
-                 console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
+                // console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
                 //  return false;
                  this.setState({
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
@@ -821,7 +821,7 @@ class AdditionalDetailsPCV_TP extends Component {
         .then(res => {
                 
                 let tpaInsurance = res.data ? res.data : {};
-                console.log("tpaInsuranceRepository===", tpaInsurance);
+               // console.log("tpaInsuranceRepository===", tpaInsurance);
                 
                 //let titleList = decryptResp.data.salutationlist
                 this.setState({
@@ -910,8 +910,8 @@ class AdditionalDetailsPCV_TP extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            console.log("values=",values)
-                            console.log("error",errors)
+                            // console.log("values=",values)
+                            // console.log("error",errors)
                         return (
                         <Form>
                         <Row>

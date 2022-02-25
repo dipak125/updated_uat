@@ -186,7 +186,7 @@ const ComprehensiveValidation = Yup.object().shape({
             if(value)
             {
                 let str = /^[0-9]*$/
-                console.log("checkb",value.match(str))
+               // console.log("checkb",value.match(str))
                 if(value.match(str))
                 {
                     return true;
@@ -227,7 +227,7 @@ const ComprehensiveValidation = Yup.object().shape({
             if(value)
             {
                 let str = /^[0-9]*$/
-                console.log("checkb",value.match(str))
+                //console.log("checkb",value.match(str))
                 if(value.match(str))
                 {
                     return true;
@@ -543,7 +543,7 @@ class OtherComprehensivePCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                console.log("decrypt--fetchData-- ", decryptResp)
+               // console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previouspolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
@@ -858,7 +858,7 @@ class OtherComprehensivePCV extends Component {
             // 'userIdvStatus': userIdvStatus ? userIdvStatus : 0,
             // 'bodyIdvStatus': bodyIdvStatus ? bodyIdvStatus : 0
         }
-        console.log('fullQuote_post_data', post_data)
+        //console.log('fullQuote_post_data', post_data)
         total_idv = parseInt(other_idv) + parseInt(post_data.idv_value) + parseInt(post_data.body_idv_value)
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data) {
@@ -917,7 +917,7 @@ class OtherComprehensivePCV extends Component {
                         let str = /blacklisted/gi
                         if(rgxp.match(str) && res.data.messages[x].code == 'SBIG-PA-Validation-B1064') // Decline vehicle
                         {
-                            msg = 'It is blacklisted vehicle. Please contact Relationship manager'
+                            msg = 'This Proposal can not be processed on-line, please contact relationship manager'
                             swal(msg);
                         }
                         else {
@@ -956,7 +956,7 @@ class OtherComprehensivePCV extends Component {
 
 
     handleSubmit = (values) => {
-        console.log("error is coming")
+        //console.log("error is coming")
         const { productId } = this.props.match.params
         const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
@@ -1033,7 +1033,7 @@ class OtherComprehensivePCV extends Component {
             }
         }
 
-        console.log('post_data', post_data)
+       // console.log('post_data', post_data)
 
         if (user_data && total_idv) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
@@ -1054,7 +1054,7 @@ class OtherComprehensivePCV extends Component {
                     axios.post('pcv/update-insured-value', formData).then(res => {
                         this.props.loadingStop();
                         let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                        console.log("decrypt--fetchData-- ", decryptResp)
+                       // console.log("decrypt--fetchData-- ", decryptResp)
                         if (decryptResp.error == false) {
                             this.props.history.push(`/AdditionalDetails_PCV/${productId}`);
                         }
@@ -1066,7 +1066,7 @@ class OtherComprehensivePCV extends Component {
                     .catch(err => {
                         // handle error
                         let decryptResp = JSON.parse(encryption.decrypt(err.data))
-                        console.log("decryptErr--fetchData-- ", decryptResp)
+                        //console.log("decryptErr--fetchData-- ", decryptResp)
                         this.props.loadingStop();
                     })
                 }
@@ -1650,7 +1650,7 @@ class OtherComprehensivePCV extends Component {
                                             validationSchema={ComprehensiveValidation}>
                                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                                 // console.log("value----------------- ", values)
-                                                console.log("server ===",serverResponse)
+                                                //console.log("server ===",serverResponse)
                                                 return (
                                                     <Form>
                                                         <Row>
