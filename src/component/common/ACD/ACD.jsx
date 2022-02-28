@@ -282,7 +282,7 @@ const ACD =(props)=>{
                                     <SideNav />
                                 </div>
                             </aside>
-                        <div className="col-sm-12 col-md-12 col-lg-10 col-xl-10 infobox">
+                        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox breakin">
                         <h4 className="text-center mt-3 mb-3">SBI General Insurance Company Limited</h4>
                             <div className="contBox m-b-45 tickedTable">
                             <h4 className="text-center mt-3 mb-3">ACD Account report</h4>
@@ -452,7 +452,7 @@ const ACD =(props)=>{
                                 }}
                                 </Formik> 
                                 {state.policyHolder ?
-                                        <div className="customInnerTable quotesearch">
+                                        <div className="customInnerTable dataTableCustom">
                                             <BootstrapTable ref={table}
                                                 data={state.policyHolder}
                                                 pagination={true}

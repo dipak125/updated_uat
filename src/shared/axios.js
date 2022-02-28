@@ -15,7 +15,7 @@ instance.interceptors.request.use(config => {
     const lang_name = localStorage.getItem('lang_name');
     if( auth_token ) config.headers['Authorization'] = auth_token;
     config.headers['Content-Security-Policy'] = "default-src 'self'"
-    config.headers['X-Frame-Options'] = "SAMEORIGIN"
+    config.headers['X-FRAME-OPTIONS'] = "deny"
     
     if( lang_name && auth_token ) {
         config.headers['X-localization'] = lang_name;
