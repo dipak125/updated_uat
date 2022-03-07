@@ -259,6 +259,8 @@ class NewTicket extends Component {
 
     render() {
         const { selectedFile, selectedFileName } = this.state
+        let user=JSON.parse(sessionStorage.getItem("user_data"))
+        console.log("hello")
 
         return (
             <>
@@ -347,8 +349,15 @@ class NewTicket extends Component {
                                                         <option value="PDF related issues">PDF related issues</option>
                                                         <option value="Portal slowness/speed related issues">Portal slowness/speed related issues</option>
                                                         <option value="Agent ID unauthorized / Invalid Request">Agent ID unauthorized / Invalid Request</option>
-                                                        <option value="Vehicle Make/Model not available in Portal">Vehicle Make/Model not available in Portal</option>
-                                                        <option value="Break-in inspection related issues">Break-in inspection related issues</option>
+                                                        {
+                                                            user.user_type != "Micro"?
+                                                            <>
+                                                            <option value="Vehicle Make/Model not available in Portal">Vehicle Make/Model not available in Portal</option> 
+                                                            <option value="Break-in inspection related issues">Break-in inspection related issues</option> 
+                                                            </>
+                                                            :null
+                                                        }
+                                                         
                                                         <option value="Payment related issues">Payment related issues</option>
                                                         <option value="VAAHAN related issues">VAAHAN related issues</option>
                                                         <option value="Any other issues">Any other issues</option>

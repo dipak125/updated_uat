@@ -129,6 +129,38 @@ class ThankYouPage extends Component {
         window.URL.revokeObjectURL(url);
       }
 
+      getPolicyDowonload =() =>{
+        console.log("third type")
+        const policyNo = this.state.policyNo;
+        const formData = new FormData();
+        formData.append("policyNo",policyNo);
+        this.props.loadingStart();
+        axios.post(`download/policy-pdf`,formData).then(res=>{
+         if(res.data.error == false)
+         {
+            this.downloadThirdType(res.data.data.uploded_path,res.data.data.file_name)
+            this.props.loadingStop()
+         }
+         else{
+           swal(res.data.error)
+         }
+        }).catch(err=>{
+          swal(err)
+          this.props.loadingStop();
+        })
+      
+      }
+      downloadThirdType =(url,name)=>{
+ 
+        const pom = document.createElement('a');
+      
+        pom.style.display = 'none';
+        pom.href = url;
+        document.body.appendChild(pom);
+        pom.click(); 
+        window.URL.revokeObjectURL(url);
+      }
+
     componentDidMount() {
         // this.getAccessToken();       
         const {policyId} = this.props.match.params
@@ -165,7 +197,11 @@ class ThankYouPage extends Component {
                          <p className="fs-16 m-b-30">Policy No <span className="lghtBlue"> {policyId}</span></p>
                          <div className="d-flex justify-content-center align-items-center">
                              {/* <button className="proposal" onClick={this.downloadDoc}>Eproposal Form</button> */}
+                             {vehicletype.download_type == 0 ?
                              <button className="policy m-l-20" onClick={this.getAccessToken}>Policy Copy</button>
+                             :
+                             <button className="policy m-l-20" onClick={this.getPolicyDowonload}>{phrases['PolicyCopy']} </button>
+                             }
                          </div>
                          </div>
                      </div>

@@ -11,7 +11,24 @@ const initialValues = {};
 class Table extends Component {
 
     state = {
-        doc_list: [
+        doc_list1: [
+            // {
+            //   "id": "1",
+            //     "product": "GarageNetwork",
+            //     "image" : "Miscellaneous-car.svg"
+            //   } ,
+              {
+                "id": "2",
+                "product": "HospitalNetwork",
+                "image" : "Miscellaneous-car.svg"
+              } ,
+              {
+                "id": "3",
+                "product": "ChangePolicyDetails",
+                "image" : "Miscellaneous-car.svg"
+              }          
+          ],
+          doc_list2: [
             {
               "id": "1",
                 "product": "GarageNetwork",
@@ -76,25 +93,41 @@ class Table extends Component {
 
 
     render() {
-        const { doc_list } = this.state;
+        const { doc_list1,doc_list2 } = this.state;
+        let user_data=JSON.parse(sessionStorage.getItem("user_data"));
+        
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         return (
             <Row>
                 <Col sm={12}>
                     <div className="tablecontent">
-                    {doc_list.length > 0 ?
+                    {doc_list1.length > 0 ?
+                        user_data.user_type == 'Micro' ?
                         <table>
-                            <tbody>                                
-                                {doc_list.map((doc, docIndex) => ( 
-                                    <tr key={docIndex}>
-                                        {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
-                                        <td className="W-70">{phrases[doc.product]}</td>
-                                        <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['Go']}</button></td>
-                                    </tr>
-                                ))
-                                }
-                            </tbody>
-                        </table>
+                        <tbody>                                
+                            {doc_list1.map((doc, docIndex) => ( 
+                                <tr key={docIndex}>
+                                    {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
+                                    <td className="W-70">{phrases[doc.product]}</td>
+                                    <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['Go']}</button></td>
+                                </tr>
+                            ))
+                            }
+                        </tbody>
+                    </table>
+                        :
+                        <table>
+                        <tbody>                                
+                            {doc_list2.map((doc, docIndex) => ( 
+                                <tr key={docIndex}>
+                                    {/* <td className="W-10"><img src={require(`../../assets/images/${doc.image}`)} alt="" /></td> */}
+                                    <td className="W-70">{phrases[doc.product]}</td>
+                                    <td className="W-10 text-right"> <button className="buy" onClick= {this.dload_doc.bind(this, doc.id )} >{phrases['Go']}</button></td>
+                                </tr>
+                            ))
+                            }
+                        </tbody>
+                    </table>
                         : null}
                     </div>
                     </Col>

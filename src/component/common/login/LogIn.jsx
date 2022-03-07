@@ -309,7 +309,7 @@ class LogIn extends Component {
   
         return (
             <BaseComponent>
-             <iframe src="https://uatcld.sbigeneral.in/sbig-bc/uat/csc_POSP.php#/login" height={this.props.height} width={this.props.width}/>   
+             
                 <div className="d-flex justify-content-center brand lginpg">
                     <div className="login-box-body">
                     {queryString.parse(this.props.location.search).csc_id || queryString.parse(this.props.location.search).authentication_token ? null :

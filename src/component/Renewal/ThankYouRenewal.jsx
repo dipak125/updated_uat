@@ -412,6 +412,37 @@ downloadWordingGSB = () => {
       e.preventDefault()
     };
 }
+getPolicyDowonload =() =>{
+  console.log("third type")
+  const policyNo = this.state.policyNo;
+  const formData = new FormData();
+  formData.append("policyNo",policyNo);
+  this.props.loadingStart();
+  axios.post(`download/policy-pdf`,formData).then(res=>{
+   if(res.data.error == false)
+   {
+      this.downloadThirdType(res.data.data.uploded_path,res.data.data.file_name)
+      this.props.loadingStop()
+   }
+   else{
+     swal(res.data.error)
+   }
+  }).catch(err=>{
+    swal(err)
+    this.props.loadingStop();
+  })
+
+}
+downloadThirdType =(url,name)=>{
+ 
+  const pom = document.createElement('a');
+
+  pom.style.display = 'none';
+  pom.href = url;
+  document.body.appendChild(pom);
+  pom.click(); 
+  window.URL.revokeObjectURL(url);
+}
 
   render() {
     const { vehicletype, policyNo, retry } = this.state
@@ -447,7 +478,10 @@ downloadWordingGSB = () => {
                         </div> : null }
                        
                         {this.state.policyNo ? 
-                        <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
+                          vehicletype.download_type == 0 ?
+                            <button className="policy m-l-20" onClick={this.generateDoc}>{phrases['PolicyCopy']} </button>
+                            :
+                            <button className="policy m-l-20" onClick={this.getPolicyDowonload}>{phrases['PolicyCopy']} </button>
                         : null }
 
                         </div>

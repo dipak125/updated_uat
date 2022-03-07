@@ -469,6 +469,7 @@ const ACD =(props)=>{
                                                 <TableHeaderColumn width='100px' dataField="credit" dataAlign="center"  >Amount Added</TableHeaderColumn>
                                                 <TableHeaderColumn width='100px' dataField="title" dataAlign="center" dataFormat={ Total} >Total</TableHeaderColumn>
                                                 <TableHeaderColumn width='100px' dataField="debit" dataAlign="center"  >Policy Amount</TableHeaderColumn>
+                                                <TableHeaderColumn width='100px' dataField="batch_no" dataAlign="center"  >Batch No</TableHeaderColumn>
                                                 <TableHeaderColumn width='100px' dataField="title" dataAlign="center" dataFormat={ AvilableForamter} >Avilable Balance</TableHeaderColumn>
                                                 
 

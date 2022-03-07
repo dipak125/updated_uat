@@ -151,19 +151,37 @@ class Dashboard extends Component {
 }
 
   fetchChartData = (rawData) => {
+    let total_premium_count =0;
+    let total_policy_count =0;
     let motor_policy_count = 0;
     let health_policy_count = 0;
     let motor_premium_count = 0;
     let health_premium_count = 0;
+    let pa_policy_count = 0;
+    let pa_premium_count = 0;
     let maxMotor = rawData ? rawData.motor.length : null;
     let maxHealth = rawData ? rawData.health.length : null;
-
+    let maxPa =  rawData ? rawData.pa.length :null;
+    let user=JSON.parse(sessionStorage.getItem('user_data'));
+    
+   if(user.user_type != 'Micro')
+   {
     for (var i = 0; i < maxMotor; i++) {
       motor_policy_count =
         parseInt(rawData.motor[i].totalPolicyCount) + motor_policy_count;
       motor_premium_count =
         parseInt(rawData.motor[i].totalPremium) + motor_premium_count;
     }
+   }
+   else{
+    for (var i = 0; i < maxPa; i++) {
+      pa_policy_count =
+        parseInt(rawData.pa[i].totalPolicyCount) + pa_policy_count;
+        pa_premium_count =
+        parseInt(rawData.pa[i].totalPremium) + pa_premium_count;
+    }
+   }
+  
 
     for (var i = 0; i < maxHealth; i++) {
       health_policy_count =
@@ -171,24 +189,40 @@ class Dashboard extends Component {
       health_premium_count =
         parseInt(rawData.health[i].totalPremium) + health_premium_count;
     }
-
-    let total_policy_count =
+    
+    if(user.user_type != 'Micro')
+    {
+     total_policy_count =
       parseInt(motor_policy_count) + parseInt(health_policy_count);
 
-    let total_premium_count =
+     total_premium_count =
       parseInt(motor_premium_count) + parseInt(health_premium_count);
+     
+    }
+    else{
+       total_policy_count =
+      parseInt(pa_policy_count) + parseInt(health_policy_count);
+
+      total_premium_count =
+      parseInt(pa_premium_count) + parseInt(health_premium_count);
+    }
     
     let chartData = {};
     const { flag } = this.state;
-    console.log("flag-----",flag)
+    console.log("flag1-----",flag)
+    let labels= user.user_type != "Micro" ? ["Motor", "Health", "Total"]:[ "PA","Health", "Total"]
+    console.log("label",labels)
+    let motorOrpa=user.user_type != 'Micro' ? motor_premium_count: pa_premium_count;
     if (flag == 1) {
+      console.log("yes")
       chartData = {
-        labels: ["Motor", "Health", "Total"],
+        
+        labels: labels,
         datasets: [
           {
             label: `GWP: ${total_premium_count}`,
             data: [
-              motor_premium_count,
+              motorOrpa ,
               health_premium_count,
               total_premium_count,
             ],
@@ -198,12 +232,17 @@ class Dashboard extends Component {
         ],
       };
     } else {
+      console.log("no")
       chartData = {
-        labels: ["Motor", "Health", "Total"],
+        labels: labels,
         datasets: [
           {
             label: `NOP: ${total_policy_count}`,
-            data: [motor_policy_count, health_policy_count, total_policy_count],
+            data: 
+            [
+              motorOrpa,
+              health_policy_count, 
+              total_policy_count],
             backgroundColor: "#833471",
             fill: false,
           },
@@ -309,12 +348,27 @@ class Dashboard extends Component {
         : [];
     let motorList =
       rawData && rawData.motor && rawData.motor.length > 0 ? rawData.motor : [];
+    
+    let paList =rawData && rawData.pa && rawData.pa.length > 0 ? rawData.pa : [];
+    console.log("raw",paList)
+
+    const pa_List= paList && paList.length > 0 ?
+                 paList.map((listing,index)=>(
+                  <tr>
+                  <td>{listing.name}</td>
+                  <td>{listing.totalPolicyCount}</td>
+                  <td>₹{listing.totalPremium}</td>
+                </tr>
+                 ))
+                 :null;
+
+                  
 
     const health_List =
       healthList && healthList.length > 0
         ? healthList.map((listing, qIndex) => (
             // listing && listing.map((benefit, bIndex) => (
-            <tr>
+              <tr>
               <td>{listing.name}</td>
               <td>{listing.totalPolicyCount}</td>
               <td>₹{listing.totalPremium}</td>
@@ -566,7 +620,7 @@ class Dashboard extends Component {
                                         <Card.Text className="canvas-container">                              
                                           <Bar
                                             data={this.state.chartData}
-                                            options={option}
+                                             options={option}
                                           />
                                         </Card.Text>           
                                       </Card.Body>
@@ -598,6 +652,7 @@ class Dashboard extends Component {
                                           <tbody>
                                           {health_List}
                                           {motor_List}
+                                          {pa_List}
                                           </tbody>
                                          </table>
                                         </Card.Text>
