@@ -56,8 +56,8 @@ const mapStateToProps = state => {
      
     return row.prev_balance + row.credit - row.debit;
   }
-  const  convertUTCToTimezone = (utcDate, timezone = '+05:30', dateFormat = 'DD-MM-YYYY hh:mm') => {
-    return moment(utcDate).utcOffset(timezone).format(dateFormat);
+  const  dateFormat = (value) => {
+    return moment(value).format("DD-MM-YYYY HH:mm:ss");
 }
 
 const ACD =(props)=>{
@@ -464,7 +464,7 @@ const ACD =(props)=>{
                                                 wrapperClasses="table-responsive"
                                             >
 
-                                                <TableHeaderColumn width='195px' dataField="created_at" dataAlign="center" dataFormat={convertUTCToTimezone} isKey >Date</TableHeaderColumn>
+                                                <TableHeaderColumn width='195px' dataField="created_at" dataAlign="center" dataFormat={dateFormat} isKey >Date</TableHeaderColumn>
                                                 <TableHeaderColumn width='100px' dataField="prev_balance" dataAlign="center" >Balance</TableHeaderColumn>
                                                 <TableHeaderColumn width='100px' dataField="credit" dataAlign="center"  >Amount Added</TableHeaderColumn>
                                                 <TableHeaderColumn width='100px' dataField="title" dataAlign="center" dataFormat={ Total} >Total</TableHeaderColumn>
