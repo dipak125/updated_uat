@@ -239,7 +239,7 @@ class PremiumGCV extends Component {
             console.log("post_data--fullQuotePMGCV- ", post_data)
             axios.post('fullQuotePMGCV', formData)
                 .then(res => {
-                    if (res.data.PolicyObject) {
+                    if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
                         this.setState({
                             fulQuoteResp: res.data.PolicyObject,
                             PolicyArray: res.data.PolicyObject.PolicyLobList,
@@ -834,7 +834,7 @@ class PremiumGCV extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 ?
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 && fulQuoteResp.QuotationNo ?
                                                                     <div>
                                                                         <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                         &nbsp;&nbsp;&nbsp;&nbsp;

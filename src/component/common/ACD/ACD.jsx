@@ -34,7 +34,9 @@ const initialValues = {
     start_date: Yup.date().required("Please Select date or Month"),
     account_list:Yup.string().required("please choose account")
   });
-  
+  const  dateFormat = (value) => {
+    return moment(value).format("DD-MM-YYYY HH:mm:ss");
+}
 
 const mapStateToProps = state => {
     return {
@@ -56,8 +58,8 @@ const mapStateToProps = state => {
      
     return row.prev_balance + row.credit - row.debit;
   }
-  const  dateFormat = (value) => {
-    return moment(value).format("DD-MM-YYYY HH:mm:ss");
+  const  convertUTCToTimezone = (utcDate, timezone = '+05:30', dateFormat = 'DD-MM-YYYY hh:mm') => {
+    return moment(utcDate).utcOffset(timezone).format(dateFormat);
 }
 
 const ACD =(props)=>{
@@ -142,7 +144,23 @@ const ACD =(props)=>{
       else if(search_flag == 3)
       {
         let start_date=value;
-        let end_date=new Date(moment(start_date).add(29,"day"));
+        let days=start_date.getMonth()+1;
+        if(days == 1 || days == 3 || days == 5 || days == 7 || days == 8 || days == 10 || days == 12)
+        {
+          days=31
+        }
+        else if(days != 2)
+        {
+          days=30
+        }
+        else{
+          let year=start_date.getFullYear()
+          if(year%4==0)
+              days=29
+          else days=28
+          console.log("leep",year%4,year)
+        }
+        let end_date=new Date(moment(start_date).add(days-1,"day"));
         setFieldTouched("start_date");
         setFieldValue("start_date",start_date);
         setFieldTouched("end_date");
@@ -157,6 +175,10 @@ const ACD =(props)=>{
         start_date.getMonth() + 1,
         0
       );
+      setFieldTouched("start_date");
+        setFieldValue("start_date",start_date);
+        setFieldTouched("end_date");
+        setFieldValue("end_date",end_date);
       }
     }
     
@@ -451,6 +473,7 @@ const ACD =(props)=>{
                                     )
                                 }}
                                 </Formik> 
+                                <br/><br/>
                                 {state.policyHolder ?
                                         <div className="customInnerTable dataTableCustom">
                                             <BootstrapTable ref={table}
