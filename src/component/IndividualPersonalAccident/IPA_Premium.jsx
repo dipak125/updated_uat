@@ -161,10 +161,30 @@ class IPA_Premium extends Component {
         let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
         let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
         // console.log("---policyHolderDetails--->> ", policyHolderDetails);
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+                let paymentButton = false
+                let smsButton = false
+
+                if (user_data) {
+                    user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+                    if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                        paymentButton =  true
+                        smsButton = false
+                    }
+                    else if(user_data.login_type == "4") {
+                        paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                        smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+                    }
+                    else {
+                        paymentButton = true
+                        smsButton = false
+                    }
+                }
         this.setState({
           ipaInfo, policyHolderDetails, bcMaster,menumaster,vehicleDetails,paymentgateway,
           nomineeDetails: policyHolderDetails.request_data && policyHolderDetails.request_data.nominee && policyHolderDetails.request_data.nominee[0],
-          refNumber: policyHolderDetails && policyHolderDetails.reference_no,
+          refNumber: policyHolderDetails && policyHolderDetails.reference_no,paymentButton,smsButton
         });
         this.quote() 
       })
@@ -678,6 +698,7 @@ class IPA_Premium extends Component {
                             );
                         }}
                   </Formik>
+                  { smsButton === true  && fulQuoteResp.QuotationNo ?
                   <Modal className="" bsSize="md"
                       show={show}
                       onHide={this.handleClose}>
@@ -696,6 +717,7 @@ class IPA_Premium extends Component {
                           </Modal.Body>
                       </div>
                   </Modal>
+                  :null}
                 <Footer />
               </div>
             </div>

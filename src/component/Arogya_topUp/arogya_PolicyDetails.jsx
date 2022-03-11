@@ -106,6 +106,7 @@ class arogya_PolicyDetails extends Component {
   }
 
   handleModal = () => {
+    
     this.setState({ show: true });
   };
 
@@ -141,8 +142,30 @@ class arogya_PolicyDetails extends Component {
         let request_data = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : {};
         let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+         let paymentButton = false
+         let smsButton = false
+
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                paymentButton =  true
+                smsButton = false
+            }
+            else if(user_data.login_type == "4") {
+                paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+                console.log("check",smsButton,paymentButton,bcMaster.eligible_for_otp_screen)
+            }
+            else {
+                paymentButton = true
+                smsButton = false
+            }
+        }
+
         this.setState({
-          policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
+          policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],paymentButton,smsButton,
           addressArray: decryptResp.data.policyHolder && decryptResp.data.policyHolder.address ? addressArray : null,
           familyMember: decryptResp.data.policyHolder.request_data.family_members,
           refNumber: decryptResp.data.policyHolder.reference_no,
@@ -755,6 +778,7 @@ sendPaymentLink = () => {
                                );
                            }}
                      </Formik>
+                     { smsButton === true  && fulQuoteResp.QuotationNo ?
                      <Modal className="" bsSize="md"
                       show={show}
                       onHide={this.handleClose}>
@@ -773,6 +797,7 @@ sendPaymentLink = () => {
                           </Modal.Body>
                       </div>
                   </Modal>
+                      :null}
                   <Footer />
               </div>
             </div>

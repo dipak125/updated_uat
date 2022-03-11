@@ -106,6 +106,7 @@ class PolicyDetails extends Component {
 
   getPolicyHolderDetails = () => {
     let policyHolder_id = 0
+    let encryption = new Encryption();
     
     this.props.loadingStart();
     axios
@@ -116,9 +117,29 @@ class PolicyDetails extends Component {
         let request_data = res.data.data.policyHolder && res.data.data.policyHolder.request_data ? res.data.data.policyHolder.request_data : {};
         let paymentgateway = res.data.data.policyHolder && res.data.data.policyHolder.bcmaster && res.data.data.policyHolder.bcmaster.bcpayment
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        let paymentButton = false
+        let smsButton = false
+
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                paymentButton =  true
+                smsButton = false
+            }
+            else if(user_data.login_type == "4") {
+                paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+            }
+            else {
+                paymentButton = true
+                smsButton = false
+            }
+        }
         this.setState({
           policyHolderDetails: res.data.data.policyHolder ? res.data.data.policyHolder : [],
-          familyMember: res.data.data.policyHolder.request_data.family_members,
+          familyMember: res.data.data.policyHolder.request_data.family_members,paymentButton,smsButton,
           refNumber: res.data.data.policyHolder.reference_no,
           paymentStatus: res.data.data.policyHolder.payment ? res.data.data.policyHolder.payment[0] : [],
           nomineedetails: res.data.data.policyHolder ? res.data.data.policyHolder.request_data.nominee[0]:[],

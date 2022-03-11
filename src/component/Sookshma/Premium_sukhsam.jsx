@@ -209,6 +209,28 @@ class Premium_sukhsam extends Component {
             axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                let bcMaster= decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster
+                let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+                let paymentButton = false
+                let smsButton = false
+
+                if (user_data) {
+                    user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+                    if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                        paymentButton =  true
+                        smsButton = false
+                    }
+                    else if(user_data.login_type == "4") {
+                        paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                        smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+                        
+                    }
+                    else {
+                        paymentButton = true
+                        smsButton = false
+                    }
+                }
                 console.log("decryptResp -------->",decryptResp)
                 if(decryptResp.data.policyHolder.step_no > 0){
     
@@ -306,7 +328,7 @@ class Premium_sukhsam extends Component {
                 
                 this.setState(
                     {
-                        salutationName:decryptResp.data.policyHolder.salutation.displayvalue,
+                        salutationName:decryptResp.data.policyHolder.salutation.displayvalue,paymentButton,smsButton,
                         pincodeArea:pincode_area_arr.LCLTY_SUBRB_TALUK_TEHSL_NM,
                         quoteId:decryptResp.data.policyHolder.request_data.quote_id,
                         gst:decryptResp.data.policyHolder.request_data.service_tax,
@@ -340,7 +362,7 @@ class Premium_sukhsam extends Component {
         const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, quoteId, paymentStatus, 
             memberdetails,nomineedetails, paymentButton, smsButton, refNumber } = this.state
         const { productId } = this.props.match.params
-
+            
         const policyHolder_refNo = queryString.parse(this.props.location.search).access_id ? 
         queryString.parse(this.props.location.search).access_id : 
         localStorage.getItem("policyHolder_refNo")
@@ -749,7 +771,7 @@ class Premium_sukhsam extends Component {
 
                                                                 {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" && paymentButton === true ?
                                                                     <Button type="submit"
-                                                                        className="proceedBtn"  type="submit"  disabled={isSubmitting ? true : false}>
+                                                                        className="proceedBtn"   disabled={isSubmitting ? true : false}>
                                                                         Generate Policy
                                                                 </Button> 
                                                             : null}
@@ -775,6 +797,7 @@ class Premium_sukhsam extends Component {
                                         );
                                     }}
                                 </Formik>
+                                { smsButton === true  && this.state.fulQuoteResp.QuotationNo ?
                                 <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>
@@ -791,6 +814,7 @@ class Premium_sukhsam extends Component {
                                         </Modal.Body>
                                     </div>
                                 </Modal>
+                            :null}
                             </div>
                             <Footer />
                         </div>

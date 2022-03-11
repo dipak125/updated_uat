@@ -158,7 +158,7 @@ class Otp extends Component {
                     <Form>
                         <div className="text-center boxotpmodl">
                             <div className="verfy">Digital consent form</div>
-                            <div className="mobotp">An automated SMS & e-mail has been sent to customer with a Policy App code and Proposal link.</div>
+                            <div className="mobotp">An automated e-mail has been sent to customer with a Policy App code and Proposal link.</div>
                             <span className="errorMsg">{otp}</span>
 
                             <div className="d-flex justify-content-center otpInputWrap mx-auto m-b-25">

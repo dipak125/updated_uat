@@ -113,10 +113,31 @@ class PolicyDetails_Plus extends Component {
         let request_data = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : {};
         let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        let paymentButton = false
+        let smsButton = false
+
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                paymentButton =  true
+                smsButton = false
+            }
+            else if(user_data.login_type == "4") {
+                paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+            }
+            else {
+                paymentButton = true
+                smsButton = false
+            }
+        }
+
         this.setState({
           policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
           familyMember: decryptResp.data.policyHolder.request_data.family_members,
-          refNumber: decryptResp.data.policyHolder.reference_no,
+          refNumber: decryptResp.data.policyHolder.reference_no,paymentButton,smsButton,
           paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
           nomineeDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : [],
           bcMaster, menumaster, request_data, paymentgateway, vehicleDetails
@@ -683,6 +704,7 @@ class PolicyDetails_Plus extends Component {
                       );
                     }}
                   </Formik>
+                  { smsButton === true  && fulQuoteResp.QuotationNo ? 
                   <Modal className="" bsSize="md"
                       show={show}
                       onHide={this.handleClose}>
@@ -701,6 +723,7 @@ class PolicyDetails_Plus extends Component {
                           </Modal.Body>
                       </div>
                   </Modal>
+                        :null}
                   <Footer />
                 </div>
               </div>

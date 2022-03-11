@@ -126,9 +126,30 @@ class PremiumMISCD extends Component {
 		        let dateDiff = 0
                 let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
+                let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+                let paymentButton = false
+                let smsButton = false
+
+                if (user_data) {
+                    user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+                    if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                        paymentButton =  true
+                        smsButton = false
+                    }
+                    else if(user_data.login_type == "4") {
+                        paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                        smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+                    }
+                    else {
+                        paymentButton = true
+                        smsButton = false
+                    }
+                }
+
                 this.setState({
                     motorInsurance,policyHolder,vehicleDetails,previousPolicy,request_data,step_completed, bcMaster,menumaster,paymentgateway,
-                    refNumber: decryptResp.data.policyHolder.reference_no,
+                    refNumber: decryptResp.data.policyHolder.reference_no,paymentButton,smsButton,
                     paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
                     memberdetails : decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
                     nomineedetails: decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data.nominee ? decryptResp.data.policyHolder.request_data.nominee[0]:[]
@@ -888,6 +909,7 @@ class PremiumMISCD extends Component {
                                         );
                                     }}
                                 </Formik>
+                                { smsButton === true && breakin_flag == 0 && fulQuoteResp.QuotationNo ?
                                 <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>
@@ -906,6 +928,7 @@ class PremiumMISCD extends Component {
                                         </Modal.Body>
                                     </div>
                                 </Modal>
+                                :null}
                             </div> : step_completed == "" ? "Forbidden" : null }
                             <Footer />
                         </div>
