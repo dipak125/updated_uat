@@ -606,9 +606,10 @@ class OtherComprehensive extends Component {
                     if(ncbDiscount != '0') {
           
                         let ncbArr = {}
-                        let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
+                        let ncbAmt=Math.round(ncbDiscount)
+                        //let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
                         ncbArr.PolicyBenefitList = [{
-                            BeforeVatPremium : 0 - ncbAmt,
+                            BeforeVatPremium : 0 -  ncbAmt,
                             ProductElementCode : 'NCB'
                         }]
     
@@ -660,6 +661,7 @@ class OtherComprehensive extends Component {
                         serverResponse: [],
                         policyCoverage: res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].PolicyCoverageList : [],
                     });
+                    
                 }
                 else if (res.data.code && res.data.message && res.data.code == "validation failed" && res.data.message == "validation failed") {
                     var validationErrors = []
@@ -1211,7 +1213,7 @@ class OtherComprehensive extends Component {
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
 
-
+        console.log("hi1",policyCoverage)
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -1222,7 +1224,9 @@ class OtherComprehensive extends Component {
                                 <FormGroup>{Coverage[benefit.ProductElementCode]}</FormGroup>
                             </Col>
                             <Col sm={12} md={6}>
+                                
                                 <FormGroup>₹ {Math.round(benefit.BeforeVatPremium)}</FormGroup>
+                                
                             </Col>
                         </Row>
                     </div> : null

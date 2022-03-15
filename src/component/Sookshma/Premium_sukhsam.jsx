@@ -81,8 +81,10 @@ class Premium_sukhsam extends Component {
         }
       }
     
-    handleModal = () => {
-        this.setState({ show: true});
+    handleModal = async() => {
+        console.log("hi");
+       await this.setState({ show: true});
+        console.log("show1",this.state.show,this.state.fulQuoteResp.QuotationNo,this.state.smsButton)
     }
 
     changePlaceHoldClassAdd(e) {
@@ -190,7 +192,12 @@ class Premium_sukhsam extends Component {
                     if(decryptResp.error == true) {
                         this.setState({paymentgateway: [], quoteId: "", error: {message : decryptResp.msg}})
                         swal(decryptResp.msg)
-                    }                 
+                    } 
+                    console.log("check3",decryptResp.data.QuotationNo)
+                     this.setState({
+                            ...this.state,
+                            QuotationNo :decryptResp.data.QuotationNo
+                     })                
                     this.props.loadingStop();  
             })
             .catch(err=>{
@@ -797,7 +804,7 @@ class Premium_sukhsam extends Component {
                                         );
                                     }}
                                 </Formik>
-                                { smsButton === true  && this.state.fulQuoteResp.QuotationNo ?
+                                { smsButton === true  && this.state.QuotationNo ?
                                 <Modal className="" bsSize="md"
                                     show={show}
                                     onHide={this.handleClose}>

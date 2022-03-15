@@ -319,8 +319,8 @@ class TwoWheelerOtherComprehensive extends Component {
                     let ncbDiscount= res.data.PolicyObject.PolicyLobList ? res.data.PolicyObject.PolicyLobList[0].PolicyRiskList[0].NCBDiscountAmt : 0
                     if(ncbDiscount != 0) {
                         let ncbArr = {}
-                        let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
-                        // let ncbAmt = Math.round(ncbDiscount)
+                        //let ncbAmt = request_data && request_data.duration < 12 ? Math.round(ncbDiscount*ncbSlab[request_data.duration]) : Math.round(ncbDiscount)
+                         let ncbAmt = Math.round(ncbDiscount)
                         ncbArr.PolicyBenefitList = [{
                             BeforeVatPremium : 0 - ncbAmt,
                             ProductElementCode : 'NCB'
