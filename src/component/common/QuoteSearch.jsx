@@ -39,7 +39,15 @@ function polNumFormatter(cell) {
 } 
 
 function productFormatter(cell, row) {
-    return (cell ? (cell.vehicletype ? cell.vehicletype.name : null): null);
+    if(new Date(row.request_data.end_date).getMonth()==new Date(row.request_data.start_date).getMonth())
+        return (row ? (row.vehiclebrandmodel ? (row.vehiclebrandmodel.vehicletype ? (row.vehiclebrandmodel.vehicletype.name ? row.vehiclebrandmodel.vehicletype.name : null) :null):null) : null);
+    else
+    {
+        if(row && row.vehiclebrandmodel && row.vehiclebrandmodel.vehicletype && row.vehiclebrandmodel.vehicletype.name && row.vehiclebrandmodel.vehicletype.name == "Two Wheeler Insurance comprehensive")
+            return "Motor Two Wheeler Short Term"
+        else
+           return "Motor Four Wheeler Short Term"
+    }
 }
 
 
@@ -288,7 +296,7 @@ class QuoteSearch extends Component {
 
                                     <TableHeaderColumn width='195px'  dataField="request_data" dataAlign="center" dataFormat={ actionFormatter(this)} isKey >{phrases['QuoteNumber']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={ nameFormatter} >{phrases['ProposerName']}</TableHeaderColumn>
-                                    <TableHeaderColumn width='100px'  dataField="vehiclebrandmodel" dataAlign="center" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
+                                    <TableHeaderColumn width='100px'  dataField="policyHolder" dataAlign="center" dataFormat={productFormatter} >{phrases['Product']}</TableHeaderColumn>
                                     <TableHeaderColumn width='95px'  dataField='created_at' dataFormat={(cell) => (cell !== '0000-00-00 00:00:00' ? moment(cell).format("DD-MM-YYYY") : '')} dataAlign="center" dataSort>{phrases['QuoteIssueDate']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px' dataAlign="center" dataField="request_data" dataFormat={premiumFormatter} > {phrases['Premium']}</TableHeaderColumn>
                                     <TableHeaderColumn width='100px'  dataField="request_data" dataAlign="center" dataFormat={statusFormatter(this)} >{phrases['Status']}</TableHeaderColumn>

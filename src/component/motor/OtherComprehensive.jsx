@@ -1237,7 +1237,7 @@ class OtherComprehensive extends Component {
                     <FormGroup>{Coverage[coverage.ProductElementCode]}</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                    <FormGroup>₹ {Math.round(coverage.AnnualPremium)}  </FormGroup>                      
+                    <FormGroup>₹ {Math.round(coverage.BeforeVatPremium)}  </FormGroup>                      
                     </Col>
                 </Row> 
             </div>
