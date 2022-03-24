@@ -160,8 +160,24 @@ class ThankYouPage extends Component {
         pom.click(); 
         window.URL.revokeObjectURL(url);
       }
+      
+      fetch=()=>{
+        let encryption = new Encryption();
+        axios.get(`policy-holder-additional-details/${localStorage.getItem("policyHolder_refNo")}`).then(res=>{
+          let decryptResp = JSON.parse(encryption.decrypt(res.data))
+          console.log("decrypt", decryptResp)
+          let vehicletype = decryptResp.data.policyHolder && decryptResp.data.policyHolder.vehiclebrandmodel ? decryptResp.data.policyHolder.vehiclebrandmodel.vehicletype : {};     
+          this.setState({
+            ...this.state,
+            vehicletype:vehicletype
+          })
+        }).catch(err=>{
+
+        })
+      }
 
     componentDidMount() {
+      this.fetch();
         // this.getAccessToken();       
         const {policyId} = this.props.match.params
         // window.addEventListener("popstate", (e) => {
@@ -180,6 +196,7 @@ class ThankYouPage extends Component {
       }
     render() {
         const {policyId} = this.props.match.params
+        console.log("type12",vehicletype)
         return (
             <>
                  <BaseComponent>

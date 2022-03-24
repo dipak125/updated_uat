@@ -173,8 +173,28 @@ class SelectBrand extends Component {
             })
 
     }
+    updatedFetchData=()=>{
+        let encryption = new Encryption();
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        axios.get(`policy-holder/motor/${policyHolder_id}`).then(res=>{
 
-    fetchData = () => {
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decrypt1", decryptResp)
+                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
+                //console.log("check0",vehicleDetails.vehiclemodel.brand_id)
+                this.setState({
+                    motorInsurance, vehicleDetails, fastlanelog
+                })
+
+        }).catch(err=>{
+
+        }) 
+    }
+
+    fetchData =async () => {
+        
         const { productId } = this.props.match.params
         console.log("redux data----- ", this.props.data)
         let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
@@ -183,10 +203,11 @@ class SelectBrand extends Component {
         axios.get(`policy-holder/motor/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decrypt", decryptResp)
+                console.log("decrypt1", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
+                //console.log("check0",vehicleDetails.vehiclemodel.brand_id)
                 this.setState({
                     motorInsurance, vehicleDetails, fastlanelog
                 })
@@ -204,6 +225,11 @@ class SelectBrand extends Component {
                     }
                     else {
                         this.setState({pageLoad: '1' })
+                        if(localStorage.getItem("fastlaneNoData") != 1)
+                        {
+                         this.update();
+                         localStorage.setItem("fastlaneNoData",0)
+                        }
                         this.getBrands();
                     }
                 }
@@ -286,6 +312,47 @@ class SelectBrand extends Component {
             fuelType: fuelType
         })
     }
+    update= ()=>{
+
+        const { productId } = this.props.match.params
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let post_data = {}
+        post_data = {
+            'policy_holder_id': localStorage.getItem('policyHolder_id'),
+            'menumaster_id': 1,
+            'brand_id': this.state.vehicleDetails.vehiclemodel.brand_id,
+            'brand_model_id':0 ,
+            'model_varient_id': 0,
+            'page_name': `Select-brand/${productId}`,
+        }
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        this.props.loadingStart();
+        axios.post('insert-brand-model-varient', formData).then(res => {
+            this.props.loadingStop();
+            // if (res.data.error == false) {
+            //     if(this.state.otherBrands) {
+            //         localStorage.setItem('brandEdit', 2)
+            //         localStorage.removeItem('newBrandEdit')
+            //     }
+            //     else {
+            //         localStorage.setItem('brandEdit', 1)
+            //         localStorage.removeItem('newBrandEdit')
+            //     }
+                
+            // }
+
+        })
+            .catch(err => {
+                // handle error
+                if(err.status == '422') {
+                    // swal(phrases.PleaseVehicleMmodel)
+                }
+                this.props.loadingStop();
+            })
+            this.updatedFetchData();
+
+    }
 
     handleSubmit = (values, pageLoad) => {
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -347,6 +414,7 @@ class SelectBrand extends Component {
     render() {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId, pageLoad, fastLaneData,
              selectedModelId, selectedVarientId, otherBrands, brandName, modelName, fuelType, vehicleDetails } = this.state
+            
         const { productId } = this.props.match.params
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = {}
@@ -443,7 +511,7 @@ class SelectBrand extends Component {
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">{phrases['Brand']}
-                                                                            - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
+                                                                            - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
                                                                         <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>

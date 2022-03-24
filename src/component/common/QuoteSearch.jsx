@@ -39,7 +39,8 @@ function polNumFormatter(cell) {
 } 
 
 function productFormatter(cell, row) {
-    if(new Date(row.request_data.end_date).getMonth()==new Date(row.request_data.start_date).getMonth())
+    console.log("diff",Math.abs(new Date(row.request_data.end_date)-new Date(row.request_data.start_date))/(1000 * 60 * 60 * 24))
+    if(Math.abs(new Date(row.request_data.end_date)-new Date(row.request_data.start_date))/(1000 * 60 * 60 * 24)>250)
         return (row ? (row.vehiclebrandmodel ? (row.vehiclebrandmodel.vehicletype ? (row.vehiclebrandmodel.vehicletype.name ? row.vehiclebrandmodel.vehicletype.name : null) :null):null) : null);
     else
     {

@@ -587,7 +587,7 @@ class TwoWheelerSelectBrand extends Component {
         const formData = new FormData();
         var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
         formData.append('registration_no', regNumber)
-        formData.append('menumaster_id', '3')
+        formData.append('menumaster_id', '1')
         this.props.loadingStart();
         axios.post('fastlane', formData).then(res => {
 

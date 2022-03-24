@@ -422,6 +422,7 @@ class VehicleDetails extends Component {
         else {
             let brandEdit = { 'brandEdit': 1 }
             this.props.setData(brandEdit)
+            localStorage.setItem("fastlaneNoData",1);
             this.props.history.push(`/Select-brand/${productId}`);
         }
 
@@ -814,7 +815,7 @@ class VehicleDetails extends Component {
                                                                                     <DatePicker
                                                                                         name="registration_date"
                                                                                         minDate={new Date(minRegnDate)}
-                                                                                        maxDate={new Date(maxRegnDate)}
+                                                                                        //maxDate={new Date(maxRegnDate)}
                                                                                         maxDate={values.policy_type_id == '3' ? new Date(maxDate) : new Date(maxRegnDate) }
                                                                                         dateFormat="dd MMM yyyy"
                                                                                         placeholderText={phrases['RegDate']}
@@ -1018,7 +1019,7 @@ class VehicleDetails extends Component {
                                                                                                 showMonthDropdown
                                                                                                 showYearDropdown
                                                                                                 dropdownMode="select"
-                                                                                                className="datePckr inputfs12"
+                                                                                                //className="datePckr inputfs12"
                                                                                                 className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
                                                                                                 selected={values.previous_start_date}
                                                                                                 onChange={(val) => {
