@@ -224,13 +224,24 @@ class SelectBrand extends Component {
                         this.handleSubmit(this.props.data.fastLaneData, '0')
                     }
                     else {
+    
                         this.setState({pageLoad: '1' })
-                        if(localStorage.getItem("fastlaneNoData") != 1)
+                        
+                        if(this.state.vehicleDetails && this.state.vehicleDetails.vehiclemodel && this.state.vehicleDetails.vehiclemodel.brand_id)
                         {
-                         this.update();
-                         localStorage.setItem("fastlaneNoData",0)
+                            if(this.props.location && this.props.location.appState &&  this.props.location.appState.flag ==1) 
+                            {
+
+                            }
+                            else
+                            {
+                                this.update();
+                            }
+                           
                         }
-                        this.getBrands();
+                    
+                         this.getBrands();
+
                     }
                 }
                

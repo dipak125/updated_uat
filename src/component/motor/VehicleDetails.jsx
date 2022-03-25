@@ -422,8 +422,15 @@ class VehicleDetails extends Component {
         else {
             let brandEdit = { 'brandEdit': 1 }
             this.props.setData(brandEdit)
-            localStorage.setItem("fastlaneNoData",1);
-            this.props.history.push(`/Select-brand/${productId}`);
+            //localStorage.setItem("fastlaneNoData",1);
+            this.props.history.push({
+                pathname: `/Select-brand/${productId}`,
+                appState: {
+                  flag : 1
+                  
+                }
+              });
+            //this.props.history.push(`/Select-brand/${productId}`);
         }
 
     }
