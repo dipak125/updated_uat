@@ -391,7 +391,8 @@ class TwoWheelerVehicleDetails extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        maxRegnDate: ""
+        maxRegnDate: "",
+        fastlane:{}
     };
 
     changePlaceHoldClassAdd(e) {
@@ -658,11 +659,36 @@ class TwoWheelerVehicleDetails extends Component {
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location, maxRegnDate, request_data
                 })
+                this.fetchFastlane()
                 this.props.loadingStop();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
+            })
+    }
+
+    fetchFastlane = (values) => {
+       let regNumber = this.state.motorInsurance.registration_no
+        const formData = new FormData();
+        formData.append('registration_no', regNumber)
+        formData.append('menumaster_id', '3')
+        this.props.loadingStart();
+        axios.post('fastlane', formData).then(res => {
+
+            if(res.data.error == false) {
+                this.setState({
+                    ...this.state,
+                    fastlane: res.data.data
+                })
+                this.props.loadingStop();
+                
+                
+            } 
+        })
+            .catch(err => {
+                this.props.loadingStop();
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: 0 })
             })
     }
 
@@ -680,14 +706,16 @@ class TwoWheelerVehicleDetails extends Component {
         this.getInsurerList();
         this.fetchData();
         
+        console.log("h11",moment(new Date('2015-10-30')).add(1,"year").subtract(1,"day").format("YYYY-MM-DD"))
     }
 
 
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID,suggestions, vehicleDetails, RTO_location, maxRegnDate, request_data} = this.state
-
+            CustomerID,suggestions, vehicleDetails, RTO_location, maxRegnDate, request_data,fastlane} = this.state
+            
+           console.log("fast",fastlane)
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let new_policy_duration= request_data && request_data.duration ? request_data.duration : ""
         let pol_start_date= request_data && request_data.start_date ? new Date(request_data.start_date) : ""
@@ -697,14 +725,14 @@ class TwoWheelerVehicleDetails extends Component {
         
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
-            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
-            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
-            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
-            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
+            location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id :"",
+            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : fastlane && fastlane.insurance_start_date ? new Date(fastlane.insurance_start_date) : "",
+            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : fastlane && fastlane.insurance_start_date ? new Date(moment(fastlane.insurance_start_date).add(1,"year").subtract(1,"day")) : "", 
+            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : fastlane && fastlane.insurance_start_date ? "1" : "",
             // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
-            insurance_company_id: previousPolicy && previousPolicy.insurancecompany_id ? previousPolicy.insurancecompany_id : "",
+            insurance_company_id: previousPolicy && previousPolicy.insurancecompany_id ? previousPolicy.insurancecompany_id :  fastlane && fastlane.insurance_comp_id ? fastlane.insurance_comp_id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
-            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
+            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no :fastlane && fastlane.insurance_policy_no ? fastlane.insurance_policy_no : "",
             newRegistrationNo:  motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
             previous_is_claim: previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : "",
             previous_claim_bonus: previousPolicy && ncbArr[previousPolicy.claim_bonus]  && previousPolicy.claim_bonus != 2 ? Math.floor(previousPolicy.claim_bonus) : "",
@@ -1004,7 +1032,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 showMonthDropdown
                                                                 showYearDropdown
                                                                 dropdownMode="select"
-                                                                className="datePckr inputfs12"
+                                                                //className="datePckr inputfs12"
                                                                 className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
                                                                 selected={values.previous_start_date}
                                                                 onChange={(val) => {
