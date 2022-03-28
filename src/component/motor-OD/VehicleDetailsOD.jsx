@@ -598,7 +598,14 @@ class VehicleDetailsOD extends Component {
         else {
             let brandEdit = { 'brandEdit': 1 }
             this.props.setData(brandEdit)
-            this.props.history.push(`/Select-brandOD/${productId}`);
+            this.props.history.push({
+                pathname: `/Select-brandOD/${productId}`,
+                appState: {
+                  flag : 1
+                  
+                }
+              });
+            //this.props.history.push(`/Select-brandOD/${productId}`);
         }
 
     }
@@ -1202,7 +1209,7 @@ class VehicleDetailsOD extends Component {
                                                                                             component="select"
                                                                                             autoComplete="off"
                                                                                             className="formGrp inputfs12"
-                                                                                            value = {values.active_policy_tenure}
+                                                                                            //value = {values.active_policy_tenure}
                                                                                             // disabled={true}
                                                                                             value={values.active_policy_tenure}
                                                                                             onChange={(e) => {
@@ -1452,7 +1459,7 @@ class VehicleDetailsOD extends Component {
                                                                                                 dropdownMode="select"
                                                                                                 className="datePckr inputfs12"
                                                                                                 selected={values.previous_end_date}
-                                                                                                disabled={ true }
+                                                                                                //disabled={ true }
                                                                                                 onChange={(val) => {
                                                                                                     setFieldTouched('previous_end_date');
                                                                                                     setFieldValue('previous_end_date', val);

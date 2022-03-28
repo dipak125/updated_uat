@@ -659,7 +659,7 @@ class TwoWheelerVehicleDetails extends Component {
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location, maxRegnDate, request_data
                 })
-                this.fetchFastlane()
+               
                 this.props.loadingStop();
             })
             .catch(err => {
@@ -668,29 +668,7 @@ class TwoWheelerVehicleDetails extends Component {
             })
     }
 
-    fetchFastlane = (values) => {
-       let regNumber = this.state.motorInsurance.registration_no
-        const formData = new FormData();
-        formData.append('registration_no', regNumber)
-        formData.append('menumaster_id', '3')
-        this.props.loadingStart();
-        axios.post('fastlane', formData).then(res => {
-
-            if(res.data.error == false) {
-                this.setState({
-                    ...this.state,
-                    fastlane: res.data.data
-                })
-                this.props.loadingStop();
-                
-                
-            } 
-        })
-            .catch(err => {
-                this.props.loadingStop();
-                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: 0 })
-            })
-    }
+    
 
     handleChange =(value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
@@ -726,13 +704,13 @@ class TwoWheelerVehicleDetails extends Component {
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
             location_id:  motorInsurance && motorInsurance.location_id ? motorInsurance.location_id :"",
-            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : fastlane && fastlane.insurance_start_date ? new Date(fastlane.insurance_start_date) : "",
-            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : fastlane && fastlane.insurance_start_date ? new Date(moment(fastlane.insurance_start_date).add(1,"year").subtract(1,"day")) : "", 
-            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : fastlane && fastlane.insurance_start_date ? "1" : "",
+            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) :  "",
+            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) :  "", 
+            previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name :  "",
             // insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
-            insurance_company_id: previousPolicy && previousPolicy.insurancecompany_id ? previousPolicy.insurancecompany_id :  fastlane && fastlane.insurance_comp_id ? fastlane.insurance_comp_id : "",
-            previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
-            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no :fastlane && fastlane.insurance_policy_no ? fastlane.insurance_policy_no : "",
+            insurance_company_id: previousPolicy && previousPolicy.insurancecompany_id ? previousPolicy.insurancecompany_id :   "",
+            previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city :  "",
+            previous_policy_no: previousPolicy && previousPolicy.policy_no ? previousPolicy.policy_no : "",
             newRegistrationNo:  motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
             previous_is_claim: previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : "",
             previous_claim_bonus: previousPolicy && ncbArr[previousPolicy.claim_bonus]  && previousPolicy.claim_bonus != 2 ? Math.floor(previousPolicy.claim_bonus) : "",
@@ -923,7 +901,9 @@ class TwoWheelerVehicleDetails extends Component {
                                                                     className="formGrp inputfs12"
                                                                     value={values.previous_policy_name}
                                                                     onChange={(e) => {
+                                                                       
                                                                         if (e.target.value == '3') {
+                                                                            
                                                                             if (values.duration && values.previous_start_date) {
                                                                                 let date1 = ""
                                                                                 var tempDate = ""
@@ -936,6 +916,7 @@ class TwoWheelerVehicleDetails extends Component {
 
                                                                         }
                                                                         else {
+                                                                            
                                                                             setFieldValue("previous_start_date", "");
                                                                             setFieldValue("previous_end_date", "");
                                                                             setFieldValue("pol_start_date", "");
@@ -1022,8 +1003,8 @@ class TwoWheelerVehicleDetails extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date(minDate)}
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                //minDate={new Date(minDate)}
+                                                                //maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth

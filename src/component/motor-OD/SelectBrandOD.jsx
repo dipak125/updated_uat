@@ -211,7 +211,20 @@ class SelectBrandOD extends Component {
                     }
                     else {
                         this.setState({pageLoad: '1' })
-                        this.getBrands();
+                        if(this.state.vehicleDetails && this.state.vehicleDetails.vehiclemodel && this.state.vehicleDetails.vehiclemodel.brand_id)
+                        {
+                            if(this.props.location && this.props.location.appState &&  this.props.location.appState.flag ==1) 
+                            {
+
+                            }
+                            else
+                            {
+                                this.update();
+                            }
+                           
+                        }
+                    
+                         this.getBrands();
                     }
                 }
                
@@ -221,7 +234,66 @@ class SelectBrandOD extends Component {
                 this.props.loadingStop();
             })
     }
+    update= ()=>{
 
+        const { productId } = this.props.match.params
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let post_data = {}
+        post_data = {
+            'policy_holder_id': localStorage.getItem('policyHolder_id'),
+            'menumaster_id': 1,
+            'brand_id': this.state.vehicleDetails.vehiclemodel.brand_id,
+            'brand_model_id':0 ,
+            'model_varient_id': 0,
+            'page_name': `Select-brand/${productId}`,
+        }
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        this.props.loadingStart();
+        axios.post('four-wh-stal/insert-brand-model-varient', formData).then(res => {
+            this.props.loadingStop();
+            // if (res.data.error == false) {
+            //     if(this.state.otherBrands) {
+            //         localStorage.setItem('brandEdit', 2)
+            //         localStorage.removeItem('newBrandEdit')
+            //     }
+            //     else {
+            //         localStorage.setItem('brandEdit', 1)
+            //         localStorage.removeItem('newBrandEdit')
+            //     }
+                
+            // }
+
+        })
+            .catch(err => {
+                // handle error
+                if(err.status == '422') {
+                    // swal(phrases.PleaseVehicleMmodel)
+                }
+                this.props.loadingStop();
+            })
+            this.updatedFetchData();
+
+    }
+    updatedFetchData=()=>{
+        let encryption = new Encryption();
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        axios.get(`four-wh-stal/policy-holder/motor-saod/${policyHolder_id}`).then(res=>{
+
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decrypt1", decryptResp)
+                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
+                //console.log("check0",vehicleDetails.vehiclemodel.brand_id)
+                this.setState({
+                    motorInsurance, vehicleDetails, fastlanelog
+                })
+
+        }).catch(err=>{
+
+        }) 
+    }
 
     registration = (productId) => {
         this.props.history.push(`/RegistrationOD/${productId}`);
@@ -442,7 +514,7 @@ class SelectBrandOD extends Component {
 
                                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                         <div className="txtRegistr resmb-15">{phrases['Brand']}
-                                                                            - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
+                                                                            - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclemodel  && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                         </div>
 
                                                                         {/* <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div> */}
