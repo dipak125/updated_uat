@@ -386,7 +386,8 @@ class VehicleDetails extends Component {
         selectedCustomerRecords: [],
         CustIdkeyword: "",
         RTO_location: "",
-        previous_is_claim: ""
+        previous_is_claim: "",
+        fastLaneResponse:0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -716,12 +717,42 @@ class VehicleDetails extends Component {
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails, RTO_location, previous_is_claim, request_data
                 })
+                this.fetchFastlane();
                 this.props.loadingStop();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '1')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found")
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
     }
 
     handleChange = (value) => {
@@ -915,6 +946,7 @@ class VehicleDetails extends Component {
                                                                                                     component="select"
                                                                                                     autoComplete="off"
                                                                                                     className="formGrp inputfs12"
+                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                                     value={values.previous_policy_name}
                                                                                                     onChange={(e) => {
                                                                                                         if (e.target.value == '3') {
@@ -1026,6 +1058,7 @@ class VehicleDetails extends Component {
                                                                                                 showMonthDropdown
                                                                                                 showYearDropdown
                                                                                                 dropdownMode="select"
+                                                                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                                 //className="datePckr inputfs12"
                                                                                                 className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
                                                                                                 selected={values.previous_start_date}
@@ -1104,6 +1137,7 @@ class VehicleDetails extends Component {
                                                                                                     component="select"
                                                                                                     autoComplete="off"
                                                                                                     className="formGrp"
+                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                                 >
                                                                                                     <option value="">{phrases['SelectInsurer']}</option>
                                                                                                     {insurerList.map((insurer, qIndex) => (
@@ -1127,6 +1161,7 @@ class VehicleDetails extends Component {
                                                                                                     autoComplete="off"
                                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
 
                                                                                                 />
                                                                                                 {errors.previous_city && touched.previous_city ? (
@@ -1148,6 +1183,7 @@ class VehicleDetails extends Component {
                                                                                                     maxLength="28"
                                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
 
                                                                                                 />
                                                                                                 {errors.previous_policy_no && touched.previous_policy_no ? (
@@ -1436,7 +1472,7 @@ class VehicleDetails extends Component {
                                                                                 </Col>
 
                                                                                 <Col sm={12} md={5} className="text-right">
-                                                                                    <button className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                    <button className="rgistrBtn"  disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button>
                                                                                 </Col>
                                                                             </Row>
 
@@ -1447,7 +1483,7 @@ class VehicleDetails extends Component {
                                                                                 </Col>
 
                                                                                 <Col sm={12} md={5} className="text-right">
-                                                                                    <button className="rgistrBtn" onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                    <button className="rgistrBtn" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                                 </Col>
                                                                             </Row>
 
@@ -1458,7 +1494,7 @@ class VehicleDetails extends Component {
                                                                                 </Col>
 
                                                                                 <Col sm={12} md={5} className="text-right">
-                                                                                    <button className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                    <button className="rgistrBtn" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                                 </Col>
                                                                             </Row>
 

@@ -320,10 +320,10 @@ class SelectBrandPCV_TP extends Component {
             swal(phrases.PleaseVBrand)
             return false
         }
-        if(!(wheels == 3 && carrying_capacity <= 6)) {
-            swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
-            return false
-        }
+        // if(!(wheels == 3 && carrying_capacity <= 6)) {
+        //     swal("Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111")
+        //     return false
+        // }
         const formData = new FormData();
         let encryption = new Encryption();
         const post_data = {

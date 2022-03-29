@@ -282,7 +282,8 @@ class TwoWheelerVerify extends Component {
             insurerList: [],
             vehicleDetails: [],
             step_completed: "0",
-            request_data: []
+            request_data: [],
+            fastLaneResponse:0
         };
 
     changePlaceHoldClassAdd(e) {
@@ -332,12 +333,42 @@ class TwoWheelerVerify extends Component {
                     motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
+                this.fetchFastlane();
                 this.props.loadingStop();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '3')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found")
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
     }
 
 
@@ -800,6 +831,7 @@ class TwoWheelerVerify extends Component {
                                                 minDate={new Date(minDate)}
                                                 maxDate={new Date(maxDate)}
                                                 dateFormat="dd MMM yyyy"
+                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                 placeholderText={phrases['PPSD']}
                                                 peekPreviousMonth
                                                 peekPreviousYear
@@ -846,6 +878,7 @@ class TwoWheelerVerify extends Component {
                                                     name='previous_policy_name'
                                                     component="select"
                                                     autoComplete="off"
+                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     className="formGrp inputfs12"
                                                     value = {values.previous_policy_name}
                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
@@ -872,6 +905,7 @@ class TwoWheelerVerify extends Component {
                                             component="select"
                                             autoComplete="off"                                                                        
                                             className="formGrp"
+                                            disabled={this.state.fastLaneResponse == 1 ? true :false}
                                         >
                                             <option value="">{phrases['SelectInsurer']}</option>
                                             {insurerList.map((insurer, qIndex) => ( 
@@ -895,6 +929,7 @@ class TwoWheelerVerify extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     
                                                 />
                                                 {errors.previous_city && touched.previous_city ? (
@@ -912,6 +947,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     name="previous_policy_no"
                                                     type="text"
+                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     placeholder={phrases['PPolicyNumber']}
                                                     autoComplete="off"
                                                     maxLength="28"
@@ -1017,7 +1053,7 @@ class TwoWheelerVerify extends Component {
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                 </Col>
                                             </Row>
 
@@ -1028,7 +1064,7 @@ class TwoWheelerVerify extends Component {
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                 </Col>
                                             </Row>
 
@@ -1039,7 +1075,7 @@ class TwoWheelerVerify extends Component {
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                 </Col>
                                             </Row>
 

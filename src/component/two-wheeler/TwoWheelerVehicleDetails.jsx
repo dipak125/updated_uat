@@ -392,7 +392,8 @@ class TwoWheelerVehicleDetails extends Component {
         CustIdkeyword: "",
         RTO_location: "",
         maxRegnDate: "",
-        fastlane:{}
+        fastlane:{},
+        fastLaneResponse:0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -659,7 +660,7 @@ class TwoWheelerVehicleDetails extends Component {
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location, maxRegnDate, request_data
                 })
-               
+                this.fetchFastlane();
                 this.props.loadingStop();
             })
             .catch(err => {
@@ -668,7 +669,35 @@ class TwoWheelerVehicleDetails extends Component {
             })
     }
 
-    
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '3')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found")
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
+    }
 
     handleChange =(value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
@@ -898,6 +927,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                     name='previous_policy_name'
                                                                     component="select"
                                                                     autoComplete="off"
+                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                     className="formGrp inputfs12"
                                                                     value={values.previous_policy_name}
                                                                     onChange={(e) => {
@@ -1011,6 +1041,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 autoComplete="off"
                                                                 peekPreviousYear
                                                                 showMonthDropdown
+                                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                 showYearDropdown
                                                                 dropdownMode="select"
                                                                 //className="datePckr inputfs12"
@@ -1087,6 +1118,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                             component="select"
                                                             autoComplete="off"                                                                        
                                                             className="formGrp"
+                                                            disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                         >
                                                             <option value="">{phrases['SelectInsurer']}</option>
                                                             {insurerList.map((insurer, qIndex) => ( 
@@ -1106,6 +1138,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 <Field
                                                                     name="previous_city"
                                                                     type="text"
+                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                     placeholder={phrases['PInsurerAddress']}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -1128,6 +1161,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                     type="text"
                                                                     maxLength="28"
                                                                     placeholder={phrases['PPolicyNumber']}
+                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                     autoComplete="off"
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1441,7 +1475,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" disabled={this.state.fastLaneResponse == 1 ? true :false} type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
@@ -1452,7 +1486,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
@@ -1463,7 +1497,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 

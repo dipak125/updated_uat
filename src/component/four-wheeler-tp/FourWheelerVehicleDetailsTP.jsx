@@ -73,7 +73,8 @@ class TwoWheelerVehicleDetails extends Component {
         step_completed: "0",
         location_reset_flag: 0,
         request_data: [],
-        changeFlag: 0
+        changeFlag: 0,
+        fastLaneResponse:0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -214,7 +215,7 @@ class TwoWheelerVehicleDetails extends Component {
                 'location_id':values.location_id,
                 'previous_is_claim':values.previous_is_claim,
                 'previous_claim_bonus': values.previous_claim_bonus == "" ? "2" : values.previous_claim_bonus,      
-                'prev_policy_flag': 0,
+                'prev_policy_flag': 1,
                 'vehicleAge': vehicleAge,
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
                 'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
@@ -296,12 +297,42 @@ class TwoWheelerVehicleDetails extends Component {
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed, request_data
                 })
+                this.fetchFastlane();
                 this.props.loadingStop();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '1')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found")
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
     }
 
     handleChange =(value) => {
@@ -466,20 +497,20 @@ class TwoWheelerVehicleDetails extends Component {
                                                             <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
                                                             <div>
-                                                            <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                             </div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">{phrases['Brand']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
+                                                        <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                          <div className="txtRegistr">{phrases['Model']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
+                                                        <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

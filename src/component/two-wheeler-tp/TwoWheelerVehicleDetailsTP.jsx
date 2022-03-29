@@ -67,7 +67,8 @@ class TwoWheelerVehicleDetails extends Component {
         CustIdkeyword: "",
         RTO_location: "",
         step_completed: "0",
-        location_reset_flag: 0
+        location_reset_flag: 0,
+        fastLaneResponse:0
     };
 
     changePlaceHoldClassAdd(e) {
@@ -194,7 +195,7 @@ class TwoWheelerVehicleDetails extends Component {
                 'location_id':values.location_id,
                 'previous_is_claim':values.previous_is_claim,
                 'previous_claim_bonus': values.previous_claim_bonus == "" ? "2" : values.previous_claim_bonus,      
-                'prev_policy_flag': 0,
+                'prev_policy_flag': 1,
                 'vehicleAge': vehicleAge,
                 'pol_start_date': moment(newPolStartDate).format('YYYY-MM-DD'),
                 'pol_end_date': moment(newPolEndDate).format('YYYY-MM-DD'),
@@ -279,6 +280,7 @@ class TwoWheelerVehicleDetails extends Component {
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed
                 })
+                this.fetchFastlane();
                 this.props.loadingStop();
                
             })
@@ -287,7 +289,35 @@ class TwoWheelerVehicleDetails extends Component {
                 this.props.loadingStop();
             })
     }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '3')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found")
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
 
+    }
     handleChange =(value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
         this.setState({
@@ -450,7 +480,7 @@ console.log("step-completed----->",step_completed)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
@@ -461,7 +491,7 @@ console.log("step-completed----->",step_completed)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
@@ -472,7 +502,7 @@ console.log("step-completed----->",step_completed)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 

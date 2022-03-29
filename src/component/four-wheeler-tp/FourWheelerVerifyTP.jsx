@@ -334,12 +334,42 @@ class FourWheelerVerifyTP extends Component {
                     motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
+                this.fetchFastlane();
                 this.props.loadingStop();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '1')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found")
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
     }
 
 
@@ -763,6 +793,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 peekPreviousYear
                                                 showMonthDropdown
                                                 showYearDropdown
+                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                 dropdownMode="select"
                                                 className="datePckr inputfs12"
                                                 selected={values.previous_start_date}
@@ -805,6 +836,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     component="select"
                                                     autoComplete="off"
                                                     className="formGrp inputfs12"
+                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     value = {values.previous_policy_name}
                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                 >
@@ -830,6 +862,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                             component="select"
                                             autoComplete="off"                                                                        
                                             className="formGrp"
+                                            disabled={this.state.fastLaneResponse == 1 ? true :false}
                                         >
                                             <option value="">{phrases['SelectInsurer']}</option>
                                             {insurerList.map((insurer, qIndex) => ( 
@@ -849,6 +882,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 <Field
                                                     name="previous_city"
                                                     type="text"
+                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     placeholder={phrases['PInsurerAddress']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -872,6 +906,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     placeholder={phrases['PPolicyNumber']}
                                                     autoComplete="off"
                                                     maxLength="28"
+                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     
@@ -973,20 +1008,20 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                     {motorInsurance && motorInsurance.registration_no}</div>
                                                     <div>
-                                                    <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                     </div>
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                 <div className="txtRegistr">{phrases['Brand']}<br/>
                                                     <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                <div><button className="rgistrBtn" type="button" onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
+                                                <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                     <div className="txtRegistr">{phrases['Model']}<br/>
                                                     <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                <div><button className="rgistrBtn" type="button" onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
+                                                <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
