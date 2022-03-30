@@ -687,6 +687,7 @@ class TwoWheelerVerify extends Component {
                                                         type="text"
                                                         name='registration_no' 
                                                         autoComplete="off"
+                                                        disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                         className="premiumslid"    
                                                         value= {values.registration_no}
                                                         maxLength={this.state.length}

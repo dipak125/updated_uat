@@ -644,7 +644,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         type="text"
                                                         name='registration_no' 
                                                         autoComplete="off"
-                                                        className="premiumslid"    
+                                                        className="premiumslid"
+                                                        disabled={this.state.fastLaneResponse == 1 ? true :false}    
                                                         value= {values.registration_no}
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
