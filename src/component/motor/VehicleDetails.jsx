@@ -833,7 +833,7 @@ class VehicleDetails extends Component {
                                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                                         // console.log("errors------------ ", errors)
-                                                        // console.log("values===",values)
+                                                         console.log("values===",values)
                                                         return (
                                                             <Form>
                                                                 <Row>
@@ -856,6 +856,7 @@ class VehicleDetails extends Component {
                                                                                         //maxDate={new Date(maxRegnDate)}
                                                                                         maxDate={values.policy_type_id == '3' ? new Date(maxDate) : new Date(maxRegnDate) }
                                                                                         dateFormat="dd MMM yyyy"
+                                                                                        disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                         placeholderText={phrases['RegDate']}
                                                                                         peekPreviousMonth
                                                                                         peekPreviousYear
@@ -899,6 +900,7 @@ class VehicleDetails extends Component {
                                                                                     </div>
                                                                                 </FormGroup>
                                                                             </Col>
+                                                                            {this.state.fastLaneResponse == 0 ?
                                                                             <Col sm={12} md={6} lg={6}>
                                                                                 <FormGroup>
                                                                                     <div className="insurerName">
@@ -910,10 +912,12 @@ class VehicleDetails extends Component {
                                                                                             shouldRenderSuggestions={this.customerIDRender}
                                                                                             renderSuggestion={this.renderCustomerIDSuggestion}
                                                                                             inputProps={inputCustomerID}
+                                                                                            disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                             onChange={e => this.onChange(e, setFieldValue)}
                                                                                             onSuggestionSelected={(e, { suggestion, suggestionValue }) => {
                                                                                                 setFieldTouched('location_id')
                                                                                                 setFieldValue("location_id", suggestion.id)
+                                                                                                
                                                                                             }}
                                                                                         />
                                                                                         {errors.location_id && touched.location_id ? (
@@ -922,6 +926,25 @@ class VehicleDetails extends Component {
                                                                                     </div>
                                                                                 </FormGroup>
                                                                             </Col>
+                                                                            :
+                                                                            <Col sm={12} md={6} lg={6}>
+                                                                                <FormGroup>
+                                                                                    <div className="insurerName">
+                                                                                        <Field
+                                                                                             name='location_id'
+                                                                                             type="text"
+                                                                                             autoComplete="off"
+                                                                                             className="formGrp inputfs12"
+                                                                                             disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                                             value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
+                                                                                        />
+                                                                                        {errors.location_id && touched.location_id ? (
+                                                                                            <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                                    }
                                                                         </Row>
                                                                         {/* {ageObj.whatIsCurrentMonth(values.registration_date) > 0 || values.registration_date == "" ? */  
                                                                             (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' &&
@@ -946,7 +969,7 @@ class VehicleDetails extends Component {
                                                                                                     component="select"
                                                                                                     autoComplete="off"
                                                                                                     className="formGrp inputfs12"
-                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                                     value={values.previous_policy_name}
                                                                                                     onChange={(e) => {
                                                                                                         if (e.target.value == '3') {
@@ -1058,7 +1081,7 @@ class VehicleDetails extends Component {
                                                                                                 showMonthDropdown
                                                                                                 showYearDropdown
                                                                                                 dropdownMode="select"
-                                                                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                                               // disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                                 //className="datePckr inputfs12"
                                                                                                 className={values.previous_policy_name == '3' ? "datePckr inputfs12ST" : "datePckr inputfs12"}
                                                                                                 selected={values.previous_start_date}
@@ -1137,7 +1160,7 @@ class VehicleDetails extends Component {
                                                                                                     component="select"
                                                                                                     autoComplete="off"
                                                                                                     className="formGrp"
-                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                                                 >
                                                                                                     <option value="">{phrases['SelectInsurer']}</option>
                                                                                                     {insurerList.map((insurer, qIndex) => (
@@ -1161,7 +1184,7 @@ class VehicleDetails extends Component {
                                                                                                     autoComplete="off"
                                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
 
                                                                                                 />
                                                                                                 {errors.previous_city && touched.previous_city ? (
@@ -1183,7 +1206,7 @@ class VehicleDetails extends Component {
                                                                                                     maxLength="28"
                                                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
 
                                                                                                 />
                                                                                                 {errors.previous_policy_no && touched.previous_policy_no ? (

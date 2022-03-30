@@ -828,10 +828,10 @@ class TwoWheelerVerify extends Component {
 
                                             <DatePicker
                                                 name="previous_start_date"
-                                                minDate={new Date(minDate)}
-                                                maxDate={new Date(maxDate)}
+                                                //minDate={new Date(minDate)}
+                                                //maxDate={new Date(maxDate)}
                                                 dateFormat="dd MMM yyyy"
-                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                               // disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                 placeholderText={phrases['PPSD']}
                                                 peekPreviousMonth
                                                 peekPreviousYear
@@ -878,7 +878,7 @@ class TwoWheelerVerify extends Component {
                                                     name='previous_policy_name'
                                                     component="select"
                                                     autoComplete="off"
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                   // disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     className="formGrp inputfs12"
                                                     value = {values.previous_policy_name}
                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
@@ -905,7 +905,7 @@ class TwoWheelerVerify extends Component {
                                             component="select"
                                             autoComplete="off"                                                                        
                                             className="formGrp"
-                                            disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                           // disabled={this.state.fastLaneResponse == 1 ? true :false}
                                         >
                                             <option value="">{phrases['SelectInsurer']}</option>
                                             {insurerList.map((insurer, qIndex) => ( 
@@ -929,7 +929,7 @@ class TwoWheelerVerify extends Component {
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     
                                                 />
                                                 {errors.previous_city && touched.previous_city ? (
@@ -947,7 +947,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     name="previous_policy_no"
                                                     type="text"
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     placeholder={phrases['PPolicyNumber']}
                                                     autoComplete="off"
                                                     maxLength="28"

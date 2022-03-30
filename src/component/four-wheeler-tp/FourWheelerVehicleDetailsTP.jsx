@@ -428,6 +428,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
+                                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
@@ -455,6 +456,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    {this.state.fastLaneResponse == 0 ?
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -477,6 +479,26 @@ class TwoWheelerVehicleDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    :
+                                                        <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                     name='location_id'
+                                                                     type="text"
+                                                                     autoComplete="off"
+                                                                     className="formGrp inputfs12"
+                                                                     disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                     value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
+                                                                />
+                                                                {errors.location_id && touched.location_id ? (
+                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                        }
+
                                                 </Row>
                                                 
                                                 <div className="d-flex justify-content-left resmb">

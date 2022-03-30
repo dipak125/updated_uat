@@ -188,6 +188,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
     getBrands = () => {
+        console.log("props",this.props)
         const { productId } = this.props.match.params
         const {vehicleDetails} = this.state
         let brandId = vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""
@@ -199,8 +200,10 @@ class TwoWheelerSelectBrand extends Component {
                         brandList,
                         otherBrands: false
                     })
+                    console.log("set",localStorage.getItem('newBrandEdit'))
                     this.props.loadingStop();
                     if(localStorage.getItem('newBrandEdit') == '1') {
+                        
                         this.setBrandName(brandId)
                     }
                     else if(localStorage.getItem('newBrandEdit') == '2') {
@@ -607,6 +610,7 @@ class TwoWheelerSelectBrand extends Component {
         const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,fastLaneData, brandView,
             selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName } = this.state
         const { productId } = this.props.match.params
+        console.log("view",this.state.brandView)
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
         const newInitialValues = Object.assign(initialValues, {
             selectedBrandId: selectedBrandId ? selectedBrandId : (vehicleDetails && vehicleDetails.vehiclebrand_id ? vehicleDetails.vehiclebrand_id : ""),

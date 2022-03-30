@@ -615,7 +615,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                     validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            
+                       console.log("values",values)     
                     return (
                         <Form>
                         <FormGroup>
@@ -785,15 +785,15 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
                                             <DatePicker
                                                 name="previous_start_date"
-                                                minDate={new Date(minDate)}
-                                                maxDate={new Date(maxDate)}
+                                                //minDate={new Date(minDate)}
+                                                //maxDate={new Date(maxDate)}
                                                 dateFormat="dd MMM yyyy"
                                                 placeholderText={phrases['PPSD']}
                                                 peekPreviousMonth
                                                 peekPreviousYear
                                                 showMonthDropdown
                                                 showYearDropdown
-                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                 dropdownMode="select"
                                                 className="datePckr inputfs12"
                                                 selected={values.previous_start_date}
@@ -836,7 +836,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     component="select"
                                                     autoComplete="off"
                                                     className="formGrp inputfs12"
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     value = {values.previous_policy_name}
                                                     // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                 >
@@ -862,7 +862,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                             component="select"
                                             autoComplete="off"                                                                        
                                             className="formGrp"
-                                            disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                            //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                         >
                                             <option value="">{phrases['SelectInsurer']}</option>
                                             {insurerList.map((insurer, qIndex) => ( 
@@ -882,7 +882,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 <Field
                                                     name="previous_city"
                                                     type="text"
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     placeholder={phrases['PInsurerAddress']}
                                                     autoComplete="off"
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
@@ -906,7 +906,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     placeholder={phrases['PPolicyNumber']}
                                                     autoComplete="off"
                                                     maxLength="28"
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                    //disabled={this.state.fastLaneResponse == 1 ? true :false}
                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                     

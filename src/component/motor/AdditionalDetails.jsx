@@ -661,12 +661,44 @@ class AdditionalDetails extends Component {
                     
                 })
                 this.props.loadingStop();
+                this.fetchFastlane();
                 this.fetchSalutation(addressDetails, motorInsurance)
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '1')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found" && res.data.data.rc_financer)
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1,
+                            showLoan:true,
+                            is_loan_account:'1'
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
     }
 
     fetchAreadetails=(e)=>{
@@ -798,6 +830,7 @@ class AdditionalDetails extends Component {
         const {showLoan, showEIA, showEIA2, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee, titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
         const {productId} = this.props.match.params 
+        console.log("loan",is_loan_account,showLoan)
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
 
         let newInitialValues = Object.assign(initialValue, {

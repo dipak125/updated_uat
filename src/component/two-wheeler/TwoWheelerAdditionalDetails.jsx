@@ -679,11 +679,43 @@ class TwoWheelerAdditionalDetails extends Component {
                 })
                 this.fetchPrevAreaDetails(addressDetails)
                 this.fetchSalutation(addressDetails, motorInsurance)
+                this.fetchFastlane();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+    }
+    fetchFastlane = () => {
+        const formData = new FormData();
+        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            let regNumber=this.state.motorInsurance.registration_no;
+            console.log("fast1",this.state.motorInsurance)
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '3')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("fast12",res.data.msg == "Data found")
+                if (res.data.error == false) {
+                    
+                    if(res.data.msg == "Data found" && res.data.data.rc_financer)
+                    {
+                        this.setState({
+                            ...this.state,
+                            fastLaneResponse:1,
+                            showLoan:true,
+                            is_loan_account:'1'
+                        })
+                    }
+                }
+                
+                
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        
+
     }
 
     fetchAreadetails=(e)=>{
