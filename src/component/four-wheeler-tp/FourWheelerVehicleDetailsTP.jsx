@@ -101,6 +101,8 @@ class TwoWheelerVehicleDetails extends Component {
     }
 
     selectBrand = (productId) => {
+        let brandEdit = {'brandEdit' : 0}
+            this.props.setData(brandEdit)
         this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
 

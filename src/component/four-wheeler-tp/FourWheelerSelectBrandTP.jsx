@@ -380,9 +380,10 @@ class TwoWheelerSelectBrand extends Component {
 
 
     handleSubmit = (values) => {
-        console.log('values----->',values)
+        
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId, request_data , brandView, fastLaneData, fastlanelog } = this.state
+        console.log('value1----->',fastLaneData)
         let post_data = {}
         var registration_part_numbers  = {}
         var regNumber = ""
@@ -432,7 +433,7 @@ class TwoWheelerSelectBrand extends Component {
                     'product_id':sessionStorage.getItem('product_id') ? sessionStorage.getItem('product_id') : "",
                     'bcmaster_id': "5",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id  : "",
                     'page_name': `four_wheeler_Select-brandTP/${productId}`,
                 }
             }
@@ -452,12 +453,12 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_token': bc_data ? bc_data.token : "",
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                     'policy_for': values.policy_for,
-                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : "",
+                    'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : "",
                     'page_name': `four_wheeler_Select-brandTP/${productId}`,
                 }
             }
             
-            // console.log('post_data-----', post_data)
+             console.log('post_data-----', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
             this.props.loadingStart();
             axios.post('four-wh-tp/update-registration', formData).then(res => {
@@ -597,6 +598,7 @@ class TwoWheelerSelectBrand extends Component {
             } 
             else {
                 this.props.loadingStop();
+                console.log("fast1")
                 this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: res.data.data.fastlaneLog_id })
             }       
         })
