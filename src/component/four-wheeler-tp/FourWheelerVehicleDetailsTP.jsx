@@ -101,7 +101,7 @@ class TwoWheelerVehicleDetails extends Component {
     }
 
     selectBrand = (productId) => {
-        let brandEdit = {'brandEdit' : 0}
+        let brandEdit = {'brandEdit' : 0,}
             this.props.setData(brandEdit)
         this.props.history.push(`/four_wheeler_Select-brandTP/${productId}`);
     }
@@ -290,6 +290,7 @@ class TwoWheelerVehicleDetails extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -297,9 +298,9 @@ class TwoWheelerVehicleDetails extends Component {
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed, request_data
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed, request_data,fastlanelog
                 })
-                this.fetchFastlane();
+                //this.fetchFastlane();
                 this.props.loadingStop();
             })
             .catch(err => {
@@ -307,35 +308,7 @@ class TwoWheelerVehicleDetails extends Component {
                 this.props.loadingStop();
             })
     }
-    fetchFastlane = () => {
-        const formData = new FormData();
-        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
-            let regNumber=this.state.motorInsurance.registration_no;
-            console.log("fast1",this.state.motorInsurance)
-            formData.append('registration_no', regNumber)
-            formData.append('menumaster_id', '1')
-            this.props.loadingStart();
-            axios.post('fastlane', formData).then(res => {
-                    console.log("fast12",res.data.msg == "Data found")
-                if (res.data.error == false) {
-                    
-                    if(res.data.msg == "Data found")
-                    {
-                        this.setState({
-                            ...this.state,
-                            fastLaneResponse:1
-                        })
-                    }
-                }
-                
-                
-            })
-                .catch(err => {
-                    this.props.loadingStop();
-                })
-        
-
-    }
+   
 
     handleChange =(value) => {
         let endDate = moment(value).add(1, 'years').format("YYYY-MM-DD")
@@ -356,7 +329,7 @@ class TwoWheelerVehicleDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag} = this.state
+        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag,fastlanelog} = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
@@ -430,7 +403,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
-                                                                disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                                disabled={fastlanelog && fastlanelog.id ? true :false}
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
@@ -458,7 +431,25 @@ class TwoWheelerVehicleDetails extends Component {
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    {this.state.fastLaneResponse == 0 ?
+                                                    {fastlanelog && fastlanelog.id  ?
+                                                     <Col sm={12} md={6} lg={6}>
+                                                     <FormGroup>
+                                                         <div className="insurerName">
+                                                             <Field
+                                                                  name='location_id'
+                                                                  type="text"
+                                                                  autoComplete="off"
+                                                                  className="formGrp inputfs12"
+                                                                  disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                  value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
+                                                             />
+                                                             {errors.location_id && touched.location_id ? (
+                                                                 <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                             ) : null}
+                                                         </div>
+                                                     </FormGroup>
+                                                 </Col>
+                                                 :
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -481,24 +472,8 @@ class TwoWheelerVehicleDetails extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    :
-                                                        <Col sm={12} md={6} lg={6}>
-                                                        <FormGroup>
-                                                            <div className="insurerName">
-                                                                <Field
-                                                                     name='location_id'
-                                                                     type="text"
-                                                                     autoComplete="off"
-                                                                     className="formGrp inputfs12"
-                                                                     disabled={this.state.fastLaneResponse == 1 ? true :false}
-                                                                     value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
-                                                                />
-                                                                {errors.location_id && touched.location_id ? (
-                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
-                                                                ) : null}
-                                                            </div>
-                                                        </FormGroup>
-                                                    </Col>
+                                                    
+                                                       
                                                         }
 
                                                 </Row>
@@ -521,20 +496,20 @@ class TwoWheelerVehicleDetails extends Component {
                                                             <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
                                                             <div>
-                                                            <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                             </div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">{phrases['Brand']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
+                                                        <div><button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                          <div className="txtRegistr">{phrases['Model']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
+                                                        <div><button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

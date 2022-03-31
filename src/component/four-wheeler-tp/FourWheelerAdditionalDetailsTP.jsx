@@ -650,7 +650,8 @@ class TwoWheelerAdditionalDetails extends Component {
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
                  let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
-                 let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
+                 let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 1
+                //let is_loan_account = 0
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""	 
 				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
@@ -669,50 +670,26 @@ class TwoWheelerAdditionalDetails extends Component {
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                     
                 })
+                is_loan_account == 1 ? this.showLoanText(1):this.showLoanText(0);
+                if(policyHolder && policyHolder.pincode) 
+                {
+                    this.fetchAreadetails(policyHolder.pincode)
+                } 
+               
                 this.props.loadingStop();
                 this.fetchPrevAreaDetails(addressDetails)
                 this.fetchSalutation(addressDetails, motorInsurance)
-                this.fetchFastlane();
+                //this.fetchFastlane();
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
     }
-    fetchFastlane = () => {
-        const formData = new FormData();
-        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
-            let regNumber=this.state.motorInsurance.registration_no;
-            console.log("fast1",this.state.motorInsurance)
-            formData.append('registration_no', regNumber)
-            formData.append('menumaster_id', '1')
-            this.props.loadingStart();
-            axios.post('fastlane', formData).then(res => {
-                    console.log("fast12",res.data.msg == "Data found")
-                if (res.data.error == false) {
-                    
-                    if(res.data.msg == "Data found" && res.data.data.rc_financer)
-                    {
-                        this.setState({
-                            ...this.state,
-                            fastLaneResponse:1,
-                            showLoan:true,
-                            is_loan_account:'1'
-                        })
-                    }
-                }
-                
-                
-            })
-                .catch(err => {
-                    this.props.loadingStop();
-                })
-        
+    
 
-    }
-
-    fetchAreadetails=(e)=>{
-        let pinCode = e.target.value;      
+    fetchAreadetails=(value)=>{
+        let pinCode = value;      
 
         if(pinCode.length==6){
             const formData = new FormData();
@@ -1285,7 +1262,7 @@ class TwoWheelerAdditionalDetails extends Component {
                                                 //maxLength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                onKeyUp={e=> this.fetchAreadetails(e)}
+                                                onKeyUp={e=> this.fetchAreadetails(e.target.value)}
                                                 value={values.pincode}
                                                 maxLength="6"
                                                 onInput= {(e)=> {

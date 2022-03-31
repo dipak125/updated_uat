@@ -525,6 +525,7 @@ class AdditionalDetails extends Component {
     }
 
     showLoanText = (value) =>{
+        console.log("calling")
         if(value == 1){
             this.setState({
                 showLoan:true,
@@ -635,12 +636,15 @@ class AdditionalDetails extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
+                 let bank =decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bankdetail : {};
+                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                  let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
                  let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
-                 let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
+                let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
+               // let is_loan_account = 0
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""             
 				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
@@ -655,13 +659,18 @@ class AdditionalDetails extends Component {
                  console.log('is_appointee', nomineeDetails ? nomineeDetails.is_appointee : "efg")
                 //  return false;
                  this.setState({
-                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, 
-                    is_eia_account, is_eia_account2, bankDetails, addressDetails, step_completed, request_data,
+                    quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, fastlanelog,
+                    is_eia_account, is_eia_account2, bankDetails, addressDetails, step_completed, request_data,bank,
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                     
                 })
+                is_loan_account == 1 ? this.showLoanText(1):this.showLoanText(0);
                 this.props.loadingStop();
-                this.fetchFastlane();
+                
+                if(policyHolder && policyHolder.pincode) 
+                {
+                    this.fetchAreadetails(policyHolder.pincode)
+                } 
                 this.fetchSalutation(addressDetails, motorInsurance)
             })
             .catch(err => {
@@ -669,40 +678,9 @@ class AdditionalDetails extends Component {
                 this.props.loadingStop();
             })
     }
-    fetchFastlane = () => {
-        const formData = new FormData();
-        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
-            let regNumber=this.state.motorInsurance.registration_no;
-            console.log("fast1",this.state.motorInsurance)
-            formData.append('registration_no', regNumber)
-            formData.append('menumaster_id', '1')
-            this.props.loadingStart();
-            axios.post('fastlane', formData).then(res => {
-                    console.log("fast12",res.data.msg == "Data found")
-                if (res.data.error == false) {
-                    
-                    if(res.data.msg == "Data found" && res.data.data.rc_financer)
-                    {
-                        this.setState({
-                            ...this.state,
-                            fastLaneResponse:1,
-                            showLoan:true,
-                            is_loan_account:'1'
-                        })
-                    }
-                }
-                
-                
-            })
-                .catch(err => {
-                    this.props.loadingStop();
-                })
-        
-
-    }
-
-    fetchAreadetails=(e)=>{
-        let pinCode = e.target.value;      
+    
+    fetchAreadetails=(value)=>{
+        let pinCode = value;      
 
         if(pinCode.length==6){
             const formData = new FormData();
@@ -828,9 +806,9 @@ class AdditionalDetails extends Component {
 
     render() {
         const {showLoan, showEIA, showEIA2, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee, titleList,tpaInsurance,
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data,fastlanelog} = this.state
         const {productId} = this.props.match.params 
-        console.log("loan",is_loan_account,showLoan)
+        
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
 
         let newInitialValues = Object.assign(initialValue, {
@@ -900,7 +878,8 @@ class AdditionalDetails extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                            console.log("values",values)
+                            console.log("error",errors)
                         return (
                         <Form>
                         <Row>
@@ -1226,7 +1205,7 @@ class AdditionalDetails extends Component {
                                                 maxlength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                onKeyUp={e=> this.fetchAreadetails(e)}
+                                                onKeyUp={e=> this.fetchAreadetails(e.target.value)}
                                                 value={values.pincode}
                                                 maxLength="6"
                                                 onInput= {(e)=> {

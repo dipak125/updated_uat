@@ -187,6 +187,8 @@ class Registration extends Component {
                     this.props.loadingStop();
                     this.setState({ fastLaneData: res.data.data, brandView: '0' })
                     let fastLaneData = { 'fastLaneData': res.data.data }
+                    localStorage.setItem("fastLane",1)
+                    console.log("fast9")
                     this.props.setData(fastLaneData)
                 }
                 else {
@@ -394,7 +396,7 @@ class Registration extends Component {
     }
 
     render() {
-        const { motorInsurance } = this.state
+        const { motorInsurance,fastlanelog } = this.state
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues, {
             reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one,

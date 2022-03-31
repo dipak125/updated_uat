@@ -193,15 +193,16 @@ class TwoWheelerVerify extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decryptResp====", decryptResp)
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,request_data,
+                    motorInsurance, previousPolicy,request_data,fastlanelog,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
-                this.fetchFastlane();
+               
                 this.props.loadingStop();
             })
             .catch(err => {
@@ -209,35 +210,7 @@ class TwoWheelerVerify extends Component {
                 this.props.loadingStop();
             })
     }
-    fetchFastlane = () => {
-        const formData = new FormData();
-        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
-            let regNumber=this.state.motorInsurance.registration_no;
-            console.log("fast1",this.state.motorInsurance)
-            formData.append('registration_no', regNumber)
-            formData.append('menumaster_id', '3')
-            this.props.loadingStart();
-            axios.post('fastlane', formData).then(res => {
-                    console.log("fast12",res.data.msg == "Data found")
-                if (res.data.error == false) {
-                    
-                    if(res.data.msg == "Data found")
-                    {
-                        this.setState({
-                            ...this.state,
-                            fastLaneResponse:1
-                        })
-                    }
-                }
-                
-                
-            })
-                .catch(err => {
-                    this.props.loadingStop();
-                })
-        
-
-    }
+   
 
 
 
@@ -395,7 +368,7 @@ class TwoWheelerVerify extends Component {
 
 
     render() {
-        const {insurerList, vahanDetails, error, policyCoverage, vahanVerify, previousPolicy, motorInsurance,request_data} = this.state
+        const {insurerList, vahanDetails, error, policyCoverage, vahanVerify, previousPolicy, motorInsurance,request_data,fastlanelog} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -500,7 +473,7 @@ class TwoWheelerVerify extends Component {
                                                 <Field
                                                     type="text"
                                                     name='registration_no' 
-                                                    disabled={this.state.fastLaneResponse == 1 ? true :false}
+                                                    disabled={fastlanelog && fastlanelog.id ? true :false}
                                                     autoComplete="off"
                                                     className="premiumslid"   
                                                     value= {values.registration_no}    

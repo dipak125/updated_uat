@@ -324,6 +324,7 @@ class FourWheelerVerifyTP extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decryptResp====", decryptResp)
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -331,7 +332,7 @@ class FourWheelerVerifyTP extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                 this.fetchFastlane();
@@ -550,7 +551,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
 
     render() {
-        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed} = this.state
+        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -645,7 +646,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         name='registration_no' 
                                                         autoComplete="off"
                                                         className="premiumslid"
-                                                        disabled={this.state.fastLaneResponse == 1 ? true :false}    
+                                                        disabled={fastlanelog && fastlanelog.id ? true :false}  
                                                         value= {values.registration_no}
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
@@ -1009,20 +1010,20 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                     {motorInsurance && motorInsurance.registration_no}</div>
                                                     <div>
-                                                    <button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                     </div>
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                 <div className="txtRegistr">{phrases['Brand']}<br/>
                                                     <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
+                                                <div><button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                     <div className="txtRegistr">{phrases['Model']}<br/>
                                                     <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                <div><button className="rgistrBtn" type="button" disabled={this.state.fastLaneResponse == 1 ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
+                                                <div><button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

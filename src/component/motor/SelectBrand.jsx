@@ -221,6 +221,7 @@ class SelectBrand extends Component {
                     if( this.props.data.fastLaneData || this.props.data.brandEdit && this.props.data.brandEdit == '0' ) {
                         this.setState({pageLoad: '0', fastLaneData: this.props.data.fastLaneData})
                         // this.props.loadingStop();
+                        
                         this.handleSubmit(this.props.data.fastLaneData, '0')
                     }
                     else {
