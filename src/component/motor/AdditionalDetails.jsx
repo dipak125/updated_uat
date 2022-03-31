@@ -644,7 +644,7 @@ class AdditionalDetails extends Component {
                  let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : {};
                  let nomineeDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0] : {}
                 let is_loan_account = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_carloan : 0
-               // let is_loan_account = 0
+                //let is_loan_account = 1
                  let quoteId = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.quote_id : ""
                  let is_eia_account=  policyHolder && (policyHolder.is_eia_account == 0 || policyHolder.is_eia_account == 1) ? policyHolder.is_eia_account : ""             
 				 let is_eia_account2=  policyHolder && (policyHolder.create_eia_account == 0 || policyHolder.create_eia_account == 1) ? policyHolder.create_eia_account : ""
@@ -808,7 +808,7 @@ class AdditionalDetails extends Component {
         const {showLoan, showEIA, showEIA2, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee, titleList,tpaInsurance,
             bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data,fastlanelog} = this.state
         const {productId} = this.props.match.params 
-        
+        console.log("loan",typeof(is_loan_account))
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null        
 
         let newInitialValues = Object.assign(initialValue, {
@@ -820,9 +820,9 @@ class AdditionalDetails extends Component {
             pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
-            is_carloan:is_loan_account,
-            bank_name: bankDetails ? bankDetails.bank_name : "",
-            bank_branch: bankDetails ? bankDetails.bank_branch : "",
+            is_carloan:parseInt(is_loan_account),
+            bank_name: bankDetails ? bankDetails.bank_name != null ? bankDetails.bank_name : "" : "",
+            bank_branch: bankDetails ? bankDetails.bank_branch != null ? bankDetails.bank_branch : "" :"",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
