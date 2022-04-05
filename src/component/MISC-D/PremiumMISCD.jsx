@@ -255,7 +255,8 @@ class PremiumMISCD extends Component {
 
             axios.post('fullQuoteMISCD', formData)
                 .then(res => {
-                    if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
+                    console.log('Sudipto Res', res);
+                    if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
                         this.setState({
                             fulQuoteResp: res.data.data.PolicyObject,
                             PolicyArray: res.data.data.PolicyObject.PolicyLobList,

@@ -135,8 +135,8 @@ class TwoWheelerSelectBrand extends Component {
             length:14,
             fastLaneData: [],
             brandView: '1',
-            fastlanelog: [],
             flag:1,
+            fastlanelog: [],
             stop: 0,
             stopMsg:""
         };
@@ -365,13 +365,7 @@ class TwoWheelerSelectBrand extends Component {
 
 
     handleSubmit = (values) => {
-        if(values.policy_type == '1')
-        {
-            this.setState({
-                brandView:'1',
-                flag:3
-            })
-        }
+       
         const { productId } = this.props.match.params
         const { selectedVarientId, selectedModelId, selectedBrandId, request_data , brandView, fastLaneData, fastlanelog } = this.state
         console.log('value1----->',fastLaneData)
@@ -637,7 +631,9 @@ class TwoWheelerSelectBrand extends Component {
                 this.setState({
                     ...this.state,
                     stop: 1,
-                    stopMsg:res.data.msg
+                    stopMsg:res.data.msg,
+                    brandView: '1',
+                    flag:1,
                 })
                 this.props.loaderStop()
             }
@@ -649,24 +645,19 @@ class TwoWheelerSelectBrand extends Component {
             else {
                 this.props.loadingStop();
                 this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: res.data.data.fastlaneLog_id,flag:3,stop: 0 })
-            }       
+            }  
+            console.log("chec12",this.state.brandView,this.state.flag)     
         })
             .catch(err => {
                 this.props.loadingStop();
                 this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: 0 })
             })
-            if(values.policy_type == '1')
-            {
-                this.setState({
-                    brandView:'1',
-                    flag:3
-                })
-            }
            
     }
     takingNewPolicy =(values)=>{
         if(values.policy_type == '1')
         {
+            console.log("pol",values.policy_type)
             this.setState({
                 brandView:'1',
                 flag:3
