@@ -677,7 +677,9 @@ class AdditionalDetailsPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                 //console.log("decrypt---", decryptResp)
+                 console.log("decrypt", decryptResp)
+                 let bank =decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bankdetail : {};
+                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -705,7 +707,13 @@ class AdditionalDetailsPCV extends Component {
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : ""
                     
                 })
+                is_loan_account == 1 ? this.showLoanText(1):this.showLoanText(0);
                 this.props.loadingStop();
+                
+                if(policyHolder && policyHolder.pincode) 
+                {
+                    this.fetchAreadetails(policyHolder.pincode)
+                } 
                 this.fetchSalutation(addressDetails, motorInsurance)
             })
             .catch(err => {
@@ -713,9 +721,9 @@ class AdditionalDetailsPCV extends Component {
                 this.props.loadingStop();
             })
     }
-
-    fetchAreadetails=(e)=>{
-        let pinCode = e.target.value;      
+    
+    fetchAreadetails=(value)=>{
+        let pinCode = value;      
 
         if(pinCode.length==6){
             const formData = new FormData();
@@ -842,8 +850,8 @@ class AdditionalDetailsPCV extends Component {
    
 
     render() {
-        const {showLoan, showEIA, showEIA2, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee, titleList, tpaInsurance,
-            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data} = this.state
+        const {showLoan, showEIA, showEIA2, is_eia_account,is_eia_account2, is_loan_account, nomineeDetails, motorInsurance,appointeeFlag, is_appointee, titleList,tpaInsurance,
+            bankDetails,policyHolder, stateName, pinDataArr, quoteId, addressDetails, relation,step_completed,vehicleDetails,request_data,fastlanelog} = this.state
         const {productId} = this.props.match.params 
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -856,9 +864,9 @@ class AdditionalDetailsPCV extends Component {
             pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
-            is_carloan:is_loan_account,
-            bank_name: bankDetails ? bankDetails.bank_name : "",
-            bank_branch: bankDetails ? bankDetails.bank_branch : "",
+            is_carloan:parseInt(is_loan_account),
+            bank_name: bankDetails ? bankDetails.bank_name != null ? bankDetails.bank_name : "" : "",
+            bank_branch: bankDetails ? bankDetails.bank_branch != null ? bankDetails.bank_branch : "" :"",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
             nominee_first_name: nomineeDetails && nomineeDetails.first_name ? nomineeDetails.first_name : "",
             nominee_gender: nomineeDetails && nomineeDetails.gender ? nomineeDetails.gender : "",
@@ -1240,7 +1248,7 @@ class AdditionalDetailsPCV extends Component {
                                                 maxLength = "6"
                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                onKeyUp={e=> this.fetchAreadetails(e)}
+                                                onKeyUp={e=> this.fetchAreadetails(e.target.value)}
                                                 value={values.pincode}
                                                 maxLength="6"
                                                 onInput= {(e)=> {

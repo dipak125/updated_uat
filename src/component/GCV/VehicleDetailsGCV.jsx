@@ -21,6 +21,7 @@ import {
     checkGreaterStartEndTimes
   } from "../../shared/validationFunctions";
 import swal from 'sweetalert';
+import { setData } from "../../store/actions/data";
 
 const year = new Date('Y')
 const ageObj = new PersonAge();
@@ -450,7 +451,24 @@ class VehicleDetailsGCV extends Component {
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/SelectBrand_GCV/${productId}`);
+       // this.props.history.push(`/SelectBrand_GCV/${productId}`);
+       const {is_fieldDisabled} =this.state
+        if (is_fieldDisabled && is_fieldDisabled == "true") {
+            this.props.history.push(`/Registration_GCV/${productId}`);
+        }
+        else {
+            let brandEdit = { 'brandEdit': 1 }
+            this.props.setData(brandEdit)
+            //localStorage.setItem("fastlaneNoData",1);
+            this.props.history.push({
+                pathname: `/SelectBrand_GCV/${productId}`,
+                appState: {
+                  flag : 1
+                  
+                }
+              });
+            //this.props.history.push(`/Select-brand/${productId}`);
+        }
     }
 
 
@@ -702,6 +720,7 @@ class VehicleDetailsGCV extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
+                 let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
                  let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicy ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -710,7 +729,7 @@ class VehicleDetailsGCV extends Component {
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim,is_fieldDisabled
                 })
                 this.props.loadingStop();
             })
@@ -888,14 +907,16 @@ class VehicleDetailsGCV extends Component {
     render() {
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions,
-              vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag} = this.state
+              vehicleDetails, RTO_location, averagemonthlyusages,goodscarriedtypes,permittypes, location_reset_flag,is_fieldDisabled} = this.state
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
             location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
+           
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
+          
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
             insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
@@ -974,6 +995,7 @@ class VehicleDetailsGCV extends Component {
                                                                 placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
+                                                                disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                 showMonthDropdown
                                                                 showYearDropdown
                                                                 dropdownMode="select"
@@ -1001,6 +1023,25 @@ class VehicleDetailsGCV extends Component {
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    {is_fieldDisabled && is_fieldDisabled == "true" ?
+                                                        <Col sm={12} md={6} lg={6}>
+                                                        <FormGroup>
+                                                            <div className="insurerName">
+                                                                <Field
+                                                                     name='location_id'
+                                                                     type="text"
+                                                                     autoComplete="off"
+                                                                     className="formGrp inputfs12"
+                                                                     disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                     value={motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""}
+                                                                />
+                                                                {errors.location_id && touched.location_id ? (
+                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                                ) : null}
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                        :
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -1023,6 +1064,7 @@ class VehicleDetailsGCV extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    }
                                                 </Row>
                                                 <Row>
                                                     <Col sm={12} md={11} lg={4}>
@@ -1570,7 +1612,7 @@ class VehicleDetailsGCV extends Component {
                                                         <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
 
@@ -1580,14 +1622,14 @@ class VehicleDetailsGCV extends Component {
                                                             - <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                         </div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">{phrases['GCVModel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                        <div> <button type="button" className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -1630,14 +1672,16 @@ class VehicleDetailsGCV extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

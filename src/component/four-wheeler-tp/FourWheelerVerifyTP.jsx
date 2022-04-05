@@ -324,6 +324,7 @@ class FourWheelerVerifyTP extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decryptResp====", decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -332,10 +333,10 @@ class FourWheelerVerifyTP extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,is_fieldDisabled,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
-                this.fetchFastlane();
+               
                 this.props.loadingStop();
             })
             .catch(err => {
@@ -343,36 +344,7 @@ class FourWheelerVerifyTP extends Component {
                 this.props.loadingStop();
             })
     }
-    fetchFastlane = () => {
-        const formData = new FormData();
-        //var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
-            let regNumber=this.state.motorInsurance.registration_no;
-            console.log("fast1",this.state.motorInsurance)
-            formData.append('registration_no', regNumber)
-            formData.append('menumaster_id', '1')
-            this.props.loadingStart();
-            axios.post('fastlane', formData).then(res => {
-                    console.log("fast12",res.data.msg == "Data found")
-                if (res.data.error == false) {
-                    
-                    if(res.data.msg == "Data found")
-                    {
-                        this.setState({
-                            ...this.state,
-                            fastLaneResponse:1
-                        })
-                    }
-                }
-                
-                
-            })
-                .catch(err => {
-                    this.props.loadingStop();
-                })
-        
-
-    }
-
+   
 
 
     getVahanDetails = async(values, setFieldTouched, setFieldValue, errors) => {
@@ -551,7 +523,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
 
     render() {
-        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog} = this.state
+        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog,is_fieldDisabled} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -646,7 +618,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         name='registration_no' 
                                                         autoComplete="off"
                                                         className="premiumslid"
-                                                        disabled={fastlanelog && fastlanelog.id ? true :false}  
+                                                        disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                         value= {values.registration_no}
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
@@ -712,53 +684,79 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                     
                                 {values.vahanVerify && !errors.chasis_no_last_part ?
                                 <Row>
-                                    <Col sm={12} md={6} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <Field
-                                                    name="engine_no"
-                                                    type="text"
-                                                    placeholder={phrases['EngineNumber']}
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.engine_no}
-                                                    maxLength="25"
-                                                    onChange = {(e) => {
-                                                        setFieldTouched('engine_no')
-                                                        setFieldValue('engine_no', e.target.value.toUpperCase())                       
-                                                    }}  
-                                                />
-                                                {errors.engine_no && touched.engine_no ? (
-                                                    <span className="errorMsg">{phrases[errors.engine_no]}</span>
-                                                ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={6} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <Field
-                                                    name="chasis_no"
-                                                    type="text"
-                                                    placeholder={phrases['ChasisNumber']}
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.chasis_no}
-                                                    maxLength="25"
-                                                    onChange = {(e) => {
-                                                        setFieldTouched('chasis_no')
-                                                        setFieldValue('chasis_no', e.target.value.toUpperCase())                       
-                                                    }} 
-                                                />
-                                                {errors.chasis_no && touched.chasis_no ? (
-                                                    <span className="errorMsg">{phrases[errors.chasis_no]}</span>
-                                                ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
+                                <Col sm={12} md={12} lg={4}>
+                                <Row>
+                                <Col sm={12} md={5} lg={6}>
+                                    <FormGroup>
+                                        <div className="insurerName">
+                                        {phrases['EngineNumber']}
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                                    
+                                <Col sm={12} md={5} lg={6}>
+                                <FormGroup>
+                                           <div className="insurerName">
+                                               <Field
+                                                   name="engine_no"
+                                                   type="text"
+                                                   placeholder={phrases["EngineNumber"]}
+                                                   autoComplete="off"
+                                                   onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                   onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                   value= {values.engine_no}
+                                                   maxLength="25"
+                                                   onChange = {(e) => {
+                                                       setFieldTouched('engine_no')
+                                                       setFieldValue('engine_no', e.target.value.toUpperCase())                       
+                                                   }}  
+                                               />
+                                               {errors.engine_no && touched.engine_no ? (
+                                                   <span className="errorMsg">{phrases[errors.engine_no]}</span>
+                                               ) : null}
+                                           </div>
+                                       </FormGroup>
+                                </Col>
                                 </Row>
+                                </Col>
+
+                                <Col sm={12} md={12} lg={5}>
+                                    <Row>
+                                        <Col sm={12} md={5} lg={6}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                {phrases['ChasisNumber']}.
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                    
+                                        <Col sm={12} md={5} lg={6}>
+                                        <FormGroup>
+                                           <div className="insurerName">
+                                               <Field
+                                                   name="chasis_no"
+                                                   type="text"
+                                                   placeholder={phrases["ChasisNumber"]}
+                                                   autoComplete="off"
+                                                   onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                   onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                   value= {values.chasis_no}
+                                                   maxLength="25"
+                                                   onChange = {(e) => {
+                                                       setFieldTouched('chasis_no')
+                                                       setFieldValue('chasis_no', e.target.value.toUpperCase())                       
+                                                   }} 
+                                               />
+                                               {errors.chasis_no && touched.chasis_no ? (
+                                                   <span className="errorMsg">{phrases[errors.chasis_no]}</span>
+                                               ) : null}
+                                           </div>
+                                       </FormGroup>
+                                        </Col>
+                                    </Row>
+                                    </Col>
+
+                            </Row>
                                 : null}
                                 <Row>
                                     <Col sm={12}>
@@ -1010,20 +1008,20 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                     <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                     {motorInsurance && motorInsurance.registration_no}</div>
                                                     <div>
-                                                    <button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button"disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                     </div>
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                 <div className="txtRegistr">{phrases['Brand']}<br/>
                                                     <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                <div><button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
+                                                <div><button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                     <div className="txtRegistr">{phrases['Model']}<br/>
                                                     <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                <div><button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
+                                                <div><button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                             </div>
 
                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

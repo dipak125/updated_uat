@@ -273,6 +273,7 @@ class TwoWheelerVehicleDetails extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -281,9 +282,9 @@ class TwoWheelerVehicleDetails extends Component {
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  console.log("fetch--step-completed----->",step_completed)
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed,fastlanelog
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed,fastlanelog,is_fieldDisabled
                 })
-                this.fetchFastlane();
+                //this.fetchFastlane();
                 this.props.loadingStop();
                
             })
@@ -340,7 +341,7 @@ class TwoWheelerVehicleDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag,fastlanelog} = this.state
+        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag,fastlanelog,is_fieldDisabled} = this.state
         
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = Object.assign(initialValue, {
@@ -410,7 +411,7 @@ console.log("step-completed----->",step_completed)
                                                                 autoComplete="off"
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
-                                                                disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -439,7 +440,7 @@ console.log("step-completed----->",step_completed)
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    {fastlanelog && fastlanelog.id  ?
+                                                    {is_fieldDisabled && is_fieldDisabled  ?
                                                     <Col sm={12} md={6} lg={6}>
                                                     <FormGroup>
                                                         <div className="insurerName">
@@ -447,9 +448,9 @@ console.log("step-completed----->",step_completed)
                                                                  name='location_id'
                                                                  type="text"
                                                                  autoComplete="off"
-                                                                 disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                 //disabled={fastlanelog && fastlanelog.id ? true :false}
                                                                  className="formGrp inputfs12"
-                                                                 
+                                                                 disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                  value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
                                                             />
                                                             {errors.location_id && touched.location_id ? (
@@ -507,7 +508,7 @@ console.log("step-completed----->",step_completed)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
@@ -518,7 +519,7 @@ console.log("step-completed----->",step_completed)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 
@@ -529,7 +530,7 @@ console.log("step-completed----->",step_completed)
                                                         </Col>
 
                                                         <Col sm={12} md={5} className="text-right">
-                                                            <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                         </Col>
                                                     </Row>
 

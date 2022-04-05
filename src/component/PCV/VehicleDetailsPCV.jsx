@@ -21,6 +21,7 @@ import {
     checkGreaterStartEndTimes
   } from "../../shared/validationFunctions";
 import swal from 'sweetalert';
+import { setData } from "../../store/actions/data";
 
 
 const menumaster_id = 4
@@ -436,7 +437,24 @@ class VehicleDetailsPCV extends Component {
     }
 
     selectBrand = (productId) => {
-        this.props.history.push(`/SelectBrand_PCV/${productId}`);
+        //this.props.history.push(`/SelectBrand_PCV_TP/${productId}`);
+        let {is_fieldDisabled}=this.state
+        if (is_fieldDisabled && is_fieldDisabled == "true") {
+            this.props.history.push(`/Registration_PCV/${productId}`);
+        }
+        else {
+            let brandEdit = { 'brandEdit': 1 }
+            this.props.setData(brandEdit)
+            //localStorage.setItem("fastlaneNoData",1);
+            this.props.history.push({
+                pathname: `/SelectBrand_PCV/${productId}`,
+                appState: {
+                  flag : 1
+                  
+                }
+              });
+            //this.props.history.push(`/Select-brand/${productId}`);
+        }
     }
 
 
@@ -734,6 +752,7 @@ class VehicleDetailsPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                 let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 // console.log("decrypt", decryptResp)
                 // console.log("lapseduration===", decryptResp.data.policyHolder.motorinsurance)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
@@ -745,7 +764,7 @@ class VehicleDetailsPCV extends Component {
                  let RTO_location = motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""
                  let previous_is_claim= previousPolicy && (previousPolicy.is_claim == 0 || previousPolicy.is_claim == 1) ? previousPolicy.is_claim : ""
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location, previous_is_claim, no_of_claim,is_fieldDisabled
                 })
                 this.props.loadingStop();
             })
@@ -897,7 +916,7 @@ class VehicleDetailsPCV extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,CustomerID,suggestions, 
+        const {insurerList, showClaim, previous_is_claim, is_fieldDisabled,motorInsurance, previousPolicy,CustomerID,suggestions, 
               vehicleDetails, RTO_location, averagemonthlyusages, proposedUse,permittypes, location_reset_flag} = this.state
               
         var defaultDate = new Date()
@@ -994,6 +1013,7 @@ class VehicleDetailsPCV extends Component {
                                                                 maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
+                                                                disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                 peekPreviousMonth
                                                                 peekPreviousYear
                                                                 showMonthDropdown
@@ -1025,6 +1045,25 @@ class VehicleDetailsPCV extends Component {
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
+                                                    {is_fieldDisabled && is_fieldDisabled == "true" ?
+                                                     <Col sm={12} md={6} lg={6}>
+                                                     <FormGroup>
+                                                         <div className="insurerName">
+                                                             <Field
+                                                                  name='location_id'
+                                                                  type="text"
+                                                                  autoComplete="off"
+                                                                  className="formGrp inputfs12"
+                                                                  disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                  value={motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""}
+                                                             />
+                                                             {errors.location_id && touched.location_id ? (
+                                                                 <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                             ) : null}
+                                                         </div>
+                                                     </FormGroup>
+                                                 </Col>
+                                                    :
                                                     <Col sm={12} md={6} lg={6}>
                                                         <FormGroup>
                                                             <div className="insurerName">
@@ -1047,6 +1086,9 @@ class VehicleDetailsPCV extends Component {
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
+
+                                                    
+                                                        }
                                                 </Row>
                                                 <Row>
                                                     <Col sm={12} md={11} lg={4}>
@@ -1298,8 +1340,8 @@ class VehicleDetailsPCV extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
+                                                               // minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
+                                                               // maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth
@@ -1593,7 +1635,7 @@ class VehicleDetailsPCV extends Component {
                                                         <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                        <div> <button type="button" className="rgistrBtn"  disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
 
@@ -1603,14 +1645,14 @@ class VehicleDetailsPCV extends Component {
                                                             - <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                         </div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                        <div> <button type="button" className="rgistrBtn"  disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">{phrases['PCVModel']}<br />
                                                         <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
 
-                                                        <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                        <div> <button type="button" className="rgistrBtn"  disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -1658,14 +1700,16 @@ class VehicleDetailsPCV extends Component {
 
 const mapStateToProps = state => {
     return {
-      loading: state.loader.loading
+      loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
   const mapDispatchToProps = dispatch => {
     return {
       loadingStart: () => dispatch(loaderStart()),
-      loadingStop: () => dispatch(loaderStop())
+      loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { setData } from "../../store/actions/data";
 import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
 
 const menumaster_id = 7
@@ -138,10 +139,10 @@ fetchData=()=>{
                   }
             }
             
-
+            let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled : {}
             let motorInsurance = i > 0 ? decryptResp.data.policyHolder.motorinsurance : []          
             this.setState({ 
-                motorInsurance
+                motorInsurance,is_fieldDisabled
             })
             this.props.loadingStop();
         })
@@ -176,6 +177,12 @@ handleSubmit=(values)=>{
 
     const {productId} = this.props.match.params;
 
+    if(this.state.stop ===1)
+    {
+        swal(this.state.stopMsg)
+        this.props.loadingStop()
+    }
+    else{
     const formData = new FormData();
     let encryption = new Encryption();
     const {fastLaneData, fastlanelog } = this.state
@@ -341,6 +348,57 @@ handleSubmit=(values)=>{
         });
     }
 }
+}
+fetchFastlane = async(values) => {
+    const {is_fieldDisabled} = this.state
+    const {productId} = this.props.match.params
+    if(is_fieldDisabled && is_fieldDisabled == "true")
+    {
+        this.props.history.push(`/VehicleDetails_MISCDST/${productId}`);
+    }
+    else{
+    const formData = new FormData();
+    var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+    if (values.check_registration == '2') {
+        formData.append('registration_no', regNumber)
+        formData.append('menumaster_id', '7')
+        this.props.loadingStart();
+        axios.post('fastlane', formData).then(res => {
+                console.log("check12",res.data)
+            if(res.data && res.data.error && res.data.error === 1)
+            {
+                console.log("cond",res.data.error,typeof(res.data.error))
+                this.setState({
+                    ...this.state,
+                    stop: 1,
+                    stopMsg:res.data.msg
+                })
+            }
+             else if (res.data.error == false) {
+                this.props.loadingStop();
+                this.setState({ fastLaneData: res.data.data, brandView: '0' ,stop: 0})
+                let fastLaneData = { 'fastLaneData': res.data.data }
+                localStorage.setItem("fastLane",1)
+                console.log("fast9")
+                this.props.setData(fastLaneData)
+            }
+            else {
+                this.props.loadingStop();
+                this.props.setData([])
+                this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [],stop: 0 })
+            }
+            this.handleSubmit(values, res.data.data)
+        })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+    } else {
+        this.props.setData([])
+        this.handleSubmit(values, [])
+    }
+
+}
+}
     
 setValueData = () => {
     var checkBoxAll = document.getElementsByClassName('user-self');
@@ -367,7 +425,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
 
     render() {
-        const {motorInsurance, subVehicleList} = this.state
+        const {motorInsurance, subVehicleList,is_fieldDisabled} = this.state
 	    var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues,{
             reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
@@ -402,8 +460,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                     <div className="boxpd">
                                         <h4 className="m-b-30">{phrases['About']}</h4>
                                         <Formik initialValues={newInitialValues} 
-                                        onSubmit={this.handleSubmit} 
-                                        validationSchema={vehicleRegistrationValidation}
+                                        onSubmit={this.fetchFastlane} 
+                                        //validationSchema={vehicleRegistrationValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                             // console.log('values',values)
@@ -514,77 +572,77 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                 <label className="col-md-4">{phrases['RegName']} :</label>
                                                 <div className="col-md-1">
 
-                                                    <Field
-                                                        name="reg_number_part_one"
-                                                        type="text"
-                                                        autoComplete="off"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value={values.reg_number_part_one}
-                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                        maxLength="3"
-                                                        onInput={e => {
-                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                            setFieldTouched('check_registration')
-                                                            setFieldValue('check_registration', '2');
-                                                        }}
+                                                                    <Field
+                                                                        name="reg_number_part_one"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.reg_number_part_one}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                        maxLength="3"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
 
                                                     />
                                                 </div>
                                                 <div className="col-md-1">
 
-                                                    <Field
-                                                        name="reg_number_part_two"
-                                                        type="text"
-                                                        autoComplete="off"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value={values.reg_number_part_two}
-                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                        maxLength="2"
-                                                        onInput={e => {
-                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                            setFieldTouched('check_registration')
-                                                            setFieldValue('check_registration', '2');
-                                                        }}
+                                                                    <Field
+                                                                        name="reg_number_part_two"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.reg_number_part_two}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                        maxLength="2"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
 
                                                     />         
                                                 </div>
                                                 <div className="col-md-1">
 
-                                                    <Field
-                                                        name="reg_number_part_three"
-                                                        type="text"
-                                                        autoComplete="off"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value={values.reg_number_part_three}
-                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                        maxLength="3"
-                                                        onInput={e => {
-                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                            setFieldTouched('check_registration')
-                                                            setFieldValue('check_registration', '2');
-                                                        }}
+                                                                    <Field
+                                                                        name="reg_number_part_three"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.reg_number_part_three}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                        maxLength="3"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
 
                                                     />
                                                 </div>
                                                 <div className="col-md-1">
 
-                                                    <Field
-                                                        name="reg_number_part_four"
-                                                        type="text"
-                                                        autoComplete="off"
-                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                        value={values.reg_number_part_four}
-                                                        disabled= {values.check_registration == '1' ? true : false}
-                                                        maxLength="4"
-                                                        onInput={e => {
-                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
-                                                            setFieldTouched('check_registration')
-                                                            setFieldValue('check_registration', '2');
-                                                        }}
+                                                                    <Field
+                                                                        name="reg_number_part_four"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value={values.reg_number_part_four}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                        maxLength="4"
+                                                                        onInput={e => {
+                                                                            this.regnoFormat(e, setFieldTouched, setFieldValue)
+                                                                            setFieldTouched('check_registration')
+                                                                            setFieldValue('check_registration', '2');
+                                                                        }}
 
                                                     />
                                                 </div>
@@ -670,6 +728,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 const mapStateToProps = state => {
     return {
       loading: state.loader.loading,
+      data: state.processData.data
     };
   };
   
@@ -677,6 +736,7 @@ const mapStateToProps = state => {
     return {
       loadingStart: () => dispatch(loaderStart()),
       loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

@@ -647,6 +647,7 @@ class TwoWheelerVehicleDetails extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -661,7 +662,7 @@ class TwoWheelerVehicleDetails extends Component {
                     : moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar()
                 console.log("previous", previousPolicy);
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails, RTO_location, maxRegnDate, request_data,fastlanelog
+                    motorInsurance, previousPolicy, vehicleDetails, RTO_location, maxRegnDate, request_data,fastlanelog,is_fieldDisabled
                 })
                
                 this.props.loadingStop();
@@ -695,7 +696,7 @@ class TwoWheelerVehicleDetails extends Component {
     render() {
         const { productId } = this.props.match.params
         const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID, suggestions, vehicleDetails, RTO_location, maxRegnDate, request_data, fastlane ,fastlanelog} = this.state
+            CustomerID, suggestions, vehicleDetails, RTO_location, maxRegnDate, request_data, fastlane ,fastlanelog,is_fieldDisabled} = this.state
 
         console.log("fast", fastlane)
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -820,7 +821,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                     placeholderText={phrases['RegDate']}
                                                                                     peekPreviousMonth
                                                                                     peekPreviousYear
-                                                                                    disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                                    disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                                     showMonthDropdown
                                                                                     showYearDropdown
                                                                                     dropdownMode="select"
@@ -854,7 +855,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                 <Field
                                                                                     name='location_id'
                                                                                     type="text"
-                                                                                    disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                                    disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                                     autoComplete="off"
                                                                                     className="formGrp inputfs12"
                                                                                     value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
@@ -1475,7 +1476,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                             </Col>
 
                                                                             <Col sm={12} md={5} className="text-right">
-                                                                                <button className="rgistrBtn" disabled={fastlanelog && fastlanelog.id ? true :false} type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                <button className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                             </Col>
                                                                         </Row>
 
@@ -1486,7 +1487,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                             </Col>
 
                                                                             <Col sm={12} md={5} className="text-right">
-                                                                                <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                <button className="rgistrBtn" type="button"disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                             </Col>
                                                                         </Row>
 
@@ -1497,7 +1498,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                             </Col>
 
                                                                             <Col sm={12} md={5} className="text-right">
-                                                                                <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                             </Col>
                                                                         </Row>
 

@@ -819,6 +819,8 @@ class TwoWheelerVehicleDetailsOD extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicyforsaod : {};
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -827,7 +829,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                 let no_of_claim= previousPolicy && previousPolicy[1] && previousPolicy[1].previouspoliciesclaims ? previousPolicy[1].previouspoliciesclaims.length : ""
 
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails, RTO_location,  previous_is_claim, no_of_claim
+                    motorInsurance, previousPolicy, vehicleDetails, RTO_location,  previous_is_claim, no_of_claim,fastlanelog,is_fieldDisabled
                 })
                 this.props.loadingStop();
             })
@@ -975,7 +977,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
     render() {
         const { productId } = this.props.match.params
         const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
-            CustomerID, suggestions, vehicleDetails, RTO_location, location_reset_flag } = this.state
+            CustomerID, suggestions, vehicleDetails, RTO_location, location_reset_flag ,fastlanelog,is_fieldDisabled} = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = {}
 
@@ -1088,6 +1090,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                     placeholderText={phrases['RegDate']}
                                                                                     peekPreviousMonth
                                                                                     peekPreviousYear
+                                                                                    disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                                     showMonthDropdown
                                                                                     showYearDropdown
                                                                                 // openToDate = {values.registration_date ? values.registration_date : new Date(minRegnDate)}
@@ -1119,6 +1122,25 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                 </div>
                                                                             </FormGroup>
                                                                         </Col>
+ {fastlanelog && fastlanelog.id  ?
+                                                                        <Col sm={12} md={6} lg={6}>
+                                                                        <FormGroup>
+                                                                            <div className="insurerName">
+                                                                                <Field
+                                                                                    name='location_id'
+                                                                                    type="text"
+                                                                                    disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                                    autoComplete="off"
+                                                                                    className="formGrp inputfs12"
+                                                                                    value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
+                                                                                />
+                                                                                {errors.location_id && touched.location_id ? (
+                                                                                    <span className="errorMsg">{phrases[errors.location_id]}</span>
+                                                                                ) : null}
+                                                                            </div>
+                                                                        </FormGroup>
+                                                                    </Col>
+                                                                    :
                                                                         <Col sm={12} md={6} lg={6}>
                                                                             <FormGroup>
                                                                                 <div className="insurerName">
@@ -1142,6 +1164,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                 </div>
                                                                             </FormGroup>
                                                                         </Col>
+									}
                                                                         </Row>
                                                                             <Row>
                                                                                 <Col sm={12}>
@@ -1163,7 +1186,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                             className="formGrp inputfs12"
                                                                                             value = {values.active_policy_tenure}
                                                                                             // disabled={true}
-                                                                                            value={values.active_policy_tenure}
+                                                                                           // value={values.active_policy_tenure}
                                                                                             onChange={(e) => {
                                                                                                 setFieldTouched('active_policy_tenure')
                                                                                                 setFieldValue("active_end_date", fourwheelerODEndDate(values.active_start_date,e.target.value));
@@ -1411,7 +1434,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                                 dropdownMode="select"
                                                                                                 className="datePckr inputfs12"
                                                                                                 selected={values.previous_end_date}
-                                                                                                disabled={ true }
+                                                                                               // disabled={ true }
                                                                                                 onChange={(val) => {
                                                                                                     setFieldTouched('previous_end_date');
                                                                                                     setFieldValue('previous_end_date', val);
@@ -1697,7 +1720,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                             </Col>
 
                                                                             <Col sm={12} md={5} className="text-right">
-                                                                                <button className="rgistrBtn" type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                <button className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} type="button" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                             </Col>
                                                                         </Row>
 
@@ -1708,7 +1731,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                             </Col>
 
                                                                             <Col sm={12} md={5} className="text-right">
-                                                                                <button className="rgistrBtn" type="button" onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                <button className="rgistrBtn" type="button"disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.editBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                             </Col>
                                                                         </Row>
 
@@ -1719,7 +1742,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                             </Col>
 
                                                                             <Col sm={12} md={5} className="text-right">
-                                                                                <button className="rgistrBtn" type="button" onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                                                <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectVehicleBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                                             </Col>
                                                                         </Row>
 

@@ -236,6 +236,7 @@ class SelectBrand extends Component {
                             }
                             else
                             {
+                                console.log("good")
                                 this.update();
                             }
                            

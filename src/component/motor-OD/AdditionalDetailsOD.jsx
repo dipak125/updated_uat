@@ -518,6 +518,8 @@ console.log('post_data', post_data);
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  console.log("decrypt", decryptResp)
+                 let bank =decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bankdetail : {};
+                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
                  let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -537,7 +539,14 @@ console.log('post_data', post_data);
                     quoteId, motorInsurance, previousPolicy, vehicleDetails, policyHolder, nomineeDetails, is_loan_account, is_eia_account,is_eia_account2, bankDetails, addressDetails,
                     is_appointee: nomineeDetails ? nomineeDetails.is_appointee : "", request_data
                 })
+                is_loan_account == 1 ? this.showLoanText(1):this.showLoanText(0);
                 this.props.loadingStop();
+                
+                if(policyHolder && policyHolder.pincode) 
+                {
+                    this.fetchAreadetails(policyHolder.pincode)
+                } 
+               
                 this.fetchPrevAreaDetails(addressDetails)
             })
             .catch(err => {
@@ -562,8 +571,8 @@ console.log('post_data', post_data);
 			console.log("tpaInsuranceRepository=");	
 	}
 
-    fetchAreadetails=(e)=>{
-        let pinCode = e.target.value;      
+    fetchAreadetails=(value)=>{
+        let pinCode = value;      
 
         if(pinCode.length==6){
             const formData = new FormData();

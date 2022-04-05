@@ -134,9 +134,11 @@ class TwoWheelerSelectBrand extends Component {
             error_msg: [],
             length:14,
             fastLaneData: [],
-            brandView: '0',
+            brandView: '1',
             fastlanelog: [],
-            fastlaneLogId: 0
+            flag:1,
+            stop: 0,
+            stopMsg:""
         };
     }
 
@@ -270,10 +272,12 @@ class TwoWheelerSelectBrand extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp', decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 this.setState({
-                    motorInsurance, vehicleDetails
+                    motorInsurance, vehicleDetails,is_fieldDisabled,fastlanelog
                 })
                 this.getBrands();
             })
@@ -361,8 +365,34 @@ class TwoWheelerSelectBrand extends Component {
 
 
     handleSubmit = (values) => {
+        if(values.policy_type == '1')
+        {
+            this.setState({
+                brandView:'1',
+                flag:3
+            })
+        }
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId, brandView, fastLaneData, fastlanelog } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, request_data , brandView, fastLaneData, fastlanelog } = this.state
+        console.log('value1----->',fastLaneData)
+      
+        console.log("cond",this.state.stop,typeof(this.state.stop),this.state.stop === 1)
+        if(this.state.stop === 1)
+        {
+            console.log("cond",this.state.stop,typeof(this.state.stop))
+         swal(this.state.stopMsg)
+         this.props.loadingStop();
+        }
+        else
+         {
+        
+       
+        if((fastlanelog && fastlanelog.id) )
+        {
+            this.props.history.push(`/two_wheeler_Vehicle_details/${productId}`);
+        }
+        else
+        {
         let post_data = {}
         var registration_part_numbers  = {}
         var regNumber = ""
@@ -403,7 +433,7 @@ class TwoWheelerSelectBrand extends Component {
                     'brand_model_id': selectedModelId ? selectedModelId : fastLaneData && fastLaneData.brand_model_id ? fastLaneData.brand_model_id : values.selectedModelId ? values.selectedModelId : "",
                     'model_varient_id': selectedVarientId ? selectedVarientId : fastLaneData && fastLaneData.model_varient_id ? fastLaneData.model_varient_id : values.selectedVarientId ? values.selectedVarientId : "",
                     'vehicle_type_id':4,
-		    'product_id': this.props.match.params.productId,
+		            'product_id': this.props.match.params.productId,
                     'registration_no': regNumber,
                     'registration_part_numbers': JSON.stringify(registration_part_numbers),
                     'policy_type_id':values.policy_type,
@@ -439,6 +469,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                     'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
                     'page_name': `two_wheeler_Select-brand/${productId}`,
+                    'csc_id':null,
+                    'agent_name':null
                 }
             }
             console.log('post_data-----', post_data)
@@ -515,6 +547,8 @@ class TwoWheelerSelectBrand extends Component {
                     'bc_agent_id': bc_data ? bc_data.user_info.data.user.username : "",
                     'fastlaneLog_id': this.state.fastlaneLogId ? this.state.fastlaneLogId : fastlanelog && fastlanelog.id ? fastlanelog.id : 0,
                     'page_name': `two_wheeler_Select-brand/${productId}`,
+                    'csc_id':null,
+                    'agent_name':null
                 }
             }
             console.log('post_data-----', post_data)
@@ -551,6 +585,11 @@ class TwoWheelerSelectBrand extends Component {
                     this.props.loadingStop();
                 })
         }
+    }
+   
+}
+    
+
         
     }
 
@@ -570,28 +609,69 @@ class TwoWheelerSelectBrand extends Component {
             setFieldValue('regNumber', "");
         }
     }
+    goWithoutFastLane=(values)=>{
+        
+        if(values.policy_type && values.policy_for && values.reg_number_part_one && values.reg_number_part_two && values.reg_number_part_three && values.reg_number_part_four)
+        {
+             const { productId } = this.props.match.params
+             this.props.history.push(`/two_wheeler_Vehicle_details/${productId}`);
+        }
+        
+    }
 
     fetchFastlane = (values) => {
         const formData = new FormData();
         var regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+        this.setState({
+            ...this.state,
+            regno:regNumber
+        })
         formData.append('registration_no', regNumber)
         formData.append('menumaster_id', '3')
         this.props.loadingStart();
         axios.post('fastlane', formData).then(res => {
 
-            if(res.data.error == false) {
+            if(res.data && res.data.error && res.data.error === 1)
+            {
+                console.log("cond",res.data.error,typeof(res.data.error))
+                this.setState({
+                    ...this.state,
+                    stop: 1,
+                    stopMsg:res.data.msg
+                })
+                this.props.loaderStop()
+            }
+           else if(res.data.error == false) {
                 this.props.loadingStop();
-                this.setState({fastLaneData: res.data.data, brandView: '0', fastlaneLogId: res.data.data.fastlaneLog_id})
+                this.setState({fastLaneData: res.data.data, brandView: '0', fastlaneLogId: res.data.data.fastlaneLog_id,flag:2,stop: 0})
+               console.log("fast10",res.data.data)
             } 
             else {
                 this.props.loadingStop();
-                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: res.data.data.fastlaneLog_id })
+                this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: res.data.data.fastlaneLog_id,flag:3,stop: 0 })
             }       
         })
             .catch(err => {
                 this.props.loadingStop();
                 this.setState({fastLaneData: [], brandView: '1', vehicleDetails: [], fastlaneLogId: 0 })
             })
+            if(values.policy_type == '1')
+            {
+                this.setState({
+                    brandView:'1',
+                    flag:3
+                })
+            }
+           
+    }
+    takingNewPolicy =(values)=>{
+        if(values.policy_type == '1')
+        {
+            this.setState({
+                brandView:'1',
+                flag:3
+            })
+        }
     }
 
     regnoFormat = (e, setFieldTouched, setFieldValue) => {
@@ -607,8 +687,8 @@ class TwoWheelerSelectBrand extends Component {
 
 
     render() {
-        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,fastLaneData, brandView,
-            selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName } = this.state
+        const { brandList, motorInsurance, selectedBrandDetails, brandModelList, selectedBrandId,fuelType,fastLaneData, brandView,fastlanelog,
+            selectedModelId, selectedVarientId, otherBrands, vehicleDetails, error_msg, brandName, modelName,flag,is_fieldDisabled } = this.state
         const { productId } = this.props.match.params
         console.log("view",this.state.brandView)
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
@@ -828,7 +908,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={values.reg_number_part_one}
-                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                     maxLength="3"
                                                                     onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -847,7 +927,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={values.reg_number_part_two}
-                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                     maxLength="2"
                                                                     onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -866,7 +946,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={values.reg_number_part_three}
-                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                     maxLength="3"
                                                                     onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -885,7 +965,7 @@ class TwoWheelerSelectBrand extends Component {
                                                                     onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                     onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                     value={values.reg_number_part_four}
-                                                                    disabled= {values.check_registration == '1' ? true : false}
+                                                                    disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                     maxLength="4"
                                                                     onInput={e => {
                                                                         this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -916,6 +996,7 @@ class TwoWheelerSelectBrand extends Component {
                                                             value="1"
                                                             className="user-self"
                                                             onChange={(e) => {
+                                                                this.takingNewPolicy(values)
                                                                 if (e.target.checked === true) {
                                                                     setFieldTouched('reg_number_part_one')
                                                                     setFieldValue('reg_number_part_one', '');
@@ -953,7 +1034,7 @@ class TwoWheelerSelectBrand extends Component {
                                                         
                                                     </div> : null }
 
-                                                    {brandView == '1' ?
+                                                    {brandView == '1' && flag != 1?
                                                     <div className="brandhead">
                                                         <h4>{phrases['VechicleBrandTp']}</h4>
                                                         {error_msg.brand_id || error_msg.brand_model_id || error_msg.model_varient_id ? 
@@ -963,18 +1044,25 @@ class TwoWheelerSelectBrand extends Component {
 
                                                     
                                                         <Col sm={12} md={12} className="two-wheeler">
-                                                        {brandView == '1' ?
+                                                        {brandView == '1'  && flag == 3?
                                                             <Fragment>
                                                                 <TwoWheelerBrandTable brandList={brandList && brandList.length > 0 ? brandList : []} selectBrandFunc={this.setBrandName} otherBrandFunc={this.getOtherBrands} />
                                                             </Fragment> : null }
 
-                                                            <div className="d-flex justify-content-left resmb">
-                                                            {brandView == '1' || (fastLaneData && fastLaneData.brand_text) ?
-                                                                <Button className={`proceedBtn`} type="submit"  >
-                                                                    {phrases['Continue']}
-                                                            </Button> : null }
-                                                            </div>
-                                                        </Col>
+                                                                <div className="d-flex justify-content-left resmb">
+                                                                {(brandView == '1' || (fastLaneData && fastLaneData.brand_text)) ?
+                                                                    <Button className={`proceedBtn`} type="submit"  >
+                                                                        {phrases['Continue']}
+                                                                </Button> : 
+                                                               null
+
+                                                                }
+                                                                </div>
+
+
+                                                            </Col>
+
+                                                            
                                                         </div>
 
                                                         <div className= "col-md-3 col-sm-12">
@@ -984,9 +1072,9 @@ class TwoWheelerSelectBrand extends Component {
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
                                                                     <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
-                                                                        {motorInsurance && motorInsurance.registration_no}</div>
+                                                                        {flag ==3 ?this.state.regno: motorInsurance && motorInsurance.registration_no}</div>
 
-                                                                    <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                    <div> <button type="button" className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" || flag == 2 ? true :false} onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -994,14 +1082,14 @@ class TwoWheelerSelectBrand extends Component {
                                                                         - <strong>{brandName ? brandName : (vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : "")}</strong>
                                                                     </div>
 
-                                                                    <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                    <div> <button type="button" className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true" || flag == 2 ? true :false} onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                     <div className="txtRegistr resmb-15">{phrases['TwoWheelModel']}
                                                                         - <strong>{modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")}</strong></div>
 
-                                                                    <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                    <div> <button type="button" className="rgistrBtn" disabled={is_fieldDisabled && is_fieldDisabled == "true"  || flag == 2 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                                 </div>
 
                                                                 <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -1016,9 +1104,9 @@ class TwoWheelerSelectBrand extends Component {
                                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
 
                                                                 <div className="txtRegistr resmb-15">{phrases['RegNo']}.<br />
-                                                                    {motorInsurance && motorInsurance.registration_no}</div>
+                                                                    {flag ==2 ?this.state.regno: motorInsurance && motorInsurance.registration_no}</div>
 
-                                                                <div> <button type="button" className="rgistrBtn" onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                <div> <button type="button" className="rgistrBtn"  disabled={is_fieldDisabled && is_fieldDisabled == "true" || flag == 2 ? true :false} onClick={this.registration.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                             </div>
 
                                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
@@ -1026,14 +1114,14 @@ class TwoWheelerSelectBrand extends Component {
                                                                     -  <strong>{fastLaneData && fastLaneData.brand_text ? fastLaneData.brand_text  : vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong>
                                                                 </div>
 
-                                                                <div> <button type="button" className="rgistrBtn" onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                <div> <button type="button" className="rgistrBtn"  disabled={is_fieldDisabled && is_fieldDisabled == "true"  || flag == 2 ? true :false} onClick={this.selectVehicle.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                             </div>
 
                                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                                 <div className="txtRegistr">{phrases['TwoWheelModel']}
                                                                     -  <strong>{fastLaneData && fastLaneData.model_text ? fastLaneData.model_text+" "+fastLaneData.varient_text : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "" }</strong></div>
 
-                                                                <div> <button type="button" className="rgistrBtn" onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
+                                                                <div> <button type="button" className="rgistrBtn"  disabled={is_fieldDisabled && is_fieldDisabled == "true" || flag == 2 ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button></div>
                                                             </div>
 
                                                             <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">

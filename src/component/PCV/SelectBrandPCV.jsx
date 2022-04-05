@@ -14,6 +14,7 @@ import swal from 'sweetalert';
 import ScrollArea from 'react-scrollbar';
 import Encryption from '../../shared/payload-encryption';
 import fuel from "../common/FuelTypes";
+import { setData } from "../../store/actions/data";
 
 
 const menumaster_id = 12
@@ -62,7 +63,8 @@ class SelectBrandPCV extends Component {
             vehicleDetails: [],
             carrying : '',
             body_style : '',
-            searchText: ""
+            searchText: "",
+            check:0
         };
     }
 
@@ -202,7 +204,41 @@ class SelectBrandPCV extends Component {
                 this.setState({
                     motorInsurance, vehicleDetails
                 })
-                this.getBrands();
+                if(this.props.data == null) {
+                    this.setState({pageLoad: '1' })
+                    this.getBrands();
+                }             
+                else {
+                    
+                    if( this.props.data.fastLaneData || this.props.data.brandEdit && this.props.data.brandEdit == '0' ) {
+                        this.setState({pageLoad: '0', fastLaneData: this.props.data.fastLaneData})
+                        // this.props.loadingStop();
+                        this.setState({
+                            check:1
+                        })
+                        this.handleSubmit(this.props.data.fastLaneData, '0')
+                    }
+                    else {
+    
+                        this.setState({pageLoad: '1' })
+                        
+                        if(this.state.vehicleDetails && this.state.vehicleDetails.vehiclemodel && this.state.vehicleDetails.vehiclemodel.brand_id)
+                        {
+                            if(this.props.location && this.props.location.appState &&  this.props.location.appState.flag ==1) 
+                            {
+
+                            }
+                            else
+                            {
+                                this.update();
+                            }
+                           
+                        }
+                    
+                         this.getBrands();
+
+                    }
+                }
             })
             .catch(err => {
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));
@@ -302,17 +338,78 @@ class SelectBrandPCV extends Component {
             wheels_capacity: varient_details.wheels
         })
     }
+    update= ()=>{
+
+        const { productId } = this.props.match.params
+        const formData = new FormData();
+        let encryption = new Encryption();
+        let post_data = {}
+        post_data = {
+            'policy_holder_id': localStorage.getItem('policyHolder_id'),
+            'menumaster_id': 12,
+            'brand_id': this.state.vehicleDetails.vehiclemodel.brand_id,
+            'brand_model_id':0 ,
+            'model_varient_id': 0,
+            'page_name': `Select-brand/${productId}`,
+        }
+        formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
+        this.props.loadingStart();
+        axios.post('/pcvinsert-brand-model-varient', formData).then(res => {
+            this.props.loadingStop();
+            // if (res.data.error == false) {
+            //     if(this.state.otherBrands) {
+            //         localStorage.setItem('brandEdit', 2)
+            //         localStorage.removeItem('newBrandEdit')
+            //     }
+            //     else {
+            //         localStorage.setItem('brandEdit', 1)
+            //         localStorage.removeItem('newBrandEdit')
+            //     }
+                
+            // }
+
+        })
+            .catch(err => {
+                // handle error
+                if(err.status == '422') {
+                    // swal(phrases.PleaseVehicleMmodel)
+                }
+                this.props.loadingStop();
+            })
+            this.updatedFetchData();
+
+    }
+    updatedFetchData=()=>{
+        let encryption = new Encryption();
+        let policyHolder_id = localStorage.getItem("policyHolder_refNo") ? localStorage.getItem("policyHolder_refNo") : 0;
+        axios.get(`pcv/policy-holder/details/${policyHolder_id}`).then(res=>{
+
+            let decryptResp = JSON.parse(encryption.decrypt(res.data));
+                console.log("decrypt1", decryptResp)
+                let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
+                let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
+                let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
+                //console.log("check0",vehicleDetails.vehiclemodel.brand_id)
+                this.setState({
+                    motorInsurance, vehicleDetails, fastlanelog
+                })
+
+        }).catch(err=>{
+
+        }) 
+    }
+
 
     handleSubmit = (values) => {
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         const { productId } = this.props.match.params
-        const { selectedVarientId, selectedModelId, selectedBrandId, modelName, vehicleDetails, carrying, wheels_capacity } = this.state
+        const { selectedVarientId, selectedModelId, selectedBrandId, modelName, vehicleDetails, carrying, wheels_capacity ,check} = this.state
 
         let carrying_capacity = carrying ? carrying : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.carrying ? vehicleDetails.varientmodel.carrying : "")
         let wheels = wheels_capacity ? wheels_capacity : vehicleDetails && vehicleDetails.varientmodel ? vehicleDetails.varientmodel.wheels : ""
         let vehicleModel = modelName ? modelName : (selectedBrandId ? "" : vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : "")
         
-        if(vehicleModel == "" || vehicleModel == null || vehicleModel == undefined) {
+        if(check === 0 && (vehicleModel == "" || vehicleModel == null || vehicleModel == undefined)) {
             swal(phrases.PleaseVBrand)
             return false
         }
@@ -322,44 +419,95 @@ class SelectBrandPCV extends Component {
         // }
         const formData = new FormData();
         let encryption = new Encryption();
-        const post_data = {
-            'policy_holder_id': localStorage.getItem('policyHolder_id'),
-            'menumaster_id': menumaster_id,
-            'brand_id': values.selectedBrandId,
-            'brand_model_id': values.selectedModelId,
-            'model_varient_id': values.selectedVarientId,
-            'page_name': `SelectBrand_PCV/${productId}`
-        }
+        let post_data={}
+        let url=""
+        if(check ===1){
+            url='pcv/insert-brand-model-varient'
+            post_data = {
+               'policy_holder_id': localStorage.getItem('policyHolder_id'),
+               'menumaster_id': 12,
+               'brand_id': values.brand_id,
+               'brand_model_id': values.brand_model_id,
+               'model_varient_id': values.model_varient_id,
+               'page_name': `SelectBrand_PCV/${productId}`
+           }
+       }
+       else{
+           url='pcv/insert-brand-model-varient'
+        post_data = {
+           'policy_holder_id': localStorage.getItem('policyHolder_id'),
+           'menumaster_id': 12,
+           'brand_id': values.selectedBrandId,
+           'brand_model_id': values.selectedModelId,
+           'model_varient_id': values.selectedVarientId,
+           'page_name': `SelectBrand_PCV/${productId}`
+       }
+   }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
        // console.log("Post Date---------- ", post_data) 
         this.props.loadingStart();
-        axios.post('pcv/insert-brand-model-varient', formData).then(res => {
-            this.props.loadingStop();
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-           // console.log("decrypt", decryptResp)
-
-            if (decryptResp.error == false) {
-                if(this.state.otherBrands) {
-                    localStorage.setItem('brandEdit', 2)
-                    localStorage.removeItem('newBrandEdit')
-                }
-                else {
-                    localStorage.setItem('brandEdit', 1)
-                    localStorage.removeItem('newBrandEdit')
-                }
-                this.props.history.push(`/VehicleDetails_PCV/${productId}`);
-            }
-
-        })
-            .catch(err => {
-                // handle error
-                let decryptResp = JSON.parse(encryption.decrypt(err.data))
-               //console.log("decrypt", decryptResp)
-                if (err.status == '422') {
-                    swal("Please select vehicle model")
-                }
+        
+        if(check === 0)
+        {
+            axios.post(url, formData).then(res => {
                 this.props.loadingStop();
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+               // console.log("decrypt", decryptResp)
+    
+                if (decryptResp.error == false) {
+                    if(this.state.otherBrands) {
+                        localStorage.setItem('brandEdit', 2)
+                        localStorage.removeItem('newBrandEdit')
+                    }
+                    else {
+                        localStorage.setItem('brandEdit', 1)
+                        localStorage.removeItem('newBrandEdit')
+                    }
+                    this.props.history.push(`/VehicleDetails_PCV/${productId}`);
+                }
+    
             })
+                .catch(err => {
+                    // handle error
+                    let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                   //console.log("decrypt", decryptResp)
+                    if (err.status == '422') {
+                        swal("Please select vehicle model")
+                    }
+                    this.props.loadingStop();
+                })
+        }
+        else {
+           
+            axios.post(url, formData).then(res => {
+                this.props.loadingStop();
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+               // console.log("decrypt", decryptResp)
+    
+                if (decryptResp.error == false) {
+                    if(this.state.otherBrands) {
+                        localStorage.setItem('brandEdit', 2)
+                        localStorage.removeItem('newBrandEdit')
+                    }
+                    else {
+                        localStorage.setItem('brandEdit', 1)
+                        localStorage.removeItem('newBrandEdit')
+                    }
+                    this.props.history.push(`/VehicleDetails_PCV/${productId}`);
+                }
+    
+            })
+                .catch(err => {
+                    // handle error
+                    let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                   //console.log("decrypt", decryptResp)
+                    if (err.status == '422') {
+                        swal("Please select vehicle model")
+                    }
+                    this.props.loadingStop();
+                })
+        }
+        
     }
 
 
@@ -697,14 +845,16 @@ class SelectBrandPCV extends Component {
 }
 const mapStateToProps = state => {
     return {
-        loading: state.loader.loading
+        loading: state.loader.loading,
+        data: state.processData.data
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         loadingStart: () => dispatch(loaderStart()),
-        loadingStop: () => dispatch(loaderStop())
+        loadingStop: () => dispatch(loaderStop()),
+        setData: (data) => dispatch(setData(data))
     };
 };
 

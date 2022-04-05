@@ -9,7 +9,7 @@ import { loaderStart, loaderStop } from "../../store/actions/loader";
 import { connect } from "react-redux";
 import * as Yup from 'yup';
 import swal from 'sweetalert';
-
+import { setData } from "../../store/actions/data";
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
@@ -134,7 +134,8 @@ fetchData=()=>{
         .then(res=>{
            //console.log("checking====",res.data)
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            
+            let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
+            let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
             if(decryptResp.data.policyHolder){
                 var obj = decryptResp.data.policyHolder
                 var i = 0
@@ -148,7 +149,7 @@ fetchData=()=>{
 
             let motorInsurance = i > 0 ? decryptResp.data.policyHolder.motorinsurance : []          
             this.setState({ 
-                motorInsurance
+                motorInsurance,is_fieldDisabled,fastlanelog
             })
             this.props.loadingStop();
         })
@@ -182,6 +183,13 @@ fetchSubVehicle=()=>{
 handleSubmit=(values)=>{
 
     const {productId} = this.props.match.params;
+   
+    if(this.state.stop ===1)
+    {
+        swal(this.state.stopMsg)
+        this.props.loadingStop()
+    }
+    else{
 
     const formData = new FormData();
     let encryption = new Encryption();
@@ -359,6 +367,56 @@ handleSubmit=(values)=>{
         });
     }
 }
+}
+fetchFastlane = async (values) => {
+    const {is_fieldDisabled} = this.state
+    const {productId} = this.props.match.params
+    if(is_fieldDisabled && is_fieldDisabled == "true")
+    {
+        this.props.history.push(`/VehicleDetails_PCV/${productId}`);
+    }
+    else{
+    const formData = new FormData();
+    var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+    if (values.check_registration == '2') {
+        formData.append('registration_no', regNumber)
+        formData.append('menumaster_id', '12')
+        this.props.loadingStart();
+        axios.post('fastlane', formData).then(res => {
+                console.log("check12",res.data)
+            if(res.data && res.data.error && res.data.error === 1)
+            {
+                console.log("cond",res.data.error,typeof(res.data.error))
+                this.setState({
+                    ...this.state,
+                    stop: 1,
+                    stopMsg:res.data.msg
+                })
+            }
+             else if (res.data.error == false) {
+                this.props.loadingStop();
+                this.setState({ fastLaneData: res.data.data, brandView: '0' ,stop: 0})
+                let fastLaneData = { 'fastLaneData': res.data.data }
+                this.props.setData(fastLaneData)
+                console.log("props12",this.props.data)
+            }
+            else {
+                this.props.loadingStop();
+                this.props.setData([])
+                this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [],stop: 0 })
+            }
+            this.handleSubmit(values, res.data.data)
+        })
+            .catch(err => {
+                this.props.loadingStop();
+            })
+    } else {
+        this.props.setData([])
+        this.handleSubmit(values, [])
+    }
+}
+
+}
     
 setValueData = () => {
     var checkBoxAll = document.getElementsByClassName('user-self');
@@ -384,7 +442,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
 
     render() {
-        const {motorInsurance, subVehicleList} = this.state
+        const {motorInsurance, subVehicleList,is_fieldDisabled} = this.state
 	    var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
         const newInitialValues = Object.assign(initialValues,{
 	        reg_number_part_one:  typeof(tempRegNo) == 'undefined'?"":tempRegNo && tempRegNo.reg_number_part_one,
@@ -420,7 +478,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                     <div className="boxpd">
                                         <h4 className="m-b-30">{phrases['About']}</h4>
                                         <Formik initialValues={newInitialValues} 
-                                        onSubmit={this.handleSubmit} 
+                                        onSubmit={this.fetchFastlane} 
                                         validationSchema={vehicleRegistrationValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
@@ -617,7 +675,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         value={values.reg_number_part_one}
-                                                        disabled= {values.check_registration == '1' ? true : false}
+                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                         maxLength="2"
                                                         onInput={e => {
                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -636,7 +694,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         value={values.reg_number_part_two}
-                                                        disabled= {values.check_registration == '1' ? true : false}
+                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                         maxLength="3"
                                                         onInput={e => {
                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -655,7 +713,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         value={values.reg_number_part_three}
-                                                        disabled= {values.check_registration == '1' ? true : false}
+                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                         maxLength="3"
                                                         onInput={e => {
                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -674,7 +732,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                         value={values.reg_number_part_four}
-                                                        disabled= {values.check_registration == '1' ? true : false}
+                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                         maxLength="4"
                                                         onInput={e => {
                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -773,6 +831,7 @@ const mapStateToProps = state => {
     return {
       loadingStart: () => dispatch(loaderStart()),
       loadingStop: () => dispatch(loaderStop()),
+      setData: (data) => dispatch(setData(data))
     };
   };
 

@@ -323,6 +323,7 @@ class TwoWheelerVerify extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decryptResp====", decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -331,7 +332,7 @@ class TwoWheelerVerify extends Component {
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,is_fieldDisabled,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                
@@ -565,7 +566,7 @@ class TwoWheelerVerify extends Component {
 
 
     render() {
-        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog} = this.state
+        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog,is_fieldDisabled} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -660,7 +661,7 @@ class TwoWheelerVerify extends Component {
                                                         type="text"
                                                         name='registration_no' 
                                                         autoComplete="off"
-                                                        disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                        disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                         className="premiumslid"    
                                                         value= {values.registration_no}
                                                         maxLength={this.state.length}
@@ -727,53 +728,79 @@ class TwoWheelerVerify extends Component {
                                     
                                 {values.vahanVerify && !errors.chasis_no_last_part ?
                                 <Row>
-                                    <Col sm={12} md={6} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <Field
-                                                    name="engine_no"
-                                                    type="text"
-                                                    placeholder={phrases['EngineNumber']}
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.engine_no}
-                                                    maxLength="25"
-                                                    onChange = {(e) => {
-                                                        setFieldTouched('engine_no')
-                                                        setFieldValue('engine_no', e.target.value.toUpperCase())                       
-                                                    }}  
-                                                />
-                                                {errors.engine_no && touched.engine_no ? (
-                                                    <span className="errorMsg">{phrases[errors.engine_no]}</span>
-                                                ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
-                                    <Col sm={12} md={6} lg={5}>
-                                        <FormGroup>
-                                            <div className="insurerName">
-                                                <Field
-                                                    name="chasis_no"
-                                                    type="text"
-                                                    placeholder={phrases['ChasisNumber']}
-                                                    autoComplete="off"
-                                                    onFocus={e => this.changePlaceHoldClassAdd(e)}
-                                                    onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                    value= {values.chasis_no}
-                                                    maxLength="25"
-                                                    onChange = {(e) => {
-                                                        setFieldTouched('chasis_no')
-                                                        setFieldValue('chasis_no', e.target.value.toUpperCase())                       
-                                                    }} 
-                                                />
-                                                {errors.chasis_no && touched.chasis_no ? (
-                                                    <span className="errorMsg">{phrases[errors.chasis_no]}</span>
-                                                ) : null}
-                                            </div>
-                                        </FormGroup>
-                                    </Col>
+                                <Col sm={12} md={12} lg={4}>
+                                <Row>
+                                <Col sm={12} md={5} lg={6}>
+                                    <FormGroup>
+                                        <div className="insurerName">
+                                        {phrases['EngineNumber']}
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                                    
+                                <Col sm={12} md={5} lg={6}>
+                                <FormGroup>
+                                           <div className="insurerName">
+                                               <Field
+                                                   name="engine_no"
+                                                   type="text"
+                                                   placeholder={phrases["EngineNumber"]}
+                                                   autoComplete="off"
+                                                   onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                   onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                   value= {values.engine_no}
+                                                   maxLength="25"
+                                                   onChange = {(e) => {
+                                                       setFieldTouched('engine_no')
+                                                       setFieldValue('engine_no', e.target.value.toUpperCase())                       
+                                                   }}  
+                                               />
+                                               {errors.engine_no && touched.engine_no ? (
+                                                   <span className="errorMsg">{phrases[errors.engine_no]}</span>
+                                               ) : null}
+                                           </div>
+                                       </FormGroup>
+                                </Col>
                                 </Row>
+                                </Col>
+
+                                <Col sm={12} md={12} lg={5}>
+                                    <Row>
+                                        <Col sm={12} md={5} lg={6}>
+                                            <FormGroup>
+                                                <div className="insurerName">
+                                                {phrases['ChasisNumber']}.
+                                                </div>
+                                            </FormGroup>
+                                        </Col>
+                                    
+                                        <Col sm={12} md={5} lg={6}>
+                                        <FormGroup>
+                                           <div className="insurerName">
+                                               <Field
+                                                   name="chasis_no"
+                                                   type="text"
+                                                   placeholder={phrases["ChasisNumber"]}
+                                                   autoComplete="off"
+                                                   onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                   onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                   value= {values.chasis_no}
+                                                   maxLength="25"
+                                                   onChange = {(e) => {
+                                                       setFieldTouched('chasis_no')
+                                                       setFieldValue('chasis_no', e.target.value.toUpperCase())                       
+                                                   }} 
+                                               />
+                                               {errors.chasis_no && touched.chasis_no ? (
+                                                   <span className="errorMsg">{phrases[errors.chasis_no]}</span>
+                                               ) : null}
+                                           </div>
+                                       </FormGroup>
+                                        </Col>
+                                    </Row>
+                                    </Col>
+
+                            </Row>
                                 : null}
                                 <Row>
                                     <Col sm={12}>
@@ -1027,7 +1054,7 @@ class TwoWheelerVerify extends Component {
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                 </Col>
                                             </Row>
 
@@ -1038,7 +1065,7 @@ class TwoWheelerVerify extends Component {
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.selectBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                 </Col>
                                             </Row>
 
@@ -1049,7 +1076,7 @@ class TwoWheelerVerify extends Component {
                                                 </Col>
 
                                                 <Col sm={12} md={5} className="text-right">
-                                                    <button className="rgistrBtn" type="button"  disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
+                                                    <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button>
                                                 </Col>
                                             </Row>
 

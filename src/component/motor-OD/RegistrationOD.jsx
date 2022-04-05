@@ -102,7 +102,9 @@ class RegistrationOD extends Component {
         motorInsurance: '',
         regno: '',
         length: 14,
-        fastlanelog: []
+        fastlanelog: [],
+        stop:0,
+        stopMsg:""
     }
 
 
@@ -132,11 +134,11 @@ class RegistrationOD extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
-
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let motorInsurance = decryptResp.data.policyHolder.motorinsurance
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                 this.setState({
-                    motorInsurance, fastlanelog
+                    motorInsurance, fastlanelog,is_fieldDisabled
                 })
                 this.props.loadingStop();
             })
@@ -147,6 +149,13 @@ class RegistrationOD extends Component {
     }
 
     fetchFastlane = (values) => {
+        const {is_fieldDisabled} = this.state
+        const {productId} = this.props.match.params
+        if(is_fieldDisabled && is_fieldDisabled == "true")
+        {
+            this.props.history.push(`/VehicleDetailsOD/${productId}`);
+        }
+        else{
         const formData = new FormData();
         var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
         if (values.check_registration == '2') {
@@ -154,17 +163,26 @@ class RegistrationOD extends Component {
             formData.append('menumaster_id', '1')
             this.props.loadingStart();
             axios.post('fastlane', formData).then(res => {
+                if(res.data && res.data.error && res.data.error === 1)
+                {
+                    console.log("cond",res.data.error,typeof(res.data.error))
+                    this.setState({
+                        ...this.state,
+                        stop: 1,
+                        stopMsg:res.data.msg
+                    })
+                }
 
-                if (res.data.error == false) {
+                else if (res.data.error == false) {
                     this.props.loadingStop();
-                    this.setState({ fastLaneData: res.data.data, brandView: '0' })
+                    this.setState({ fastLaneData: res.data.data, brandView: '0',stop: 0 })
                     let fastLaneData = { 'fastLaneData': res.data.data }
                     this.props.setData(fastLaneData)
                 }
                 else {
                     this.props.loadingStop();
                     this.props.setData([])
-                    this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [] })
+                    this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [] ,stop: 0})
                 }
                 this.handleSubmit(values, res.data.data)
             })
@@ -177,8 +195,18 @@ class RegistrationOD extends Component {
         }
 
     }
+}
 
     handleSubmit = (values, fastLaneData) => {
+        console.log("cond",this.state.stop,typeof(this.state.stop),this.state.stop === 1)
+        if(this.state.stop === 1)
+        {
+            console.log("cond",this.state.stop,typeof(this.state.stop))
+         swal(this.state.stopMsg)
+         this.props.loadingStop();
+        }
+        else
+         {
 
         const { productId } = this.props.match.params;
         const { fastlanelog } = this.state;
@@ -345,6 +373,7 @@ class RegistrationOD extends Component {
                 });
         }
     }
+}
 
     setValueData = () => {
         var checkBoxAll = document.getElementsByClassName('user-self');
@@ -371,7 +400,7 @@ class RegistrationOD extends Component {
 
 
     render() {
-        const { motorInsurance } = this.state
+        const { motorInsurance ,is_fieldDisabled} = this.state
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers ? JSON.parse(motorInsurance.registration_part_numbers) : []
         const newInitialValues = Object.assign(initialValues, {
             reg_number_part_one: tempRegNo && tempRegNo.reg_number_part_one ? tempRegNo.reg_number_part_one : "",
@@ -584,6 +613,7 @@ class RegistrationOD extends Component {
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value={values.reg_number_part_one}
+                                                                            disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                             maxLength="3"
                                                                             onInput={e => {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -602,6 +632,7 @@ class RegistrationOD extends Component {
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value={values.reg_number_part_two}
+                                                                            disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                             maxLength="2"
                                                                             onInput={e => {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -620,6 +651,7 @@ class RegistrationOD extends Component {
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value={values.reg_number_part_three}
+                                                                            disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                             maxLength="3"
                                                                             onInput={e => {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -638,6 +670,7 @@ class RegistrationOD extends Component {
                                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                             value={values.reg_number_part_four}
+                                                                            disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                             maxLength="4"
                                                                             onInput={e => {
                                                                                 this.regnoFormat(e, setFieldTouched, setFieldValue)

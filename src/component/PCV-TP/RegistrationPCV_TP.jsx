@@ -12,7 +12,7 @@ import swal from 'sweetalert';
 import Encryption from '../../shared/payload-encryption';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { registrationNumberFirstBlock, registrationNumberSecondBlock, registrationNumberThirdBlock, registrationNumberLastBlock } from "../../shared/validationFunctions";
-
+import { setData } from "../../store/actions/data";
 const menumaster_id = 12
 const initialValues = {
     regNumber: '',
@@ -105,7 +105,9 @@ class RegistrationPCV_TP extends Component {
         length: 14,
         fastLaneData: [],
         fastlanelog: [],
-        subVehicleList: []
+        subVehicleList: [],
+        stop: 0,
+        stopMsg:""
     }
 
 
@@ -134,6 +136,7 @@ class RegistrationPCV_TP extends Component {
             .then(res => {
               //  console.log("value is=======", res.data)
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
               //  console.log("decrypt", decryptResp)
                 if (decryptResp.data.policyHolder) {
                     var obj = decryptResp.data.policyHolder
@@ -148,7 +151,7 @@ class RegistrationPCV_TP extends Component {
 
                 let motorInsurance = i > 0 ? decryptResp.data.policyHolder.motorinsurance : []
                 this.setState({
-                    motorInsurance
+                    motorInsurance,is_fieldDisabled
                 })
                 this.props.loadingStop();
             })
@@ -178,8 +181,23 @@ class RegistrationPCV_TP extends Component {
                 this.props.loadingStop();
             })
     }
+    // goWithoutFastLane =(values)=>{
+    //     if(values.policy_type && values.policy_for && values.reg_number_part_one && values.reg_number_part_two && values.reg_number_part_three && values.reg_number_part_four)
+    //     {
+    //          const { productId } = this.props.match.params
+    //          this.props.history.push(`/VehicleDetails_PCV_TP/${productId}`);
+    //     }
+    // }
 
     handleSubmit = (values) => {
+        const {productId} = this.props.match.params
+        if(this.state.stop ===1)
+        {
+            swal(this.state.stopMsg)
+            this.props.loadingStop()
+        }
+        else{
+
 
         const { productId } = this.props.match.params;
 
@@ -359,6 +377,56 @@ class RegistrationPCV_TP extends Component {
                 });
         }
     }
+    }
+    fetchFastlane = async (values) => {
+        const {is_fieldDisabled} = this.state
+        const {productId} = this.props.match.params
+        if(is_fieldDisabled && is_fieldDisabled == "true")
+        {
+            this.props.history.push(`/VehicleDetails_PCV_TP/${productId}`);
+        }
+        else{
+        const formData = new FormData();
+        var regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+        if (values.check_registration == '2') {
+            formData.append('registration_no', regNumber)
+            formData.append('menumaster_id', '12')
+            this.props.loadingStart();
+            axios.post('fastlane', formData).then(res => {
+                    console.log("check12",res.data)
+                if(res.data && res.data.error && res.data.error === 1)
+                {
+                    console.log("cond",res.data.error,typeof(res.data.error))
+                    this.setState({
+                        ...this.state,
+                        stop: 1,
+                        stopMsg:res.data.msg
+                    })
+                }
+                 else if (res.data.error == false) {
+                    this.props.loadingStop();
+                    this.setState({ fastLaneData: res.data.data, brandView: '0' ,stop: 0})
+                    let fastLaneData = { 'fastLaneData': res.data.data }
+                    this.props.setData(fastLaneData)
+                    console.log("props12",this.props.data)
+                }
+                else {
+                    this.props.loadingStop();
+                    this.props.setData([])
+                    this.setState({ fastLaneData: [], brandView: '1', vehicleDetails: [],stop: 0 })
+                }
+                this.handleSubmit(values, res.data.data)
+            })
+                .catch(err => {
+                    this.props.loadingStop();
+                })
+        } else {
+            this.props.setData([])
+            this.handleSubmit(values, [])
+        }
+    }
+    
+    }
 
     setValueData = () => {
         var checkBoxAll = document.getElementsByClassName('user-self');
@@ -384,7 +452,7 @@ class RegistrationPCV_TP extends Component {
 
 
     render() {
-        const { motorInsurance, subVehicleList } = this.state
+        const { motorInsurance, subVehicleList,is_fieldDisabled } = this.state
         var tempRegNo = motorInsurance && motorInsurance.registration_part_numbers && JSON.parse(motorInsurance.registration_part_numbers)
        // console.log("tempreg",motorInsurance)
         const newInitialValues = Object.assign(initialValues, {
@@ -421,7 +489,7 @@ class RegistrationPCV_TP extends Component {
                                         <div className="boxpd">
                                             <h4 className="m-b-30">{phrases['About']}</h4>
                                             <Formik initialValues={newInitialValues}
-                                                onSubmit={this.handleSubmit}
+                                                onSubmit={this.fetchFastlane}
                                                 validationSchema={vehicleRegistrationValidation}
                                             >
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
@@ -620,7 +688,7 @@ class RegistrationPCV_TP extends Component {
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                         value={values.reg_number_part_one}
-                                                                        disabled={values.check_registration == '1' ? true : false}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                         maxLength="2"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -639,7 +707,7 @@ class RegistrationPCV_TP extends Component {
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                         value={values.reg_number_part_two}
-                                                                        disabled={values.check_registration == '1' ? true : false}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                         maxLength="3"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -658,7 +726,7 @@ class RegistrationPCV_TP extends Component {
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                         value={values.reg_number_part_three}
-                                                                        disabled={values.check_registration == '1' ? true : false}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                         maxLength="3"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -677,7 +745,7 @@ class RegistrationPCV_TP extends Component {
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                         value={values.reg_number_part_four}
-                                                                        disabled={values.check_registration == '1' ? true : false}
+                                                                        disabled={values.check_registration == '1' ? true : is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                         maxLength="4"
                                                                         onInput={e => {
                                                                             this.regnoFormat(e, setFieldTouched, setFieldValue)
@@ -740,11 +808,14 @@ class RegistrationPCV_TP extends Component {
                                                                         <span className="error-message">{errors.check_registration}</span> : ""
                                                                     }
 
-                                                                </div> : null}
-                                                            <div className="cntrbtn">
-                                                                <Button className={`btnPrimary`} type="submit" >
+                                                                    </div> : null}
+
+                                                                <div className="cntrbtn">
+                                                                 
+                                                                    <Button className={`btnPrimary`} type="submit" >
                                                                     {phrases['Go']}
                                                                 </Button>
+                                                                        
 
 
                                                             </div>
@@ -776,6 +847,7 @@ const mapDispatchToProps = dispatch => {
     return {
         loadingStart: () => dispatch(loaderStart()),
         loadingStop: () => dispatch(loaderStop()),
+        setData: (data) => dispatch(setData(data))
     };
 };
 

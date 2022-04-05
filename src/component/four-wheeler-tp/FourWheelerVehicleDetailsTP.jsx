@@ -290,6 +290,7 @@ class TwoWheelerVehicleDetails extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp_fetchData', decryptResp)
+                let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
                 let fastlanelog = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.fastlanelog : {};
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  let previousPolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {};
@@ -298,7 +299,7 @@ class TwoWheelerVehicleDetails extends Component {
                  let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                  let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
                 this.setState({
-                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed, request_data,fastlanelog
+                    motorInsurance, previousPolicy, vehicleDetails,RTO_location,step_completed, request_data,fastlanelog,is_fieldDisabled,
                 })
                 //this.fetchFastlane();
                 this.props.loadingStop();
@@ -329,7 +330,7 @@ class TwoWheelerVehicleDetails extends Component {
 
     render() {
         const {productId} = this.props.match.params  
-        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag,fastlanelog} = this.state
+        const { motorInsurance, CustomerID,suggestions, vehicleDetails, RTO_location, step_completed, location_reset_flag,fastlanelog,is_fieldDisabled} = this.state
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         let newInitialValues = Object.assign(initialValue, {
@@ -403,7 +404,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
-                                                                disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                 peekPreviousYear
                                                                 showMonthDropdown
                                                                 showYearDropdown
@@ -431,7 +432,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                          </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    {fastlanelog && fastlanelog.id  ?
+                                                    {is_fieldDisabled && is_fieldDisabled  ?
                                                      <Col sm={12} md={6} lg={6}>
                                                      <FormGroup>
                                                          <div className="insurerName">
@@ -440,7 +441,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                   type="text"
                                                                   autoComplete="off"
                                                                   className="formGrp inputfs12"
-                                                                  disabled={fastlanelog && fastlanelog.id ? true :false}
+                                                                  disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                   value={motorInsurance && motorInsurance.location && motorInsurance.location.RTO_LOCATION ? motorInsurance.location.RTO_LOCATION : ""}
                                                              />
                                                              {errors.location_id && touched.location_id ? (
@@ -496,20 +497,20 @@ class TwoWheelerVehicleDetails extends Component {
                                                             <div className="txtRegistr">{phrases['RegNo']}.<br />
                                                             {motorInsurance && motorInsurance.registration_no}</div>
                                                             <div>
-                                                            <button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
+                                                            <button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick={this.selectBrand.bind(this, productId)}>{phrases['Edit']}</button>
                                                             </div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                         <div className="txtRegistr">{phrases['Brand']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
+                                                        <div><button className="rgistrBtn" type="button" disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.editBrand.bind(this,productId)}>{phrases['Edit']}</button></div>
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
                                                          <div className="txtRegistr">{phrases['Model']}<br/>
                                                             <strong>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</strong></div>
-                                                        <div><button className="rgistrBtn" type="button" disabled={fastlanelog && fastlanelog.id ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
+                                                        <div><button className="rgistrBtn" type="button"  disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false} onClick= {this.selectVehicleBrand.bind(this,productId)}>{phrases['Edit']}</button></div>          
                                                     </div>
 
                                                     <div className="d-flex justify-content-between flex-lg-row flex-md-column m-b-25">
