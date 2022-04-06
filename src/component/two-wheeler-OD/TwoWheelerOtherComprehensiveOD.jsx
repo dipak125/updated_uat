@@ -1147,7 +1147,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                         <Col sm={12} md={6} lg={6}>
                                                                             <FormGroup>
                                                                                 <div className="insurerName">
-                                                                                {phrases['ChassisNo']}.
+                                                                                {phrases['ChassisNo']}
                                                                                 </div>
                                                                             </FormGroup>
                                                                         </Col>
@@ -1198,7 +1198,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                </FormGroup>
                                                            </Col>
                                                                
-                                                           <Col sm={12} md={5} lg={6}>
+                                                           <Col sm={12} md={5} lg={7}>
                                                            <FormGroup>
                                                                       <div className="insurerName">
                                                                           <Field
@@ -1229,12 +1229,12 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                    <Col sm={12} md={5} lg={6}>
                                                                        <FormGroup>
                                                                            <div className="insurerName">
-                                                                           {phrases['ChasisNumber']}.
+                                                                           {phrases['ChasisNumber']}
                                                                            </div>
                                                                        </FormGroup>
                                                                    </Col>
                                                                
-                                                                   <Col sm={12} md={5} lg={6}>
+                                                                   <Col sm={12} md={5} lg={7}>
                                                                    <FormGroup>
                                                                       <div className="insurerName">
                                                                           <Field
