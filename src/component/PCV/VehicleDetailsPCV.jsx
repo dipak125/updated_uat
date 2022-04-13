@@ -1341,7 +1341,7 @@ class VehicleDetailsPCV extends Component {
                                                             <DatePicker
                                                                 name="previous_start_date"
                                                                // minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)}
-                                                               // maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
+                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth

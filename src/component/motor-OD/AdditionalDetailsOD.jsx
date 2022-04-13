@@ -153,15 +153,11 @@ const ownerValidation = Yup.object().shape({
     }),
 
     address:Yup.string().required('AddressRequired')
-    .test(
-        "addressChecking",
-        function() {
-            return "PleaseEnterValidAddress"
-        },
-        function(value) {   
-            return addressValidation(value);
-        }
-    )
+    // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, 
+    function() {
+        return "PleaseValidAddress"
+    })
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
     }),
@@ -177,13 +173,14 @@ const ownerValidation = Yup.object().shape({
     }).matches(/^[a-zA-Z0-9]+([._\-]?[a-zA-Z0-9]+)*@\w+([-]?\w+)*(\.\w{2,3})+$/,'InvalidEmail'),
 
     is_carloan: Yup.mixed().required('RequiredField'),
-    bank_name:Yup.string().notRequired('BankNameReq')
+    bank_name:Yup.string().notRequired('BankNameReq').nullable()
     .test(
         "isLoanChecking",
         function() {
             return "PleaseEnterBank"
         },
         function (value) {
+            console.log("vald",this.parent.is_carloan == 1,value)
             if (this.parent.is_carloan == 1 && !value) {   
                 return false;    
             }
@@ -192,14 +189,16 @@ const ownerValidation = Yup.object().shape({
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
         return "EnterValidBank"
     }),
-    bank_branch: Yup.string().notRequired('BankBranchReq')
+    bank_branch: Yup.string().notRequired('BankBranchReq').nullable()
     .test(
         "isLoanChecking",
         function() {
             return "PleaseEnterBranch"
         },
         function (value) {
-            if (this.parent.is_carloan == 1 && !value) {   
+            console.log("vald11",this.parent.is_carloan == 1,value)
+            if (this.parent.is_carloan == 1 && !value) { 
+                console.log("vald11",this.parent.is_carloan == 1,value)  
                 return false;    
             }
             return true;
@@ -573,7 +572,7 @@ console.log('post_data', post_data);
 
     fetchAreadetails=(value)=>{
         let pinCode = value;      
-
+        console.log("hi")
         if(pinCode.length==6){
             const formData = new FormData();
             this.props.loadingStart();
@@ -581,6 +580,7 @@ console.log('post_data', post_data);
             const post_data_obj = {
                 'pincode':pinCode
             };
+            
         //    formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data_obj)))
            formData.append('pincode',pinCode)
            axios.post('pincode-details',
@@ -702,7 +702,7 @@ console.log('post_data', post_data);
             pincode_id: addressDetails && addressDetails.id ? addressDetails.id : "",
             pincode: policyHolder && policyHolder.pincode ? policyHolder.pincode : "",
             address: policyHolder && policyHolder.address ? policyHolder.address : "",
-            is_carloan:is_loan_account,
+            is_carloan:parseInt(is_loan_account),
             bank_name: bankDetails ? bankDetails.bank_name : "",
             bank_branch: bankDetails ? bankDetails.bank_branch : "",
             nominee_relation_with: nomineeDetails && nomineeDetails.relation_with ? nomineeDetails.relation_with.toString() : "",
@@ -757,7 +757,8 @@ console.log('post_data', post_data);
                                     validationSchema={ownerValidation}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                                        console.log("err",errors)
+                                        console.log("value",values)
                                     return (
                                     <Form autoComplete="off">
                                     <Row>
@@ -1042,7 +1043,7 @@ console.log('post_data', post_data);
                                                             maxlength = "6"
                                                             onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
-                                                            onKeyUp={e=> this.fetchAreadetails(e)}
+                                                            onKeyUp={e=> this.fetchAreadetails(e.target.value)}
                                                             value={values.pincode}
                                                             maxLength="6"
                                                             onInput= {(e)=> {

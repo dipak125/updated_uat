@@ -694,7 +694,7 @@ class VehicleDetailsOD extends Component {
 
     handleSubmit = (values, actions) => {
         const { productId } = this.props.match.params
-        const { motorInsurance } = this.state
+        const { motorInsurance ,previousPolicy} = this.state
         let policy_type = 15
 
         // if (values.valid_previous_policy == "0" && (values.policy_type_id == 2 || (values.policy_type_id == '3' && values.lapse_duration == '1')) ) {
@@ -765,7 +765,8 @@ class VehicleDetailsOD extends Component {
                 'active_policy_address': values.active_policy_address,
                 'active_policy_no': values.active_policy_no,
                 'active_policy_tenure': values.active_policy_tenure,
-                'page_name': `VehicleDetailsOD/${productId}`
+                'page_name': `VehicleDetailsOD/${productId}`,
+                'active_policy_id':previousPolicy && previousPolicy[1] && previousPolicy[1].id ? previousPolicy[1].id : "",
             }
         }
         else {
@@ -788,7 +789,8 @@ class VehicleDetailsOD extends Component {
                 'prev_policy_flag': 1,
                 'previous_is_claim': 0,
                 'valid_previous_policy': values.valid_previous_policy,
-                'page_name': `VehicleDetailsOD/${productId}`
+                'page_name': `VehicleDetailsOD/${productId}`,
+                'active_policy_id':previousPolicy && previousPolicy[0] && previousPolicy[0].id ? previousPolicy[0].id : "",
             }
         }
        
@@ -1023,7 +1025,7 @@ class VehicleDetailsOD extends Component {
         const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID, suggestions, vehicleDetails, RTO_location,fastlanelog,is_fieldDisabled } = this.state
             
-
+          
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
         let newInitialValues = {}
         if( (( motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '1') ||
@@ -1034,6 +1036,7 @@ class VehicleDetailsOD extends Component {
                 previous_start_date: previousPolicy && previousPolicy[1] && previousPolicy[1].start_date ? new Date(previousPolicy[1].start_date) : "",
                 previous_end_date: previousPolicy && previousPolicy[1] && previousPolicy[1].end_date ? new Date(previousPolicy[1].end_date) : "",
                 previous_policy_name: previousPolicy && previousPolicy[1] && previousPolicy[1].name ? previousPolicy[1].name : "",
+              
                 insurance_company_id: previousPolicy && previousPolicy[1] && previousPolicy[1].insurancecompany_id ? previousPolicy[1].insurancecompany_id : "",
                 previous_city: previousPolicy && previousPolicy[1] && previousPolicy[1].city ? previousPolicy[1].city : "",
                 previous_policy_no: previousPolicy && previousPolicy[1] && previousPolicy[1].policy_no ? previousPolicy[1].policy_no : "",
@@ -1060,6 +1063,7 @@ class VehicleDetailsOD extends Component {
             });
         }
         else{
+           
             newInitialValues = Object.assign(initialValue, {
                 registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
                 location_id: motorInsurance && motorInsurance.location_id ? motorInsurance.location_id : "",
@@ -1111,7 +1115,8 @@ class VehicleDetailsOD extends Component {
                                             <div className="brand-bg">
                                                 <Formik initialValues={newInitialValues} onSubmit={this.handleSubmit} validationSchema={vehicleRegistrationValidation}>
                                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                                                        console.log("values",values)
+                                                        console.log("err",errors)
                                                         return (
                                                             <Form autoComplete="off">
                                                                 <Row>
@@ -1449,7 +1454,7 @@ class VehicleDetailsOD extends Component {
                                                                                             <DatePicker
                                                                                                 name={phrases['previous_start_date']}
                                                                                                 // minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDatePyp)}
-                                                                                                // maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
+                                                                                                 maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                                                 dateFormat="dd MMM yyyy"
                                                                                                 placeholderText={phrases['PPSD']}
                                                                                                 peekPreviousMonth

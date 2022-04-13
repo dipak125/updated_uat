@@ -1064,7 +1064,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                 validationSchema={vehicleRegistrationValidation}
                                             >
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                                                    console.log("err",errors)
                                                     return (
                                                         <Form>
                                                             <Row>
@@ -1122,7 +1122,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                 </div>
                                                                             </FormGroup>
                                                                         </Col>
- {fastlanelog && fastlanelog.id  ?
+                                                                        {fastlanelog && fastlanelog.id  ?
                                                                         <Col sm={12} md={6} lg={6}>
                                                                         <FormGroup>
                                                                             <div className="insurerName">
@@ -1399,7 +1399,7 @@ class TwoWheelerVehicleDetailsOD extends Component {
                                                                                             <DatePicker
                                                                                                 name={phrases['previous_start_date']}
                                                                                                 // minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDatePyp)}
-                                                                                                // maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
+                                                                                                 maxDate={values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                                                 dateFormat="dd MMM yyyy"
                                                                                                 placeholderText={phrases['PPSD']}
                                                                                                 peekPreviousMonth

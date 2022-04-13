@@ -177,15 +177,11 @@ const ownerValidation = Yup.object().shape({
     }),
 
     address:Yup.string().required('AddressRequired')
-    .test(
-        "addressChecking",
-        function() {
-            return "PleaseEnterValidAddress"
-        },
-        function(value) {   
-            return addressValidation(value);
-        }
-    )
+    // .matches(/^(?![0-9._])(?!.*[0-9._]$)(?!.*\d_)(?!.*_\d)[a-zA-Z0-9_.,-\\]+$/, 
+    .matches(/^[a-zA-Z0-9][a-zA-Z0-9\s,/.-]*$/, 
+    function() {
+        return "PleaseValidAddress"
+    })
     .max(100, function() {
         return "AddressMustBeMaximum100Chracters"
     }),
@@ -404,13 +400,14 @@ const ownerValidation = Yup.object().shape({
     .nullable(),
 
     is_carloan: Yup.mixed().required('RequiredField'),
-    bank_name:Yup.string().notRequired('BankNameReq')
+    bank_name:Yup.string().notRequired('BankNameReq').nullable()
     .test(
         "isLoanChecking",
         function() {
             return "PleaseEnterBank"
         },
         function (value) {
+            console.log("vald",value,typeof(value) == "undefined")
             if (this.parent.is_carloan == 1 && !value) {   
                 return false;    
             }
@@ -419,7 +416,7 @@ const ownerValidation = Yup.object().shape({
     ).matches(/^[A-Za-z][A-Za-z\s]*$/, function() {
         return "EnterValidBank"
     }),
-    bank_branch: Yup.string().notRequired('BankBranchReq')
+    bank_branch: Yup.string().notRequired('BankBranchReq').nullable()
     .test(
         "isLoanChecking",
         function() {

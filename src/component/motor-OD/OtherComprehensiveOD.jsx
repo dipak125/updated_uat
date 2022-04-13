@@ -1377,17 +1377,16 @@ class OtherComprehensiveOD extends Component {
                                         </Row>
                                         {values.vahanVerify && !errors.chasis_no_last_part ?
                                         <Row>
-                                        <Col sm={12} md={12} lg={4}>
+                                        <Col sm={12} md={12} lg={6}>
                                         <Row>
-                                        <Col sm={12} md={5} lg={6}>
+                                        <Col sm={12} md={6} lg={6}>
                                             <FormGroup>
                                                 <div className="insurerName">
                                                 {phrases['EngineNumber']}
                                                 </div>
                                             </FormGroup>
-                                        </Col>
-                                            
-                                        <Col sm={12} md={5} lg={7}>
+                                        </Col>  
+                                        <Col sm={12} md={6} lg={6}>
                                         <FormGroup>
                                                    <div className="insurerName">
                                                        <Field
@@ -1412,7 +1411,6 @@ class OtherComprehensiveOD extends Component {
                                         </Col>
                                         </Row>
                                         </Col>
-       
                                         <Col sm={12} md={12} lg={6}>
                                             <Row>
                                                 <Col sm={12} md={5} lg={6}>
@@ -1422,8 +1420,7 @@ class OtherComprehensiveOD extends Component {
                                                         </div>
                                                     </FormGroup>
                                                 </Col>
-                                            
-                                                <Col sm={12} md={5} lg={7}>
+                                                <Col sm={12} md={5} lg={6}>
                                                 <FormGroup>
                                                    <div className="insurerName">
                                                        <Field
@@ -1587,7 +1584,7 @@ class OtherComprehensiveOD extends Component {
                                         <Row>
                                             <Col sm={12} md={12} lg={12}>
                                                 <FormGroup>
-                                                    <span className="fs-18"> {phrases['AddMoreCoverage']}.</span>
+                                                    <span className="fs-18"> {phrases['AddMoreCoverage']}</span>
                                                 </FormGroup>
                                             </Col>
                                         </Row>

@@ -553,7 +553,7 @@ class TwoWheelerVerify extends Component {
                                     
                                 {values.vahanVerify && !errors.chasis_no_last_part ?
                                <Row>
-                               <Col sm={12} md={12} lg={4}>
+                               <Col sm={12} md={12} lg={6}>
                                <Row>
                                <Col sm={12} md={5} lg={6}>
                                    <FormGroup>
@@ -589,12 +589,12 @@ class TwoWheelerVerify extends Component {
                                </Row>
                                </Col>
 
-                               <Col sm={12} md={12} lg={5}>
+                               <Col sm={12} md={12} lg={6}>
                                    <Row>
                                        <Col sm={12} md={5} lg={6}>
                                            <FormGroup>
                                                <div className="insurerName">
-                                               {phrases['ChasisNumber']}.
+                                               {phrases['ChasisNumber']}
                                                </div>
                                            </FormGroup>
                                        </Col>

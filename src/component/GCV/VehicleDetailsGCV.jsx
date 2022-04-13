@@ -537,6 +537,7 @@ class VehicleDetailsGCV extends Component {
 }
   
   onSuggestionsFetchCustomerID = ({ value }) => {
+      
     this.setState({
       suggestions: this.getCustomerIDSuggestions(value)
     });
@@ -971,7 +972,7 @@ class VehicleDetailsGCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                                console.log("values",values)
                                 return (
                                     <Form enableReinitialize = {true}>
                                         <Row>
@@ -1033,7 +1034,7 @@ class VehicleDetailsGCV extends Component {
                                                                      autoComplete="off"
                                                                      className="formGrp inputfs12"
                                                                      disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
-                                                                     value={motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? motorInsurance.rtolocation.RTO_LOCATION : ""}
+                                                                     value={motorInsurance && motorInsurance.rtolocation && motorInsurance.rtolocation.RTO_LOCATION ? `${motorInsurance.rtolocation.RTO_LOCATION}  ${motorInsurance.rtolocation.RTO_Cluster}` : ""}
                                                                 />
                                                                 {errors.location_id && touched.location_id ? (
                                                                     <span className="errorMsg">{phrases[errors.location_id]}</span>

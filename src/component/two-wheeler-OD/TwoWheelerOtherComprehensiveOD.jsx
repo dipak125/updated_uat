@@ -1151,7 +1151,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                                 </div>
                                                                             </FormGroup>
                                                                         </Col>
-                                                                    
+                                                                                {console.log("CH23",phrases['ChassisNo'])}
                                                                         <Col sm={12} md={6} lg={4}>
                                                                             <FormGroup>
                                                                                 <div className="insurerName">
@@ -1188,7 +1188,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                             </Row>
                                                             {values.vahanVerify && !errors.chasis_no_last_part ?
                                                            <Row>
-                                                           <Col sm={12} md={12} lg={4}>
+                                                           <Col sm={12} md={12} lg={6}>
                                                            <Row>
                                                            <Col sm={12} md={5} lg={6}>
                                                                <FormGroup>
@@ -1198,7 +1198,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                </FormGroup>
                                                            </Col>
                                                                
-                                                           <Col sm={12} md={5} lg={7}>
+                                                           <Col sm={12} md={6} lg={6}>
                                                            <FormGroup>
                                                                       <div className="insurerName">
                                                                           <Field
@@ -1224,7 +1224,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                            </Row>
                                                            </Col>
                           
-                                                           <Col sm={12} md={12} lg={5}>
+                                                           <Col sm={12} md={12} lg={6}>
                                                                <Row>
                                                                    <Col sm={12} md={5} lg={6}>
                                                                        <FormGroup>
@@ -1234,7 +1234,7 @@ class TwoWheelerOtherComprehensiveOD extends Component {
                                                                        </FormGroup>
                                                                    </Col>
                                                                
-                                                                   <Col sm={12} md={5} lg={7}>
+                                                                   <Col sm={12} md={6} lg={6}>
                                                                    <FormGroup>
                                                                       <div className="insurerName">
                                                                           <Field

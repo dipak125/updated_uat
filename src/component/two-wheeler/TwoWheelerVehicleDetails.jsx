@@ -58,8 +58,17 @@ const initialValue = {
     pol_end_date: ""
 }
 const vehicleRegistrationValidation = Yup.object().shape({
-    registration_date: Yup.string().required('RegistrationRequired'),
-
+    registration_date: Yup.string().required('RegistrationRequired')
+        .test(
+            "checkGreaterTimes",
+            "RegistrationLessPrevious",
+            function (value) {
+                if (value) {
+                    return checkGreaterStartEndTimes(value, this.parent.previous_start_date);
+                }
+                return true;
+            }
+        ),
     location_id: Yup.string()
         .required(function () {
             return "CityRequired"
@@ -142,28 +151,47 @@ const vehicleRegistrationValidation = Yup.object().shape({
         ),
 
 
-    previous_is_claim: Yup.string().when("policy_type_Id", {
-        is: 1,
-        then: Yup.string(),
-        otherwise: Yup.string()
-            .test(
-                "validRegistrationChecking",
-                function () {
-                    return "PleaseSPC"
-                },
-                function (value) {
-                    let age = new PersonAge();
-                    if (this.parent.lapse_duration == '2' && this.parent.policy_type_Id == '3') {
-                        return true
-                    }
-                    else if (value && value != '2') {
-                        return true
-                    }
-                    else if (this.parent.policy_type_id == '1' && age.whatIsCurrentMonth(this.parent.registration_date) <= 5)
-                        return true;
-                    else return false
-                })
-    }),
+    // previous_is_claim: Yup.string().when("policy_type_Id", {
+    //     is: 1,
+    //     then: Yup.string(),
+    //     otherwise: Yup.string()
+    //         .test(
+    //             "validRegistrationChecking",
+    //             function () {
+    //                 return "PleaseSPC"
+    //             },
+    //             function (value) {
+    //                 let age = new PersonAge();
+    //                 if (this.parent.lapse_duration == '2' && this.parent.policy_type_Id == '3') {
+    //                     return true
+    //                 }
+    //                 else if (value && value != '2') {
+    //                     return true
+    //                 }
+    //                 else if (this.parent.policy_type_id == '1' && age.whatIsCurrentMonth(this.parent.registration_date) <= 5)
+    //                     return true;
+    //                 else return false
+    //             })
+    // }),
+    previous_is_claim: Yup.string()
+    .when(['policy_type_id','lapse_duration'], {
+        is: (policy_type_id, lapse_duration) => (policy_type_id == '3' && lapse_duration == '2'),       
+    then: Yup.string(),
+    otherwise: Yup.string().test(
+        "currentMonthChecking",
+        function () {
+            return "PleaseSPC"
+        },
+        function (value) {
+            const ageObj = new PersonAge();
+            if (ageObj.whatIsCurrentMonth(this.parent.registration_date) > 5 && this.parent.previous_policy_name == '1' &&
+                Math.floor(moment().diff(this.parent.previous_end_date, 'days', true)) <= 90 && !value) {
+                return false;
+            }
+            return true;
+        }
+    )
+}),
 
     previous_claim_bonus: Yup.string().when("previous_is_claim", {
         is: "0",
@@ -508,6 +536,7 @@ class TwoWheelerVehicleDetails extends Component {
         const { productId } = this.props.match.params
         const { motorInsurance } = this.state
         let newPolStartDate = addDays(new Date(), 2)
+        let ageDiff = ageObj.whatIsCurrentMonth(values.registration_date);
         let newPolEndDate = addDays(new Date(newPolStartDate), 364)
         let vehicleAge = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'months', true))
         let vehicleAgeDays = Math.floor(moment(newPolStartDate).diff(values.registration_date, 'days', true))
@@ -515,71 +544,190 @@ class TwoWheelerVehicleDetails extends Component {
         // console.log("vehicleAge===", vehicleAgeDays)
         const formData = new FormData();
         let post_data = {}
-        if ((motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1' && ageObj.whatIsCurrentMonth(values.registration_date) > 5) || (motorInsurance && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '2')) {
-            post_data = {
-                'policy_holder_id': localStorage.getItem("policyHolder_id"),
-                'menumaster_id': 3,
-                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id': values.location_id,
-                'previous_is_claim': 2,
-                'prev_policy_flag': ageObj.whatIsCurrentMonth(values.registration_date) > 5 ? 1 : 0,
-                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_name': values.previous_policy_name,
-                'insurance_company_id': values.insurance_company_id,
-                'previous_city': values.previous_city,
-                'previous_policy_no': values.previous_policy_no,
-                'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
-                'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
-                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'vehicleAge': vehicleAge,
-                'duration': values.duration,
-                'new_policy_duration': values.new_policy_duration,
-                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD"),
-                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD"),
-                'policy_type': policy_type,
-                'page_name': `two_wheeler_Vehicle_details/${productId}`,
+        // if ((motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1' && ageObj.whatIsCurrentMonth(values.registration_date) > 5) || (motorInsurance && motorInsurance.policytype_id == '3' && motorInsurance.lapse_duration == '2')) {
+        //     post_data = {
+        //         'policy_holder_id': localStorage.getItem("policyHolder_id"),
+        //         'menumaster_id': 3,
+        //         'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+        //         'location_id': values.location_id,
+        //         'previous_is_claim': 2,
+        //         'prev_policy_flag': ageObj.whatIsCurrentMonth(values.registration_date) > 5 ? 1 : 0,
+        //         'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+        //         'previous_policy_name': values.previous_policy_name,
+        //         'insurance_company_id': values.insurance_company_id,
+        //         'previous_city': values.previous_city,
+        //         'previous_policy_no': values.previous_policy_no,
+        //         'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
+        //         'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+        //         'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+        //         'vehicleAge': vehicleAge,
+        //         'duration': values.duration,
+        //         'new_policy_duration': values.new_policy_duration,
+        //         'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD"),
+        //         'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD"),
+        //         'policy_type': policy_type,
+        //         'page_name': `two_wheeler_Vehicle_details/${productId}`,
+        //     }
+
+        // }
+        // else if (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1' && ageObj.whatIsCurrentMonth(values.registration_date) <= 5) {
+        //     post_data = {
+        //         'policy_holder_id': localStorage.getItem("policyHolder_id"),
+        //         'menumaster_id': 3,
+        //         'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+        //         'location_id': values.location_id,
+        //         'previous_is_claim': 2,
+        //         'prev_policy_flag': ageObj.whatIsCurrentMonth(values.registration_date) > 5 ? 1 : 0,
+        //         'vehicleAge': vehicleAge,
+        //         'pol_start_date': moment(new Date()).format("YYYY-MM-DD"),
+        //         'pol_end_date': moment(moment(new Date()).add(12, "M")).subtract(1, "days").format("YYYY-MM-DD"),
+        //         'policy_type': policy_type,
+        //         'page_name': `two_wheeler_Vehicle_details/${productId}`,
+        //     }
+        // }
+        // else {
+        //     post_data = {
+        //         'policy_holder_id': localStorage.getItem("policyHolder_id"),
+        //         'menumaster_id': 3,
+        //         'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+        //         'location_id': values.location_id,
+        //         'previous_is_claim': values.lapse_duration == '2' ? '2' : (values.previous_is_claim == 0 || values.previous_is_claim == 1 ? values.previous_is_claim : '2'),
+        //         'previous_claim_bonus': values.previous_claim_bonus === "" ? "2" : values.previous_claim_bonus,
+        //         'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+        //         'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+        //         'previous_policy_no': values.previous_policy_no,
+        //         'previous_policy_name': values.previous_policy_name,
+        //         'insurance_company_id': values.insurance_company_id,
+        //         'cng_kit': 0,
+        //         'previous_city': values.previous_city,
+        //         'prev_policy_flag': 1,
+        //         'vehicleAge': vehicleAge,
+        //         'duration': values.duration,
+        //         'new_policy_duration': values.new_policy_duration,
+        //         'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD"),
+        //         'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD"),
+        //         'policy_type': policy_type,
+        //         'page_name': `two_wheeler_Vehicle_details/${productId}`,
+        //     }
+        // }
+
+        if(values.policy_type_id == '1' || values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
+            if (ageObj.whatIsCurrentMonth(values.registration_date) > 5 && values.previous_policy_name == '1') {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 3,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                    'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                    'previous_policy_name': values.previous_policy_name,
+                    'insurance_company_id': values.insurance_company_id,
+                    'previous_city': values.previous_city,
+                    'previous_policy_no': values.previous_policy_no,
+                    'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
+                    'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                    'previous_claim_for': values.previous_claim_for,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 1,
+                    'page_name':  `two_wheeler_Vehicle_details/${productId}`,
+                    'new_policy_duration': values.new_policy_duration,
+                    'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                    'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")  
+                }
+            }
+            else if(ageObj.whatIsCurrentMonth(values.registration_date) > 5 && values.previous_policy_name == '3')
+            {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 3,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                    'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                    'previous_policy_name': values.previous_policy_name,
+                    'insurance_company_id': values.insurance_company_id,
+                    'previous_city': values.previous_city,
+                    'previous_policy_no': values.previous_policy_no,
+                    'previous_is_claim': values.previous_is_claim ? values.previous_is_claim : '0',
+                    'previous_claim_bonus': values.previous_claim_bonus ? values.previous_claim_bonus : 1,
+                    'previous_claim_for': values.previous_claim_for,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 1,
+                    'page_name':  `two_wheeler_Vehicle_details/${productId}`,
+                    'duration': values.duration,
+                    'new_policy_duration': values.new_policy_duration,
+                    'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                    'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")
+                } 
             }
 
-        }
-        else if (motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '1' && ageObj.whatIsCurrentMonth(values.registration_date) <= 5) {
-            post_data = {
-                'policy_holder_id': localStorage.getItem("policyHolder_id"),
-                'menumaster_id': 3,
-                'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
-                'location_id': values.location_id,
-                'previous_is_claim': 2,
-                'prev_policy_flag': ageObj.whatIsCurrentMonth(values.registration_date) > 5 ? 1 : 0,
-                'vehicleAge': vehicleAge,
-                'pol_start_date': moment(new Date()).format("YYYY-MM-DD"),
-                'pol_end_date': moment(moment(new Date()).add(12, "M")).subtract(1, "days").format("YYYY-MM-DD"),
-                'policy_type': policy_type,
-                'page_name': `two_wheeler_Vehicle_details/${productId}`,
+            else if (ageObj.whatIsCurrentMonth(values.registration_date) > 5 && values.previous_policy_name == '2') {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 3,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
+                    'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
+                    'previous_policy_name': values.previous_policy_name,
+                    'insurance_company_id': values.insurance_company_id,
+                    'previous_city': values.previous_city,
+                    'previous_policy_no': values.previous_policy_no,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 1,
+                    'previous_is_claim': '0',
+                    'previous_claim_bonus': 1,
+                    'page_name': `two_wheeler_Vehicle_details/${productId}`,
+                    'new_policy_duration': values.new_policy_duration,
+                    'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                    'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")
+                }
+            }
+            else if (ageObj.whatIsCurrentMonth(values.registration_date) <= 5) {
+                post_data = {
+                    'policy_holder_id': localStorage.getItem('policyHolder_id'),
+                    'menumaster_id': 3,
+                    'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
+                    'location_id': values.location_id,
+                    'previous_is_claim': '0',
+                    'previous_claim_bonus': 1,
+                    'vehicleAge': vehicleAge,
+                    'policy_type': policy_type,
+                    'prev_policy_flag': 0,
+                    'page_name':  `two_wheeler_Vehicle_details/${productId}`,
+                    'new_policy_duration': values.new_policy_duration,
+                    'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                    'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")
+                }
             }
         }
         else {
             post_data = {
-                'policy_holder_id': localStorage.getItem("policyHolder_id"),
+                'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': 3,
                 'registration_date': moment(values.registration_date).format("YYYY-MM-DD"),
                 'location_id': values.location_id,
-                'previous_is_claim': values.lapse_duration == '2' ? '2' : (values.previous_is_claim == 0 || values.previous_is_claim == 1 ? values.previous_is_claim : '2'),
-                'previous_claim_bonus': values.previous_claim_bonus === "" ? "2" : values.previous_claim_bonus,
-                'previous_start_date': moment(values.previous_start_date).format("YYYY-MM-DD"),
-                'previous_end_date': moment(values.previous_end_date).format("YYYY-MM-DD"),
-                'previous_policy_no': values.previous_policy_no,
-                'previous_policy_name': values.previous_policy_name,
-                'insurance_company_id': values.insurance_company_id,
-                'cng_kit': 0,
-                'previous_city': values.previous_city,
-                'prev_policy_flag': 1,
+                'previous_is_claim': '0',
+                'previous_claim_bonus': 1,
                 'vehicleAge': vehicleAge,
-                'duration': values.duration,
-                'new_policy_duration': values.new_policy_duration,
-                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD"),
-                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD"),
                 'policy_type': policy_type,
-                'page_name': `two_wheeler_Vehicle_details/${productId}`,
+                'prev_policy_flag': 0,
+                'page_name':  `two_wheeler_Vehicle_details/${productId}`,
+                'new_policy_duration': values.new_policy_duration,
+                'pol_start_date': moment(values.pol_start_date).format("YYYY-MM-DD") ,
+                'pol_end_date': moment(values.pol_end_date).format("YYYY-MM-DD")
             }
+        }
+            
+
+        if (ageDiff < 1 && motorInsurance && motorInsurance.registration_no == "") {
+            localStorage.setItem('registration_number', "NEW");
+        }
+        else {
+            localStorage.removeItem('registration_number');
         }
 
 
@@ -660,7 +808,7 @@ class TwoWheelerVehicleDetails extends Component {
 
                 let maxRegnDate = motorInsurance && motorInsurance.policytype_id == '1' ? moment()
                     : moment(moment().subtract(1, 'years').calendar()).add(3, 'months').calendar()
-                console.log("previous", previousPolicy);
+                console.log("previous1", motorInsurance);
                 this.setState({
                     motorInsurance, previousPolicy, vehicleDetails, RTO_location, maxRegnDate, request_data,fastlanelog,is_fieldDisabled
                 })
@@ -828,8 +976,25 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                     className="datePckr inputfs12"
                                                                                     selected={values.registration_date}
                                                                                     onChange={(val) => {
+                                                                                        // setFieldTouched('registration_date');
+                                                                                        // setFieldValue('registration_date', val);
+
                                                                                         setFieldTouched('registration_date');
                                                                                         setFieldValue('registration_date', val);
+
+                                                                                        setFieldValue('previous_end_date', "");
+                                                                                        setFieldValue('previous_start_date', "");
+                                                                                        if( (motorInsurance && motorInsurance.policytype_id && (motorInsurance.policytype_id == '3' &&
+                                                                                            motorInsurance && motorInsurance.lapse_duration == '2' ) ) || (ageObj.whatIsCurrentMonth(values.registration_date) > 5 ) ){
+                                                                                                setFieldValue('pol_start_date', addDays(new Date(),1) );
+                                                                                        }
+                                                                                        if(ageObj.whatIsCurrentMonth(values.registration_date) <= 5  ){
+                                                                                                let date1 = addDays(new Date(),1)
+                                                                                                let date2 = moment(moment(date1).add(12, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+                                                                                                setFieldValue('pol_start_date', date1 ); 
+                                                                                                setFieldValue('new_policy_duration', 12 );         
+                                                                                                setFieldValue("pol_end_date", new Date(date2));
+                                                                                        }
                                                                                     }}
 
                                                                                 />
@@ -897,6 +1062,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                         }
                                                                     </Row>
                                                                     {console.log("age0", ageObj.whatIsCurrentMonth(values.registration_date))}
+                                                                    {console.log("age0",motorInsurance.policytype_id == '3', motorInsurance.lapse_duration == '2')}
                                                                     {(motorInsurance && motorInsurance.policytype_id && motorInsurance.policytype_id == '3' &&
                                                                         motorInsurance && motorInsurance.lapse_duration == '2') || (ageObj.whatIsCurrentMonth(values.registration_date) <= 5) ? null :
                                                                         <Fragment>
@@ -1035,7 +1201,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                         <DatePicker
                                                                                             name="previous_start_date"
                                                                                             //minDate={new Date(minDate)}
-                                                                                            //maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                                            maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                                             dateFormat="dd MMM yyyy"
                                                                                             placeholderText={phrases['PPSD']}
                                                                                             peekPreviousMonth
@@ -1343,7 +1509,9 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                     </Row>
                                                                                 </Fragment>
                                                                                 : null}
-                                                                            {console.log("age", ageObj.whatIsCurrentMonth(values.registration_date))}
+                                                              
+                                                                        </Fragment>}
+                                                                        {console.log("age", ageObj.whatIsCurrentMonth(values.registration_date))}
                                                                             {(motorInsurance && motorInsurance.policytype_id && ((motorInsurance.policytype_id == '3' &&
                                                                                 motorInsurance && motorInsurance.lapse_duration == '2') || (motorInsurance.policytype_id == '2'))) || (ageObj.whatIsCurrentMonth(values.registration_date) > 5) ?
 
@@ -1387,7 +1555,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                                         <option value='6'> Six Month</option>
                                                                                                         <option value='7'> Seven Month</option>
                                                                                                         <option value='8'> Eight Month</option>
-                                                                                                        <option value='12'> One year</option>
+                                                                                                        <option value='12'> Twelve Month</option>
 
                                                                                                     </Field>
                                                                                                     {errors.new_policy_duration && touched.new_policy_duration ? (
@@ -1455,7 +1623,6 @@ class TwoWheelerVehicleDetails extends Component {
 
                                                                                 </Fragment>
                                                                                 : null}
-                                                                        </Fragment>}
                                                                     <div className="d-flex justify-content-left resmb">
                                                                         <Button className={`backBtn`} type="button" disabled={isSubmitting ? true : false} onClick={this.selectBrand.bind(this, productId)}>
                                                                             {isSubmitting ? phrases['Wait..'] : phrases['Back']}
