@@ -170,12 +170,13 @@ class arogya_SelectDuration extends Component {
                 return false
             }
         }
-
+       // console.log("dy1",moment(serverResponse.ExpiryDate).format("YYYY/MM/DD"),serverResponse.EffectiveDate)
         const post_data = {
             'page_name': 'arogya_SelectDuration/12',
             'policy_holder_id': policy_holder_id,
             'start_date': serverResponse.EffectiveDate,
-            'end_date': serverResponse.ExpiryDate,
+            //'end_date': moment(serverResponse.ExpiryDate).formate("YYYY-MM-DD"),
+           'end_date': moment(serverResponse.ExpiryDate).format("YYYY-MM-DD"),
             'gross_premium': serverResponse.GrossPremium,
             'service_tax': serverResponse.TGST,
             'swatch_bharat_cess': 0,

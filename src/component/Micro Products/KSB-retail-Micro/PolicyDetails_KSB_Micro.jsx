@@ -64,6 +64,7 @@ class PolicyDetails_KSB_Micro extends Component {
     show: false,
     refNumber: "",
     paymentStatus: [],
+    hide:0,
     serverResponse: false,
     paymentgateway: [],
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
@@ -146,6 +147,15 @@ class PolicyDetails_KSB_Micro extends Component {
     axios
       .post(`/fullQuoteServiceKSBRetail`, formData)
       .then((res) => {
+        if(res.data.ValidateResult)
+        {
+             this.setState({
+                 ...this.state,
+                 hide:1
+             })
+             this.props.loadingStop();
+        }
+        else{
         if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
             fulQuoteResp: res.data.PolicyObject,
@@ -167,6 +177,7 @@ class PolicyDetails_KSB_Micro extends Component {
           });
         }
         this.props.loadingStop();
+      }
       })
       .catch((err) => {
         this.setState({
@@ -207,7 +218,7 @@ class PolicyDetails_KSB_Micro extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error,  serverResponse, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster,
+    const { fulQuoteResp, error,  serverResponse, policyHolderDetails, refNumber, paymentStatus, nomineeDetails, bcMaster,hide,
        menumaster, request_data, vehicleDetails, paymentgateway } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -573,13 +584,13 @@ class PolicyDetails_KSB_Micro extends Component {
                                               Back
                                             </Button>
                                           
-                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0 ?
                                               <div>
                                               <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse  && hide == 0 ? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >

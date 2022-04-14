@@ -65,6 +65,7 @@ class PolicyDetails_Micro extends Component {
     paymentStatus: [],
     serverResponse: false,
     paymentgateway: [],
+    hide:0,
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                         queryString.parse(this.props.location.search).access_id : 
                         localStorage.getItem("policyHolder_refNo")
@@ -204,6 +205,15 @@ class PolicyDetails_Micro extends Component {
     axios
       .post(`/fullQuoteServiceArogyaSeriesMicro`, formData)
       .then((res) => {
+        if(res.data.ValidateResult)
+        {
+             this.setState({
+                 ...this.state,
+                 hide:1
+             })
+             this.props.loadingStop();
+        }
+        else{
         if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
             fulQuoteResp: res.data.PolicyObject,
@@ -225,6 +235,7 @@ class PolicyDetails_Micro extends Component {
           });
         }
         this.props.loadingStop();
+      }
       })
       .catch((err) => {
         this.setState({
@@ -270,7 +281,7 @@ class PolicyDetails_Micro extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, 
+    const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster,hide, 
       paymentgateway, nomineeDetails, request_data , vehicleDetails} = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -635,13 +646,13 @@ class PolicyDetails_Micro extends Component {
                                               Back
                                             </Button>
 
-                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0?
                                               <div>
                                               <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse && hide == 0? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >

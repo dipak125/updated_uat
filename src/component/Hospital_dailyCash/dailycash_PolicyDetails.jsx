@@ -104,6 +104,7 @@ class dailycash_PolicyDetails extends Component {
     refNumber: "",
     paymentStatus: [],
     nomineedetails: [],
+     hide:0,
     request_data: [],
     serverResponse: false,
     paymentgateway: [],
@@ -201,6 +202,16 @@ class dailycash_PolicyDetails extends Component {
       .post(`/daily-cash/full-quote`, formData)
       .then((res) => {
         let decryptResp = JSON.parse(encryption.decrypt(res.data))
+	 console.log("fullQuoteResponse====",res.data.ValidateResult)
+                   if(decryptResp.ValidateResult)
+                   {
+                        this.setState({
+                            ...this.state,
+                            hide:1
+                        })
+                        this.props.loadingStop();
+                   }
+                   else{
 
         if (!decryptResp.error) {
           this.setState({
@@ -223,6 +234,7 @@ class dailycash_PolicyDetails extends Component {
           });
         }
         this.props.loadingStop();
+	}
       })
       .catch((err) => {
         this.setState({
@@ -265,7 +277,7 @@ sendPaymentLink = () => {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, addressArray, error, serverResponse, policyHolderDetails, nomineedetails, paymentStatus,
+    const { fulQuoteResp, addressArray, error, serverResponse, policyHolderDetails, nomineedetails, paymentStatus,hide,
       paymentgateway, bcMaster, menumaster, request_data, paymentButton, smsButton, show, refNumber } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -725,17 +737,17 @@ sendPaymentLink = () => {
                                             >
                                               Back
                                             </button>
-                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0?
                                             <div>
                                               <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
-                                          {values.gateway ?
+                                          {values.gateway && hide == 0?
                                             <Button className="backBtn" type="submit" >{phrases['MakePayment']}</Button>
                                           : null}
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true && hide == 0? 
                                            <Button type="submit"
                                               className="proceedBtn"
                                             >

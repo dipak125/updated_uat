@@ -54,6 +54,7 @@ class IPA_Premium extends Component {
     refNumber: "",
     policyCoverage: [],
     paymentStatus: [],
+     hide:0,
     relationArr: {},
     paymentgateway: [],
     policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
@@ -211,6 +212,16 @@ class IPA_Premium extends Component {
     axios
       .post(`/fullQuoteServiceIPA`, formData)
       .then(res => { 
+       console.log("fullQuoteResponse====",res.data.ValidateResult)
+                   if(res.data.ValidateResult)
+                   {
+                        this.setState({
+                            ...this.state,
+                            hide:1
+                        })
+                        this.props.loadingStop();
+                   }
+                   else{
         if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
               fulQuoteResp: res.data.PolicyObject,
@@ -253,6 +264,7 @@ class IPA_Premium extends Component {
             serverResponse: []
         });
         this.props.loadingStop();
+	}
     }
       })
       .catch(err => {
@@ -295,7 +307,7 @@ class IPA_Premium extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr, 
+    const { fulQuoteResp, error, show, policyHolderDetails, nomineeDetails, paymentStatus, policyCoverage, relationArr,hide, 
       ipaInfo, bcMaster, paymentgateway, vehicleDetails, paymentButton, smsButton, refNumber } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -662,17 +674,17 @@ class IPA_Premium extends Component {
                                               Back
                                             </Button>
 
-                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                            {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0?
                                               <div>
                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                               </div> : null }
 
-                                            {smsButton === true ?
+                                            {smsButton === true && hide == 0 ?
                                               <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                             : null}
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true && hide == 0? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >

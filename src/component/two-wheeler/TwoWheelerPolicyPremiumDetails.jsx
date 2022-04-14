@@ -58,6 +58,7 @@ class Premium extends Component {
             policyHolder: [],
             vehicleDetails: [],
             step_completed: "0",
+            hide:0,
 	        paymentgateway: [],
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
@@ -221,6 +222,15 @@ class Premium extends Component {
 
         axios.post('fullQuotePM2W', formData)
             .then(res => {
+                if(res.data.ValidateResult)
+                {
+                     this.setState({
+                         ...this.state,
+                         hide:1
+                     })
+                     this.props.loadingStop();
+                }
+                else{
                 if(res.data.PolicyObject && res.data.PolicyObject.EffectiveDate && res.data.PolicyObject && res.data.PolicyObject.ExpiryDate)
                 {
                     this.dateDiffrence(res.data.PolicyObject.EffectiveDate ,res.data.PolicyObject.ExpiryDate )
@@ -238,6 +248,7 @@ class Premium extends Component {
                     });
                 }
                 this.props.loadingStop();
+            }
             })
             .catch(err => {
                 this.setState({
@@ -293,7 +304,7 @@ class Premium extends Component {
     }
 
     render() {
-        const { policyHolder, paymentgateway, show, fulQuoteResp, motorInsurance, error, error1, refNumber, request_data,menumaster,
+        const { policyHolder, paymentgateway, show, fulQuoteResp, motorInsurance, error, error1, refNumber, request_data,menumaster,hide,
             paymentStatus, relation, memberdetails,nomineedetails, vehicleDetails,step_completed, bcMaster, paymentButton, smsButton } = this.state
         const { productId } = this.props.match.params
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -757,18 +768,18 @@ class Premium extends Component {
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
                                                                 
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0 ?
                                                                 <div>
 
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                 </div> : null }
 
-                                                                {smsButton === true && fulQuoteResp.QuotationNo ?
+                                                                {smsButton === true && fulQuoteResp.QuotationNo && hide == 0 ?
                                                                     <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 
-                                                                {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true ?
+                                                                {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true && hide == 0 ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >

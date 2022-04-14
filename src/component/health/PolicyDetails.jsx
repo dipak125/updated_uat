@@ -70,6 +70,7 @@ class PolicyDetails extends Component {
     error1: [],
     show: false,
     refNumber: "",
+     hide:0,
     nomineedetails: [],
     paymentStatus: [],
     serverResponse: false,
@@ -266,6 +267,16 @@ class PolicyDetails extends Component {
     axios
       .post(`/fullQuoteServiceArogyaSeries`, formData)
       .then((res) => {
+       console.log("fullQuoteResponse====",res.data.ValidateResult)
+                   if(res.data.ValidateResult)
+                   {
+                        this.setState({
+                            ...this.state,
+                            hide:1
+                        })
+                        this.props.loadingStop();
+                   }
+                   else{
         if (res.data.PolicyObject && res.data.UnderwritingResult && res.data.UnderwritingResult.Status == "Success") {
           this.setState({
             fulQuoteResp: res.data.PolicyObject,
@@ -288,6 +299,7 @@ class PolicyDetails extends Component {
           });
         }
         this.props.loadingStop();
+	}
       })
       .catch((err) => {
         this.setState({
@@ -333,7 +345,7 @@ class PolicyDetails extends Component {
 
   render() {
     const { productId } = this.props.match.params;
-    const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, 
+    const { fulQuoteResp, error, serverResponse, policyHolderDetails, refNumber, paymentStatus, bcMaster, hide,
       paymentgateway, menumaster, request_data, nomineedetails, paymentButton, smsButton, show } = this.state;
 
     let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
@@ -710,17 +722,17 @@ class PolicyDetails extends Component {
                                               Back
                                             </Button>
 
-                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0 ?
                                             <div>
                                               <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
-                                          {smsButton === true ?
+                                          {smsButton === true && hide == 0 ?
                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                           : null}
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse && paymentButton === true ? 
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" &&  serverResponse && paymentButton === true && hide == 0 ? 
                                             <Button type="submit"
                                               className="proceedBtn"
                                             >

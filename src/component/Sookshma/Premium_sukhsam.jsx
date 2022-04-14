@@ -61,6 +61,7 @@ class Premium_sukhsam extends Component {
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
+	     hide:0,
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policy_holder_ref_no")
@@ -188,6 +189,16 @@ class Premium_sukhsam extends Component {
             formDataNew
             ).then(res=>{
                     let decryptResp = JSON.parse(encryption.decrypt(res.data));   
+                   
+                    if(decryptResp.ValidateResult)
+                    {
+                         this.setState({
+                             ...this.state,
+                             hide:1
+                         })
+                         this.props.loadingStop();
+                    }
+                    else{
                     console.log("decryptRespQuote --------------- ", decryptResp)
                     if(decryptResp.error == true) {
                         this.setState({paymentgateway: [], quoteId: "", error: {message : decryptResp.msg}})
@@ -198,7 +209,8 @@ class Premium_sukhsam extends Component {
                             ...this.state,
                             QuotationNo :decryptResp.data.QuotationNo
                      })                
-                    this.props.loadingStop();  
+                    this.props.loadingStop(); 
+                    } 
             })
             .catch(err=>{
                 this.props.loadingStop();
@@ -366,7 +378,7 @@ class Premium_sukhsam extends Component {
     }
 
     render() {
-        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, quoteId, paymentStatus, 
+        const { policyHolder, show, vehicleDetails, paymentgateway, error, error1, quoteId, paymentStatus, hide,
             memberdetails,nomineedetails, paymentButton, smsButton, refNumber } = this.state
         const { productId } = this.props.match.params
             
@@ -766,17 +778,17 @@ class Premium_sukhsam extends Component {
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this,productId)}>Back</Button>
                                                                
-                                                                { this.props.payment_link_status == 1 ?
+                                                                { this.props.payment_link_status == 1 && hide== 0 ?
                                                                     <div>
                                                                         <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                                                         &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
 
-                                                                {smsButton === true ?
+                                                                {smsButton === true && hide== 0?
                                                                     <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 
-                                                                {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" && paymentButton === true ?
+                                                                {this.state.quoteId && this.state.quoteId != '' && values.gateway != "" && paymentButton === true && hide== 0 ?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"   disabled={isSubmitting ? true : false}>
                                                                         Generate Policy

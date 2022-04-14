@@ -61,6 +61,7 @@ class PremiumMISCD extends Component {
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
+	     hide:0,
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ?
                                 queryString.parse(this.props.location.search).access_id :
                                 localStorage.getItem("policyHolder_refNo")
@@ -255,8 +256,18 @@ class PremiumMISCD extends Component {
 
             axios.post('fullQuoteMISCD', formData)
                 .then(res => {
-                    console.log('Sudipto Res', res);
+		 console.log("fullQuoteResponse====",res.data.ValidateResult)
+                   if(res.data.ValidateResult)
+                   {
+                        this.setState({
+                            ...this.state,
+                            hide:1
+                        })
+                        this.props.loadingStop();
+                   }
+                   else{
                     if (res.data.data.PolicyObject && res.data.data.UnderwritingResult && res.data.data.UnderwritingResult.Status == "Success") {
+                        console.log("hi")
                         this.setState({
                             fulQuoteResp: res.data.data.PolicyObject,
                             PolicyArray: res.data.data.PolicyObject.PolicyLobList,
@@ -275,6 +286,7 @@ class PremiumMISCD extends Component {
                         swal(res.data.msg)
                     }
                     this.props.loadingStop();
+		    }
                 })
                 .catch(err => {
                     this.setState({
@@ -401,7 +413,7 @@ class PremiumMISCD extends Component {
     }
 
     render() {
-        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,paymentgateway,
+        const { policyHolder, show, fulQuoteResp, motorInsurance, error, error1, refNumber, paymentStatus, relation, memberdetails,paymentgateway,hide,
             nomineedetails, vehicleDetails, breakin_flag, step_completed, paymentButton, smsButton, bcMaster,menumaster,request_data } = this.state
         const { productId } = this.props.match.params
 
@@ -880,17 +892,17 @@ class PremiumMISCD extends Component {
                                                             <Row>&nbsp;</Row>
                                                             <div className="d-flex justify-content-left resmb">
                                                                 <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>
-                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 && fulQuoteResp.QuotationNo ?
+                                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 && breakin_flag == 0 && fulQuoteResp.QuotationNo  && hide == 0?
                                                                     <div>
                                                                     <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                                     </div> : null }
 
-                                                                {smsButton === true && breakin_flag == 0 && fulQuoteResp.QuotationNo ?
+                                                                {smsButton === true && breakin_flag == 0 && fulQuoteResp.QuotationNo  && hide == 0 ?
                                                                 <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
                                                                 : null}
 
-                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" && paymentButton === true ?
+                                                                {fulQuoteResp.QuotationNo && breakin_flag == 0 && values.gateway != "" && paymentButton === true  && hide == 0?
                                                                     <Button type="submit"
                                                                         className="proceedBtn"
                                                                     >
