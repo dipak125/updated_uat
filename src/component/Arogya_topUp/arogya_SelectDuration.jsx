@@ -295,8 +295,8 @@ class arogya_SelectDuration extends Component {
         axios
             .post(`/arogya-topup/fullQuoteServiceArogyaTopup`, formData)
             .then(res => {
-                // let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                let decryptResp = res.data
+                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                //let decryptResp = res.data
                 console.log("decrypt---quote--service---", decryptResp)
 
                 if (decryptResp.PolicyObject && decryptResp.UnderwritingResult && decryptResp.UnderwritingResult.Status == "Success") {

@@ -1179,6 +1179,7 @@ class arogya_InformationYourself extends Component {
     }
 
     handleSubmitForm = (values, actions) => {
+        
         var drv = [];
         var display_looking_for = [];
         var display_dob = [];
@@ -1276,6 +1277,7 @@ class arogya_InformationYourself extends Component {
         this.props.loadingStart();
         axios.get(`arogya-topup/health-policy-details/${policyHolder_refNo}`)
             .then(res => {
+               
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 console.log("decrypt", decryptResp)
                 let family_members = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data && decryptResp.data.policyHolder.request_data.family_members ? decryptResp.data.policyHolder.request_data.family_members : []
