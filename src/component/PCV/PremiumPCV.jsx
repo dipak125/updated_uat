@@ -318,17 +318,24 @@ class PremiumPCV extends Component {
     }
 
     breakinService = (motorInsurance,previousPolicy, request_data, policyHolder,vehicleDetails) => {
+        
         let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
         let valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
         let dateDiff = 0
         return new Promise((resolve, reject) => {
+            console.log("pType",valid_previous_policy,policyHolder.break_in_status,policy_type_id)
             if((valid_previous_policy == '0' && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
                 dateDiff = previousPolicy && previousPolicy.end_date ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : 1;
                 let previousPolicyName = previousPolicy ? previousPolicy.name : ""
                 let carrying_capacity = vehicleDetails && vehicleDetails.varientmodel ? vehicleDetails.varientmodel.carrying : ""
                 let wheels_capacity = vehicleDetails && vehicleDetails.varientmodel ? vehicleDetails.varientmodel.wheels : ""
-
-                if((dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3" || valid_previous_policy == '0') && !(wheels_capacity == 3 && carrying_capacity <= 4) ) {       
+                
+                //if=condition====(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3" || valid_previous_policy == '0') && !(wheels_capacity == 3 && carrying_capacity <= 4)
+               
+                console.log("break1",wheels_capacity,carrying_capacity)
+                if((dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3" || valid_previous_policy == '0') && !(wheels_capacity == 3 && carrying_capacity <= 4) ) {   
+                    console.log("pType",policy_type_id != "1",policy_type_id)
+                    if(policy_type_id != "1"){
                     const formData1 = new FormData();
                     let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
                     formData1.append('policy_ref_no',policyHolder_id)
@@ -385,6 +392,7 @@ class PremiumPCV extends Component {
                     resolve({'inspectionNumber' :"" , 'inspection' : 0})
                 }
             }
+        }
             else {
                 resolve({'inspectionNumber' :"" , 'inspection' : 0})
             }

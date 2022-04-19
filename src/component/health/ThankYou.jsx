@@ -28,6 +28,7 @@ class ThankYouPage extends Component {
   // ------------------------ Custom PDF----------------------------
 
   generateDoc = () => {
+    console.log("custom")
     const { policyId } = this.props.match.params
     const formData = new FormData();
     formData.append('policyNo', policyId)
@@ -293,6 +294,7 @@ getPolicyDowonload =() =>{
 }
 
 downloadThirdType =(url,name)=>{
+  console.log("third3",url,name)
  
   const pom = document.createElement('a');
 

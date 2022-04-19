@@ -272,6 +272,7 @@ class TwoWheelerSelectBrandOD extends Component {
         this.props.loadingStart();
         axios.get(`two-wh-stal/policy-holder/motor-saod/${policyHolder_id}`)
             .then(res => {
+                console.log()
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
                 console.log('decryptResp', decryptResp)
                 let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
@@ -284,6 +285,8 @@ class TwoWheelerSelectBrandOD extends Component {
                 this.getBrands();
             })
             .catch(err => {
+                let decryptErr = JSON.parse(encryption.decrypt(err.data));
+                    console.log('decryptResp--err---', decryptErr)
                 // handle error
                 this.props.loadingStop();
             })

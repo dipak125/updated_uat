@@ -855,7 +855,7 @@ class VehicleDetails extends Component {
                                                                                                     setFieldValue('pol_start_date', addDays(new Date(),1) );
                                                                                             }
                                                                                             if(ageObj.whatIsCurrentMonth(values.registration_date) <= 5  ){
-                                                                                                    let date1 = addDays(new Date(),1)
+                                                                                                    let date1 = new Date()
                                                                                                     let date2 = moment(moment(date1).add(12, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
                                                                                                     setFieldValue('pol_start_date', date1 ); 
                                                                                                     setFieldValue('new_policy_duration', 12 );         
