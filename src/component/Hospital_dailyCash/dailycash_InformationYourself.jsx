@@ -19,11 +19,12 @@ import { changeFormat, get18YearsBeforeDate, PersonAge } from "../../shared/date
 import Encryption from '../../shared/payload-encryption';
 import Select from 'react-select';
 
-const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
+const minDobAdult = moment(moment().subtract(66, 'years').calendar()).add(1, 'day').calendar()
 const maxDobAdult = moment().subtract(18, 'years').calendar();
 
-const minDobChild = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
-const maxDobChild = moment().subtract(3, 'months').calendar();
+//const minDobChild = moment(moment().subtract(23, 'years').calendar()).add(1, 'day').calendar()
+const minDobChild = moment().subtract(23, 'years').calendar()
+const maxDobChild = moment().subtract(90, 'days').calendar();
 
 const initialValues = {
     self: 0,
@@ -77,7 +78,7 @@ const validateFamilyMembers = Yup.object().shape({
 
     looking_for_1: Yup.string(),
     looking_for_6: Yup.string(),
-    looking_for_0: Yup.string().required('Self is Mandatory'),
+    looking_for_0: Yup.string(), //looking_for_0: Yup.string().required('Self is Mandatory'), 
     // looking_for_0: Yup.string().when(['looking_for_2', 'cover_type_id'], {
     //     is: (looking_for_2, cover_type_id) => (looking_for_2 == 'child1' && cover_type_id == '3'),
     //     then: Yup.string().required('Please select self'),
@@ -177,12 +178,12 @@ const validateFamilyMembers = Yup.object().shape({
         then: Yup.string().required('Child 1 DOB field is required').test(
             "3monthsChecking",
             function () {
-                return "Age should be minimum 3 months and maximum 56 years"
+                return "Age should be minimum 3 months and maximum 23 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                    return ageObj.whatIsMyAge(value) < 24 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
@@ -278,12 +279,12 @@ const validateFamilyMembers = Yup.object().shape({
         then: Yup.string().required('Child 2 DOB field is required').test(
             "3monthsChecking",
             function () {
-                return "Age should be minimum 3 months and maximum 56 years"
+                return "Age should be minimum 3 months and maximum 23 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                    return ageObj.whatIsMyAge(value) < 24 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
@@ -376,12 +377,12 @@ const validateFamilyMembers = Yup.object().shape({
         then: Yup.string().required('Child 3 DOB field is required').test(
             "3monthsChecking",
             function () {
-                return "Age should be minimum 3 months and maximum 56 years"
+                return "Age should be minimum 3 months and maximum 23 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                    return ageObj.whatIsMyAge(value) < 24 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
@@ -474,12 +475,12 @@ const validateFamilyMembers = Yup.object().shape({
         then: Yup.string().required('Child 4 DOB field is required').test(
             "3monthsChecking",
             function () {
-                return "Age should be minimum 3 months and maximum 56 years"
+                return "Age should be minimum 3 months and maximum 23 years"
             },
             function (value) {
                 if (value) {
                     const ageObj = new PersonAge();
-                    return ageObj.whatIsMyAge(value) < 57 && ageObj.whatIsMyAgeMonth(value) >= 3;
+                    return ageObj.whatIsMyAge(value) < 24 && ageObj.whatIsMyAgeMonth(value) >= 3;
                 }
                 return true;
             }
@@ -578,7 +579,7 @@ const validateFamilyMembers = Yup.object().shape({
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) <= 65 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -660,7 +661,7 @@ const validateFamilyMembers = Yup.object().shape({
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) <= 65 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -742,7 +743,7 @@ const validateFamilyMembers = Yup.object().shape({
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) <= 65 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -823,7 +824,7 @@ const validateFamilyMembers = Yup.object().shape({
                 function (value) {
                     if (value) {
                         const ageObj = new PersonAge();
-                        return ageObj.whatIsMyAge(value) < 56 && ageObj.whatIsMyAge(value) >= 18;
+                        return ageObj.whatIsMyAge(value) <= 65 && ageObj.whatIsMyAge(value) >= 18;
                     }
                     return true;
                 }
@@ -1003,6 +1004,7 @@ class dailycash_InformationYourself extends Component {
     }
 
     handleFormSubmit = (values) => {
+       
         if (values.marital_status_id == '193' && (values.occupation_description == null || values.occupation_description == '')) {
             swal({
                 text: "Please specify the occupation !",
@@ -1019,7 +1021,8 @@ class dailycash_InformationYourself extends Component {
             let familyMembers = this.state.familyMembers;
             let cover_type_id = this.state.cover_type_id;
             let post_data = []
-            let menumaster_id = 8;
+            //let menumaster_id = 8;
+            let menumaster_id = 13;
 
             let bc_data = sessionStorage.getItem('bcLoginData') ? sessionStorage.getItem('bcLoginData') : "";
             if (bc_data) {
@@ -1145,6 +1148,7 @@ class dailycash_InformationYourself extends Component {
                     });
             }
         }
+   
     }
 
     checkPolicyType = (value, isSelect, setFieldTouched, setFieldValue) => {
@@ -1180,6 +1184,18 @@ class dailycash_InformationYourself extends Component {
         var display_looking_for = [];
         var display_dob = [];
         let display_gender = [];
+        let count=0;
+        count=values.looking_for_0 ? count+1:count;
+        count=values.looking_for_1 ? count+1:count;
+        count=values.looking_for_6 ? count+1:count;
+        count=values.looking_for_7 ? count+1:count;
+        count=values.looking_for_8 ? count+1:count;
+        count=values.looking_for_9 ? count+1:count;
+        this.setState({
+            ...this.state,
+            count,
+
+        });
 
         display_gender[0] = this.state.gender ? this.state.gender : null
         display_gender[1] = this.state.gender ? (this.state.gender == 'm') ? 'f' : 'm' : null
@@ -1193,68 +1209,74 @@ class dailycash_InformationYourself extends Component {
         display_gender[9] = this.state.gender ? 'f' : null
 
         if (this.state.validateCheck == 1) {
-            for (const key in values) {
-                if (values.hasOwnProperty(key)) {
-                    if (key.match(/looking_for/gi)) {
-                        //  lastChar = key[key.length -1];                          
-                        if (values[key] != '')
-                            drv.push(values[key]);
+            if(this.state.count<=6)
+            {
+                for (const key in values) {
+                    if (values.hasOwnProperty(key)) {
+                        if (key.match(/looking_for/gi)) {
+                            //  lastChar = key[key.length -1];                          
+                            if (values[key] != '')
+                                drv.push(values[key]);
+                        }
                     }
                 }
-            }
-            if (drv && drv.length > 0) {
+                if (drv && drv.length > 0) {
+                    this.setState({
+                        insureList: drv.toString()
+                    })
+                }
+
+                const { productId } = this.props.match.params
+                const { gender } = this.state
+                const formData = new FormData();
+                let looking_for = []
+                let gender_for = []
+                let dob = []
+                let i = [];
+                let j = [];
+
+                for (const key in values) {
+                    if (values.hasOwnProperty(key)) {
+                        if (key.match(/looking_for/gi)) {
+                            i = key.substr(12, 1);
+                            display_looking_for[i] = values[key] ? values[key] : '';
+                            if (values[key]) {
+                                looking_for.push(values[key]);
+                                gender_for.push(display_gender[i])
+                            }
+                        }
+
+                        if (key.match(/dob/gi)) {
+                            i = key.substr(4, 1);
+                            display_dob[i] = values[key] ? values[key] : '';
+                            if (values[key]) {
+                                dob.push(moment(values[key]).format("YYYY-MM-DD"))
+                            }
+                        }
+                    }
+                }
+
+
+                sessionStorage.setItem('display_looking_for', JSON.stringify(display_looking_for));
+                sessionStorage.setItem('display_dob', JSON.stringify(display_dob));
+                // console.log('dataa',this.state.lookingFor,this.state.display_gender,this.state.cover_type_id)
                 this.setState({
-                    insureList: drv.toString()
-                })
+                    lookingFor: looking_for,
+                    display_looking_for,
+                    display_gender: display_gender,
+                    gender_for: gender_for,
+                    cover_type_id: values.cover_type_id
+                });
+                this.setState({
+                    dob: dob,
+                    display_dob
+
+                });
+                this.handleClose()
             }
-
-            const { productId } = this.props.match.params
-            const { gender } = this.state
-            const formData = new FormData();
-            let looking_for = []
-            let gender_for = []
-            let dob = []
-            let i = [];
-            let j = [];
-
-            for (const key in values) {
-                if (values.hasOwnProperty(key)) {
-                    if (key.match(/looking_for/gi)) {
-                        i = key.substr(12, 1);
-                        display_looking_for[i] = values[key] ? values[key] : '';
-                        if (values[key]) {
-                            looking_for.push(values[key]);
-                            gender_for.push(display_gender[i])
-                        }
-                    }
-
-                    if (key.match(/dob/gi)) {
-                        i = key.substr(4, 1);
-                        display_dob[i] = values[key] ? values[key] : '';
-                        if (values[key]) {
-                            dob.push(moment(values[key]).format("YYYY-MM-DD"))
-                        }
-                    }
-                }
+            else {
+                swal("Not allowed more then Six adult memeber")
             }
-
-
-            sessionStorage.setItem('display_looking_for', JSON.stringify(display_looking_for));
-            sessionStorage.setItem('display_dob', JSON.stringify(display_dob));
-            // console.log('dataa',this.state.lookingFor,this.state.display_gender,this.state.cover_type_id)
-            this.setState({
-                lookingFor: looking_for,
-                display_looking_for,
-                display_gender: display_gender,
-                gender_for: gender_for,
-                cover_type_id: values.cover_type_id
-            });
-            this.setState({
-                dob: dob,
-                display_dob
-
-            });
-            this.handleClose()
 
         }
         else {
@@ -1443,7 +1465,8 @@ class dailycash_InformationYourself extends Component {
             // cover_type_id: cover_type_id || lookingFor > 1 ? 1 : cover_type_id,
             insureList: insureListPrev ? insureListPrev.toString() : (insureList ? insureList : ''),
             marital_status_id: policyHolder && policyHolder.marital_status_id ? policyHolder.marital_status_id : "",
-            occupation_description: (policyHolder && policyHolder.occupation_description != null) ? policyHolder.occupation_description : ""
+            occupation_description: (policyHolder && policyHolder.occupation_description != null) ? policyHolder.occupation_description : "",
+            confirm:display_dob_arr[0] ? "1" : "",
         });
 
         //console.log('newInitialValues',newInitialValues)

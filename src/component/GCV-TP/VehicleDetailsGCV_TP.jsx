@@ -71,7 +71,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkMinDate_MaxDate_NewPolicy",
         "RegistrationDateOneMonth",
         function (value) {
-            if (value && this.parent.policy_type_id == '1') {
+            if (value && this.parent.policy_type_id == '1' && this.parent.is_fieldDisabled && this.parent.is_fieldDisabled != "true") {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
                 return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<0); 
             }
@@ -446,7 +446,7 @@ class VehicleDetailsGCV extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        const {motorInsurance, changeFlag} = this.state
+        const {motorInsurance, changeFlag,is_fieldDisabled} = this.state
         let policy_type = 2
         // let vehicleAge = ageObj.whatIsMyVehicleAge(values.registration_date)
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
@@ -467,7 +467,7 @@ class VehicleDetailsGCV extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2') {
+        if(is_fieldDisabled == "true" || values.policy_type_id == '2') {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':4,
@@ -488,7 +488,7 @@ class VehicleDetailsGCV extends Component {
                 'averagemonthlyusage_id': values.averagemonthlyusages_id,
                 'goodscarriedtype_id': values.goodscarriedtypes_id,
                 'permittype_id': values.permittypes_id,
-                'valid_previous_policy': values.valid_previous_policy,
+                'valid_previous_policy': is_fieldDisabled == "true" ? 1 :values.valid_previous_policy,
                 'page_name': `VehicleDetails_GCV_TP/${productId}`,
                 'duration': values.duration,
                 'is_new_policy' : 0
@@ -661,6 +661,7 @@ class VehicleDetailsGCV extends Component {
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
+            is_fieldDisabled:is_fieldDisabled,
             location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
@@ -730,8 +731,8 @@ class VehicleDetailsGCV extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="registration_date"
-                                                                minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
-                                                                maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
+                                                                minDate={is_fieldDisabled == "true" ? new Date(minRegnDate) : values.policy_type_id == '1' ? new Date() : new Date(minRegnDate)}
+                                                                maxDate={is_fieldDisabled == "true" ? new Date() : values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 peekPreviousMonth
@@ -949,7 +950,7 @@ class VehicleDetailsGCV extends Component {
                                                     </Col>
                                                 </Row>
                                             </Fragment> : null }
-                                            {values.policy_type_id == '2' && values.valid_previous_policy == '1' ?
+                                            {(values.policy_type_id == '2' && values.valid_previous_policy == '1') || is_fieldDisabled =="true" ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -1058,8 +1059,8 @@ class VehicleDetailsGCV extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={new Date(minDate)} 
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                //minDate={new Date(minDate)} 
+                                                                //maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth

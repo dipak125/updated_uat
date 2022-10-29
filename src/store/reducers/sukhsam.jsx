@@ -20,8 +20,11 @@ const initialState = {
 
         start_date:null,
         end_date:null,
+	registration_type : null,
         
         shop_building_name: null,
+        multipleAddress : [],
+        policy_type : null,
         block_no:null,
         house_flat_no:null,
         pincode:null,
@@ -30,6 +33,7 @@ const initialState = {
         buildings_si:null,
         content_sum_insured:null,
         stock_sum_insured:null, 
+	multiple_fire_sum_insured:[],
         plant_machinary_si: null,
         furniture_fixture_si: null,
         stock_raw_mat: null,
@@ -70,11 +74,13 @@ const initialState = {
     
 }
 
+//Add Registration type, policy type
 const sukhsam = ( state = initialState, action) => {
     switch( action.type ) {
         case SUKHSAM_FIRE: return {...state, 
             start_date:action.payload.start_date,
             end_date:action.payload.end_date,
+	    registration_type : action.payload.registration_type,
             policy_holder_id:action.payload.policy_holder_id,
             policy_holder_ref_no:action.payload.policy_holder_ref_no,
             request_data_id:action.payload.request_data_id,
@@ -84,14 +90,17 @@ const sukhsam = ( state = initialState, action) => {
 
         case SUKHSAM_FIRE_UPDATE: return {...state, 
             start_date:action.payload.start_date,
-            end_date:action.payload.end_date}
+            end_date:action.payload.end_date,
+	    registration_type : action.payload.registration_type}
 
         case SUKHSAM_FIRE_RISK: return {...state, 
+            policy_type : action.payload.policy_type,
             shop_building_name:action.payload.shop_building_name,
             block_no:action.payload.block_no,
             house_flat_no:action.payload.house_flat_no,
             pincode:action.payload.pincode,
             pincode_id:action.payload.pincode_id,
+            multipleAddress : action.payload.multipleAddress,
             buildings_si:action.payload.buildings_si,
             plant_machinary_si: action.payload.plant_machinary_si,
             furniture_fixture_si: action.payload.furniture_fixture_si,
@@ -99,7 +108,8 @@ const sukhsam = ( state = initialState, action) => {
             finish_goods: action.payload.finish_goods,
             stock_wip: action.payload.stock_wip,
             content_sum_insured: action.payload.content_sum_insured,
-            stock_sum_insured : action.payload.stock_sum_insured      
+            stock_sum_insured : action.payload.stock_sum_insured,
+	    multiple_fire_sum_insured : action.payload.multiple_fire_sum_insured,      
         }
             
         case SUKHSAM_FIRE_OTHER_DETAILS: return {...state, 

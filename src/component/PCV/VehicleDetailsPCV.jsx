@@ -78,7 +78,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkMinDate_MaxDate_NewPolicy",
         "RegistrationDateOneMonth",
         function (value) {
-            if (value && this.parent.policy_type_id == '1') {
+            if (value && this.parent.policy_type_id == '1' && this.parent.is_fieldDisabled && this.parent.is_fieldDisabled != "true") {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
                 return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<=0);       
             }
@@ -545,7 +545,7 @@ class VehicleDetailsPCV extends Component {
     handleSubmit = (values, actions) => {
         
         const {productId} = this.props.match.params 
-        const {motorInsurance, changeFlag} = this.state
+        const {motorInsurance, changeFlag,is_fieldDisabled} = this.state
         let policy_type = 1
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
 
@@ -577,7 +577,7 @@ class VehicleDetailsPCV extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
+        if(is_fieldDisabled == "true" || values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':menumaster_id,
@@ -595,7 +595,7 @@ class VehicleDetailsPCV extends Component {
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                'valid_previous_policy': values.valid_previous_policy,
+                'valid_previous_policy':  values.valid_previous_policy,
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
                 'no_of_claim': values.no_of_claim,
@@ -627,7 +627,7 @@ class VehicleDetailsPCV extends Component {
                 'proposed_used_id' : values.proposed_used_id,
                 'averagemonthlyusage_id': values.averagemonthlyusages_id,
                 'permittype_id': values.permittypes_id,
-                'is_new_policy' : 0
+                'is_new_policy' : 0,
             } 
         }
 
@@ -637,7 +637,7 @@ class VehicleDetailsPCV extends Component {
         else {
             localStorage.removeItem('registration_number');
         }
-        //console.log("post_data", post_data)
+        console.log("post_data", post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
@@ -753,7 +753,7 @@ class VehicleDetailsPCV extends Component {
             .then(res => {
                  let decryptResp = JSON.parse(encryption.decrypt(res.data))
                  let is_fieldDisabled = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.is_fieldDisabled :{}
-                // console.log("decrypt", decryptResp)
+                 console.log("decrypt", decryptResp)
                 // console.log("lapseduration===", decryptResp.data.policyHolder.motorinsurance)
                  let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {};
                  motorInsurance.valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
@@ -930,6 +930,7 @@ class VehicleDetailsPCV extends Component {
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
+            is_fieldDisabled:is_fieldDisabled,
             location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
@@ -989,8 +990,8 @@ class VehicleDetailsPCV extends Component {
                             onSubmit={this.handleSubmit} 
                             validationSchema={vehicleRegistrationValidation}>
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-// console.log("errors-------------- ", errors)
-// console.log("values======",values)
+ console.log("errors-------------- ", errors)
+ console.log("values======",values)
 // console.log("lapse duration=========",this.state. motorInsurance.lapse_duration)
                                 return (
                                     <Form enableReinitialize = {true}>
@@ -1009,8 +1010,8 @@ class VehicleDetailsPCV extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="registration_date"
-                                                                minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
-                                                                maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
+                                                                minDate={is_fieldDisabled == "true" ? new Date(minRegnDate) : values.policy_type_id == '1' ? new Date() : new Date(minRegnDate)}
+                                                                maxDate={is_fieldDisabled == "true" ? new Date() : values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
@@ -1231,7 +1232,7 @@ class VehicleDetailsPCV extends Component {
                                                     </Row>
                                                 </Fragment> : null }
 
-                                            {(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1' ?
+                                            {((values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1') || is_fieldDisabled =="true"?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>

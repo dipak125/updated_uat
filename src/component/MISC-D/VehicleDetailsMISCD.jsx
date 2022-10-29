@@ -76,7 +76,7 @@ const vehicleRegistrationValidation = Yup.object().shape({
         "checkMinDate_MaxDate_NewPolicy",
         "RegistrationDateOneMonth",
         function (value) {
-            if (value && this.parent.policy_type_id == '1') {
+            if (value && this.parent.policy_type_id == '1' && this.parent.is_fieldDisabled && this.parent.is_fieldDisabled != "true") {
                 // return checkGreaterStartEndTimes(value, new Date()) && checkGreaterStartEndTimes(minRegnDateNew, value);
                 return checkGreaterStartEndTimes(value, new Date()) && Math.floor(moment(minRegnDateNew).diff(value, 'days', true)<=0);       
             }
@@ -539,7 +539,7 @@ class VehicleDetailsMISCD extends Component {
 
     handleSubmit = (values, actions) => {
         const {productId} = this.props.match.params 
-        const {motorInsurance, changeFlag} = this.state
+        const {motorInsurance, changeFlag,is_fieldDisabled} = this.state
         let policy_type = 1
         let vehicleAge = Math.floor(moment().diff(values.registration_date, 'months', true))
 
@@ -571,7 +571,7 @@ class VehicleDetailsMISCD extends Component {
         const formData = new FormData(); 
         let encryption = new Encryption();
         let post_data = {}
-        if(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
+        if(is_fieldDisabled == "true" || values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1') ) {
             post_data = {
                 'policy_holder_id':localStorage.getItem('policyHolder_id'),
                 'menumaster_id':menumaster_id,
@@ -589,7 +589,7 @@ class VehicleDetailsMISCD extends Component {
                 'vehicleAge': vehicleAge,
                 'policy_type': policy_type,
                 'prev_policy_flag': 1,
-                'valid_previous_policy': values.valid_previous_policy,
+                'valid_previous_policy': is_fieldDisabled == "true" ? 1: values.valid_previous_policy,
                 'page_name': `VehicleDetails/${productId}`,
                 'claim_array': JSON.stringify(values.claim_array),
                 'no_of_claim': values.no_of_claim,
@@ -893,6 +893,7 @@ class VehicleDetailsMISCD extends Component {
 
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
+            is_fieldDisabled:is_fieldDisabled,
             location_id:  motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
             previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
             previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
@@ -967,8 +968,8 @@ class VehicleDetailsMISCD extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="registration_date"
-                                                                minDate={values.policy_type_id == '1' ? new Date(minRegnDateNew) : new Date(minRegnDate)}
-                                                                maxDate={values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
+                                                                minDate={is_fieldDisabled == "true" ? new Date(minRegnDate) : values.policy_type_id == '1' ? new Date() : new Date(minRegnDate)}
+                                                                maxDate={is_fieldDisabled == "true" ? new Date() : values.policy_type_id == '1' ? new Date() : new Date(maxDate)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['RegDate']}
                                                                 disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
@@ -1115,7 +1116,7 @@ class VehicleDetailsMISCD extends Component {
                                                     </Row>
                                                 </Fragment> : null }
 
-                                            {(values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1' ?
+                                            {((values.policy_type_id == '2' || (values.policy_type_id == '3' && values.lapse_duration == '1' ) ) && values.valid_previous_policy == '1') || is_fieldDisabled =="true" ?
                                                 <Fragment>
                                                 <Row>
                                                     <Col sm={12}>
@@ -1224,8 +1225,8 @@ class VehicleDetailsMISCD extends Component {
                                                         <FormGroup>
                                                             <DatePicker
                                                                 name="previous_start_date"
-                                                                minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)} 
-                                                                maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) :  values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
+                                                               // minDate={values.policy_type_id == '3' ? new Date(minDatePypLapsed) : new Date(minDate)} 
+                                                               // maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) :  values.policy_type_id == '3' ? new Date(maxDatePYPLapsed) : new Date(maxDatePYP)}
                                                                 dateFormat="dd MMM yyyy"
                                                                 placeholderText={phrases['PPSD']}
                                                                 peekPreviousMonth

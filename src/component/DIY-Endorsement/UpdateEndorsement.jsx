@@ -207,10 +207,20 @@ class UpdateEndorsement extends Component {
         for(let i=0; i<endorsementInfo.length; i++){
             let product_endorsement_id = endorsementInfo[i].product_endorsement_type_id
             const formData=new FormData();
-            formData.append("endrosment_data_id",this.state.endorsement_data_id);
-            formData.append("endorsementinfo_id",endorsementInfo[i].id)
-            formData.append("product_endorsement_id",product_endorsement_id);
-            formData.append("type",1);
+            // formData.append("endrosment_data_id",this.state.endorsement_data_id);
+            // formData.append("endorsementinfo_id",endorsementInfo[i].id)
+            // formData.append("product_endorsement_id",product_endorsement_id);
+            // formData.append("type",1);
+
+            console.log("endorsementDetails", this.state.endorsementDetails);
+
+            formData.append("endorsementdata_id", this.state.endorsement_data_id)
+            formData.append("new_endrosment_values", endorsementInfo[i].id)
+            formData.append("old_endrosment_values", product_endorsement_id)
+            formData.append("user_email", this.state.endorsementDetails.email)
+            formData.append("user_mobile", this.state.endorsementDetails.mobile)
+            //formData.append("type",1)
+
             this.props.loadingStart();
             axios
             .post('dyi-endorsement/update-endorsement-value',formData)
@@ -614,13 +624,21 @@ class UpdateEndorsement extends Component {
         })
     }
     
-   getAddEndorsementSubTypeList=(product_endorsement_id,values, errors, touched, setFieldTouched, setFieldValue,i)=>{
+   c=(product_endorsement_id,values, errors, touched, setFieldTouched, setFieldValue,i)=>{
     const {additionalEndorsement_sub_type_list} = this.state
     const formData=new FormData();
-    formData.append("endrosment_data_id",this.state.endorsement_data_id);
-    formData.append("endorsementinfo_id",this.state.endorsement_info_id)
-    formData.append("product_endorsement_id",product_endorsement_id);
-    formData.append("type",2);
+    // formData.append("endrosment_data_id",this.state.endorsement_data_id);
+    // formData.append("endorsementinfo_id",this.state.endorsement_info_id)
+    // formData.append("product_endorsement_id",product_endorsement_id);
+    // formData.append("type",2);
+
+    formData.append("endorsementdata_id", this.state.endorsement_data_id)
+    formData.append("new_endrosment_values", this.state.endorsement_info_id)
+    formData.append("old_endrosment_values", product_endorsement_id)
+    formData.append("user_email", values.email_id)
+    formData.append("user_mobile", values.mobile_no)
+    //formData.append("type",2)
+
     this.props.loadingStart();
     axios
     .post('dyi-endorsement/update-endorsement-value',formData)
@@ -756,7 +774,7 @@ class UpdateEndorsement extends Component {
                                     component="select"
                                     autoComplete="off"
                                     className="formGrp inputfs12"
-                                     value = {values.endorsement_sub_type}  
+                                     value = {values.endorsement_sub_type.id}  
                                      disabled = {true} 
                                     //  onChange={(e)=>{
                                        
@@ -768,9 +786,10 @@ class UpdateEndorsement extends Component {
                                                                            
                                 >  
                                     <option value="">List Of Endorsement Sub Type </option>
-                                    {endorsement_sub_type_list && endorsement_sub_type_list.length>0 && endorsement_sub_type_list[0] && endorsement_sub_type_list[0].length>0 && endorsement_sub_type_list[0].map(data=>
+                                    {/* {endorsement_sub_type_list && endorsement_sub_type_list.length>0 && endorsement_sub_type_list[0] && endorsement_sub_type_list[0].length>0 && endorsement_sub_type_list[0].map(data=>
                                         <option value={data.id} key= {data.id}>{data.Sub_Type}</option>
-                                    )}
+                                    )} */}
+                                    <option value={values.endorsement_sub_type.id} >{values.endorsement_sub_type.Sub_Type}</option>
                                     
                                 </Field>
                                 {errors.endorsement_sub_type ? (
@@ -979,11 +998,14 @@ class UpdateEndorsement extends Component {
 
 
     componentDidMount(){
+        this.getEndorsementDetails();
         this.getProductCategoryList(this.props.endorsementInfo);
+        
     }
 
     render() {
         const { product_category_list, product_list,count, endorsementDetails,endorsementInfo, documents,endorsement_doc_id, Document_List} = this.state
+        console.log("render",endorsementInfo);
         const newInitialValues = Object.assign(initialValues,{
             makeEndorsement: this.initClaimDetailsList(),
             additionalEndorsement: this.initAddClaimDetailsList(),
@@ -991,7 +1013,8 @@ class UpdateEndorsement extends Component {
             product: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].product_id ? endorsementInfo[0].product_id : "",
             policy_no: endorsementDetails && endorsementInfo.length > 0 && endorsementDetails.policy_no ? endorsementDetails.policy_no : "",
             endorsement_type: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].product_endorsement_type_id ? endorsementInfo[0].product_endorsement_type_id : "",
-            endorsement_sub_type: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].master_endorsement_id ? endorsementInfo[0].master_endorsement_id : "",
+            // endorsement_sub_type: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].master_endorsement_id ? endorsementInfo[0].master_endorsement_id : "",
+             endorsement_sub_type: endorsementInfo && endorsementInfo.length > 0 && endorsementInfo[0].field ? endorsementInfo[0].field : "",
             newCount:count,
             email_id: endorsementDetails && endorsementInfo.length > 0 && endorsementDetails.email ? endorsementDetails.email : "",
             mobile_no: endorsementDetails && endorsementInfo.length > 0 && endorsementDetails.mobile ? endorsementDetails.mobile : "",

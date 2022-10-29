@@ -36,12 +36,22 @@ const endorsementValidation = Yup.object().shape({
 
     makeEndorsement: Yup.array().of(
         Yup.object().shape({
-            New_values: Yup.string().required('This field is required')
+            New_values: Yup.string()
             .test(
                 "validation_rules",
-                function(){return "Invalid Input"; },
-                function (value) {    
+                function(){return "Invalid input"; },
+                function (value) {  
+                    console.log("checkv1",value)
+                    console.log("checkv",this.parent.validation_rules,typeof(this.parent.validation_rules));  
+                    if(typeof(this.parent.validation_rules)==='undefined')
+                                {
+                                    return true;
+                                }
+                    if(typeof(this.parent.validation_rules)==='string' && this.parent.validation_rules.length<=2)
+                        return true;
                     if ( value && (value != '' || value != undefined) ) { 
+                        
+                        
                         let str = new RegExp(this.parent.validation_rules)
                         if(this.parent.validation_rules=="at" || value.match(str)) { 
                         return true
@@ -52,7 +62,7 @@ const endorsementValidation = Yup.object().shape({
                         return false
                     }
                    
-            }),
+            }).required('This field is required'),
             // Old_values: Yup.string().required('This field is required')            
         })
     ),
@@ -67,8 +77,16 @@ const endorsementValidation = Yup.object().shape({
                     .test(
                         "validation_rules",
                         function(){return "Invalid Input"; },
-                        function (value) {    
+                        function (value) {   
+                            if(typeof(this.parent.add_endorsement_validation_rules)==='undefined')
+                            {
+                                return true;
+                            } 
+                            if(typeof(this.parent.add_endorsement_validation_rules)==='string' && this.parent.add_endorsement_validation_rules.length<=2)
+                                return true;
                             if ( value && (value != '' || value != undefined) ) { 
+                                console.log("checkv",this.parent.add_endorsement_validation_rules,typeof(this.parent.add_endorsement_validation_rules),this.parent.add_endorsement_validation_rules.length);
+                               
                                 let str = new RegExp(this.parent.add_endorsement_validation_rules)
                                 if( this.parent.add_endorsement_validation_rules=="at" || value.match(str)) { 
                                 return true
@@ -84,7 +102,7 @@ const endorsementValidation = Yup.object().shape({
             )
         })
     ),
-
+    Old_values: Yup.string().required("Required field"),
     email_id:Yup.string().email().required('This field is required').min(8, function() {
         return "Min 8 characters required"
         })
@@ -162,7 +180,8 @@ class BasicInfo extends Component {
         add_endorsement_received_date: [],
         Document_List: [],
         endorsementValidationRules: [],
-        addEndorsementValidationRules: []
+        addEndorsementValidationRules: [],
+        
         
        
     }
@@ -436,6 +455,7 @@ class BasicInfo extends Component {
              selected={values.additionalEndorsement && values.additionalEndorsement[j] && values.additionalEndorsement[j].addEndorsementInitValues && values.additionalEndorsement[j].addEndorsementInitValues[i] && values.additionalEndorsement[j].addEndorsementInitValues[i].add_endorsement_new_value}
            
                onChange={(e)=>{
+                console.log("date1",e, moment(e).format("DD-MM-YYYY"))
                 setFieldValue(`additionalEndorsement[${j}]addEndorsementInitValues[${i}]add_endorsement_new_value`,e)
                    
                }}                                             
@@ -482,6 +502,7 @@ class BasicInfo extends Component {
                     className="formGrp inputfs12"
                     onChange={(e)=>{
                         setFieldValue(`Old_values`,e.target.value)
+                        setFieldTouched(`Old_values`)
                     }}                                             
                 >  
                 </Field>         
@@ -518,7 +539,10 @@ class BasicInfo extends Component {
              selected={values.makeEndorsement&& values.makeEndorsement[i] && values.makeEndorsement[i].New_values}
            
                onChange={(e)=>{
-                    setFieldValue(`makeEndorsement[${i}].New_values`,e)
+                console.log("date2",e,moment(e).format("DD-MM-YYYY"));
+                    
+                    setFieldValue(`makeEndorsement[${i}]New_values`,e)
+                    
                     console.log("1",values.makeEndorsement[i].New_values)
                }}                                             
        />  
@@ -538,6 +562,7 @@ class BasicInfo extends Component {
            className="formGrp inputfs12"
                onChange={(e)=>{
                    setFieldValue(`makeEndorsement[${i}].New_values`,e.target.value)
+                   setFieldTouched(`makeEndorsement[${i}].New_values`)
                }}                                             
        >  
         </Field>
@@ -617,7 +642,13 @@ class BasicInfo extends Component {
         }
     }
 
-    upload=()=>{
+    upload=(values)=>{
+        console.log("uplod file",values.fileData[0].fileSize)
+        if(values && values.fileData[0] && values.fileData[0].fileSize && values.fileData[0].fileSize>5000000)
+        {
+            swal("File size should not be more then 5mb")
+        }
+        else{
         const formData=new FormData();
         formData.append("endorsementinfo_id",this.state.endorsement_info_id);
         formData.append("endrosment_data_id",this.state.endorsement_data_id)
@@ -639,6 +670,7 @@ class BasicInfo extends Component {
             this.props.loadingStop();
         })
     }
+}
     
    getAddEndorsementSubTypeList=(product_endorsement_id,values, errors, touched, setFieldTouched, setFieldValue,i)=>{
     const {additionalEndorsement_sub_type_list} = this.state
@@ -1019,7 +1051,7 @@ class BasicInfo extends Component {
                             >
                             {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
                                 console.log("values ---------- ", values)
-                                // console.log("error=======",errors)
+                                 console.log("error=======",errors)
                                 
                             return (
                                 <Form>    
@@ -1205,7 +1237,7 @@ class BasicInfo extends Component {
                                         Submit
                                     </Button>
                                     {Document_List && Document_List.length > 0 ?
-                                        <Button type="button" onClick={()=>this.upload()}>Upload Document</Button>
+                                        <Button type="button" onClick={()=>this.upload(values)}>Upload Document</Button>
                                     : null }
                                     {/* <Button className={`proceedBtn`} type="submit" disabled={isSubmitting ? true : false}>
                                     {isSubmitting ? "Wait...." : "CREATE"}

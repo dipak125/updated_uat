@@ -257,6 +257,7 @@ class PremiumPCV_TP extends Component {
         axios.get('relations')
         .then(res=>{
             let relation = res.data.data ? res.data.data : []
+            console.log("rel",relation)
             this.setState({
                 relation
             });
@@ -674,7 +675,7 @@ class PremiumPCV_TP extends Component {
                                                                                         <Col sm={12} md={6}>
                                                                                         {nomineedetails && relation.map((relations, qIndex) =>
                                                                                         relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
+                                                                                            <FormGroup key={qIndex}>{relations.pcv_relation_name}</FormGroup> : null
                                                                                         )}
                                                                                         </Col>
                                                                                     </Row>
@@ -716,7 +717,7 @@ class PremiumPCV_TP extends Component {
                                                                                             <Col sm={12} md={6}>
                                                                                             {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) =>
                                                                                             relations.id == nomineedetails.appointee_relation_with ?
-                                                                                                <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
+                                                                                                <FormGroup key={qIndex}>{relations.pcv_relation_name}</FormGroup> : null
                                                                                             )}
                                                                                             </Col>
                                                                                         </Row>

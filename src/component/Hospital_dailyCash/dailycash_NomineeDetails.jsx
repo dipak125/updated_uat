@@ -21,7 +21,7 @@ import Encryption from '../../shared/payload-encryption';
 
 
 const minDobNominee = moment(moment().subtract(100, 'years').calendar()).calendar()
-const maxDobNominee = moment().subtract(3, 'months').calendar();
+const maxDobNominee = moment().subtract(90, 'days').calendar();
 const year = new Date('Y')
 const ageObj = new PersonAge();
 // const minDate = moment(moment().subtract(1, 'years').calendar()).add(1, 'day').calendar();
@@ -828,6 +828,10 @@ class dailycash_NomineeDetails extends Component {
                                                             >
                                                             <option value="">Relation with Primary Insured</option>
                                                             {/* {self_selected ? '': <option value="1">Self</option>} */}
+                                                            <option value="1">Self</option>
+                                                            <option value="2">Spouse</option>
+                                                            <option value="3">Son</option>
+                                                            <option value="4">Daughter</option>
                                                             <option value="5">Father</option>
                                                             <option value="6">Mother</option>
                                                             <option value="7">Father In Law</option>
@@ -836,6 +840,18 @@ class dailycash_NomineeDetails extends Component {
                                                             <option value="10">Sister</option>
                                                             <option value="11">Grand Father</option>
                                                             <option value="12">Grand Mother</option>
+                                                            <option value="13">Husband</option>
+                                                            <option value="14">Wife</option>
+                                                            <option value="15">Child</option>
+                                                            <option value="16">Brother in Law</option>
+                                                            <option value="17">Sister in Law</option>
+                                                            <option value="18">Uncle</option>
+                                                            <option value="19">Aunty</option>
+                                                            <option value="20">Ex-Wife</option>
+                                                            <option value="21">Ex-Husband</option>
+                                                            <option value="22">Employee</option>
+                                                            <option value="23">Niece</option>
+                                                            <option value="24">Nephew</option>
                                                             </Field>     
                                                             {errors.relation_with && touched.relation_with ? (
                                                                 <span className="errorMsg">{errors.relation_with}</span>
@@ -905,6 +921,10 @@ class dailycash_NomineeDetails extends Component {
                                                                 >
                                                                 <option value="">Relation with Nominee</option>
                                                                 {/* {self_selected ? '':<option value="1">Self</option>} */}
+                                                                <option value="1">Self</option>
+                                                                <option value="2">Spouse</option>
+                                                                <option value="3">Son</option>
+                                                                <option value="4">Daughter</option>
                                                                 <option value="5">Father</option>
                                                                 <option value="6">Mother</option>
                                                                 <option value="7">Father In Law</option>
@@ -913,6 +933,18 @@ class dailycash_NomineeDetails extends Component {
                                                                 <option value="10">Sister</option>
                                                                 <option value="11">Grand Father</option>
                                                                 <option value="12">Grand Mother</option>
+                                                                <option value="13">Husband</option>
+                                                                <option value="14">Wife</option>
+                                                                <option value="15">Child</option>
+                                                                <option value="16">Brother in Law</option>
+                                                                <option value="17">Sister in Law</option>
+                                                                <option value="18">Uncle</option>
+                                                                <option value="19">Aunty</option>
+                                                                <option value="20">Ex-Wife</option>
+                                                                <option value="21">Ex-Husband</option>
+                                                                <option value="22">Employee</option>
+                                                                <option value="23">Niece</option>
+                                                                <option value="24">Nephew</option>
                                                                 
                                                                 </Field>     
                                                                 {errors.appointee_relation_with && touched.appointee_relation_with ? (

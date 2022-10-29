@@ -163,6 +163,7 @@ export const intermediate_authProcess = (data, onSuccess, onFailure) => {
         axios
             .post('/login', formData)
             .then(response => {
+                console.log("loginData",response.data)
                 dispatch(authSuccess(response.data));
                 if(!!sessionStorage.getItem('type')){
                     response.data.user_data.type=sessionStorage.getItem('type')

@@ -84,8 +84,18 @@ class Sahipay_gateway extends Component {
     }
 
     additionalDetails = (productId) => {
+        const{renewalinfo}=this.state
+       
+        if(renewalinfo && renewalinfo.policy_type && renewalinfo.policy_type === 1)
+        {
+            this.props.history.push(`/MotorSummery`);  
+        }
+        else if(renewalinfo && renewalinfo.policy_type && renewalinfo.policy_type !== 1)
+        {
+            this.props.history.push(`/HealthSummery`);
+        }
 
-        if(productId == 11) {
+       else if(productId == 11) {
             this.props.history.push(`/Premium_MISCD/${productId}`);
         }
         else if(productId == 9) {
@@ -136,16 +146,23 @@ class Sahipay_gateway extends Component {
 
     handleSubmit = (values) => {
         const {policyHolder_refNo} = this.state
+        //var renewal_id = policyHolder.renewal_id
         const formData = new FormData();    
         formData.append('policy_ref_no', policyHolder_refNo)
         this.props.loadingStart();
+
         axios.post('payment/sahipay-submit', formData).then(res => {
             if(res.data.error === false) {
                 this.policyInception(res.data.data.transaction_no, this.state.quote_id)
             }
             else {
-                swal(res.data.msg)
-                this.props.loadingStop();
+                if(res.data.data.transction_no != ''){
+                    this.policyInception(res.data.data.transaction_no, this.state.quote_id)
+                }else{
+                    swal(res.data.msg)
+                    this.props.loadingStop();
+                }
+               
             }
 
         })
@@ -157,28 +174,63 @@ class Sahipay_gateway extends Component {
     }
 
     policyInception = (transaction_no ) => {
-        const {policyHolder_refNo, request_data } = this.state
-        var amount = request_data && request_data.net_premium ? request_data.net_premium : ""
+        const {policyHolder_refNo, request_data, policyHolder } = this.state
+        var amount = request_data && request_data.net_premium ? request_data.net_premium : "" 
         var quote_id = request_data && request_data.quote_id ? request_data.quote_id : ""
-        const formData = new FormData();    
-        formData.append('quote_id', quote_id)
-        formData.append('csc_txn', transaction_no)
-        formData.append('amount', amount)
         
-        axios.post('wallet/issue-policy', formData).then(res => {
-            if(res.data.error === false) {
-                this.props.history.push(`/ThankYou/${res.data.data.PolicyNo}?access_id=${this.state.policyHolder_refNo}`);
-            }
-            else {
-                this.paymentRefund(policyHolder_refNo, res.data.msg)
-            }
-            this.props.loadingStop();
 
-        })
-        .catch(err => {
-            // handle error
+        console.log("policyHolder sahi pay", policyHolder);
+        var renewal_id = policyHolder.renewal_id
+
+        if(renewal_id == 0){
+            console.log("policy issue part", policyHolder_refNo)
+            const formData = new FormData();    
+            formData.append('quote_id', quote_id)
+            formData.append('csc_txn', transaction_no)
+            formData.append('amount', amount)
+            
+            axios.post('wallet/issue-policy', formData).then(res => {
+                if(res.data.error === false) {
+                    this.props.history.push(`/ThankYou/${res.data.data.PolicyNo}?access_id=${this.state.policyHolder_refNo}`);
+                }
+                else {
+                    this.paymentRefund(policyHolder_refNo, res.data.msg)
+                }
+                this.props.loadingStop();
+    
+            })
+            .catch(err => {
+                // handle error
+                this.props.loadingStop();
+            })
+        } else{
+            console.log("renewal part", policyHolder_refNo)
+
+            this.props.history.push(`/ThankYouRenewal?access_id=${this.state.policyHolder_refNo}`);
             this.props.loadingStop();
-        })
+            // const formData = new FormData();
+            // formData.append('policy_ref_no', policyHolder_refNo);
+            // this.props.loadingStart();
+
+            // axios
+            // .post(`/renewal/issue-policy`, formData)
+            // .then(res => {
+            //     console.log("renewal response", res)
+            //   if(res.data.error === false) {
+            //     this.props.history.push(`/ThankYou/${res.data.data.PolicyNumber}?access_id=${this.state.policyHolder_refNo}`);
+            //     this.props.loadingStop();   
+            //   }
+            //   else { 
+            //     this.props.loadingStop();   
+            //     swal("Due to some reason, policy could not be created at this moment. Please retry in some time.")               
+            //   }      
+            // })
+            // .catch(err => {
+              
+            //   this.props.loadingStop();
+            // });
+        }
+        
 
     }
 
@@ -233,10 +285,34 @@ class Sahipay_gateway extends Component {
                 this.props.loadingStop();
             })
     }
+    getRenewal =()=>{
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
+        axios.get(`renewal/policy-details/${policyHolder_id}`)	
+        .then(res => {	
+            // let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            let decryptResp = res.data
+            console.log("decrypt", decryptResp)	
+            
+            let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];	
+            this.setState({
+                ...this.state,
+                renewalinfo:policyHolder.renewalinfo && policyHolder.renewalinfo
+            })
+           
+           
+            this.props.loadingStop();
+            // this.getAccessToken(motorInsurance)       	
+        })	
+        .catch(err => {	
+            // handle error	
+            this.props.loadingStop();	
+        })	
+     }
 
 
     componentDidMount() {
         this.fetchData()
+        this.getRenewal()
     }
 
     render() {
@@ -299,10 +375,17 @@ class Sahipay_gateway extends Component {
                                                                                 {productId == 9 ?
                                                                                 <div className="premamount">
                                                                                     ₹ {request_data.payable_premium ? request_data.payable_premium : null}
-                                                                                </div> : 
+                                                                                </div> : null}
+                                                                                {productId != 9 && policyHolder && policyHolder.renewal_id && policyHolder.renewal_id ==0 ?
+
                                                                                 <div className="premamount">
                                                                                     ₹ {request_data.net_premium ? request_data.net_premium : null}
-                                                                                </div> }
+                                                                                </div> :
+                                                                                <div className="premamount">
+                                                                                ₹ {request_data.net_premium ? request_data.payable_premium : null}
+                                                                            </div>
+                                                                                
+                                                                                }
 
                                                                             </Col>
 
@@ -328,11 +411,16 @@ class Sahipay_gateway extends Component {
                                                                             {productId == 9 ?
                                                                                 <div className="premamount">
                                                                                     ₹ {request_data.payable_premium && request_data.gross_premium ? Math.round(request_data.payable_premium - request_data.gross_premium) : null }
-                                                                                </div> : 
+                                                                                </div> : null}
+                                                                                {productId != 9 && policyHolder && policyHolder.renewal_id && policyHolder.renewal_id ==0 ?
                                                                                 <div className="premamount">
                                                                                 ₹ {request_data.net_premium && request_data.gross_premium ? Math.round(request_data.net_premium - request_data.gross_premium) : null }
                                                                             </div> 
-                                                                            }
+                                                                                :
+                                                                                <div className="premamount">
+                                                                                ₹ {request_data.net_premium && request_data.gross_premium ? Math.round(request_data.net_premium - request_data.gross_premium) : null }
+                                                                            </div> 
+                                                                                 }
                                                                             </Col>
                                                                         </Row>
                                                                     </div>

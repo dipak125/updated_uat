@@ -20,6 +20,7 @@ import swal from 'sweetalert';
 import "react-datepicker/dist/react-datepicker.css"
 import 'react-datepicker/dist/react-datepicker-cssmodules.min.css'
 import Encryption from '../../shared/payload-encryption';
+import { faAssistiveListeningSystems } from '@fortawesome/free-solid-svg-icons';
 
 const maxDob = dateformat(new Date(), 'mm/dd/yyyy');
 const minDobAdult = moment(moment().subtract(56, 'years').calendar()).add(1, 'day').calendar()
@@ -27,6 +28,7 @@ const maxDobAdult = moment().subtract(18, 'years').calendar();
 
 const initialFamilyDetails = {
 	fname: "",
+    lname: "",
 	cashlimit: "",
     coverduration: "",
     education_id:"",
@@ -53,6 +55,7 @@ const initialValues = {
     eIA: "",
     eia_account_no:"",
     proposerName: "",
+    proposerLastName: "",
     proposercashlimit: "",
     proposercoverduration: "",
     proposereducation_id: "",
@@ -172,14 +175,22 @@ const validateAddress =  Yup.object().shape({
                     .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
                         return "Please enter valid name"
                 }),
+                lname: Yup.string()
+                .required("Please enter last name")
+                .matches(/^[a-zA-Z]+$/, "Please enter valid L-name")
+                .min(1, "Name must be minimum 1 chracters")
+                .max(40, "Name must be maximum 40 chracters")                
+                ,
                 cashlimit: Yup.string(function() {
                     return "Please Select Daily Cash Limit"
                 }).required(function() {
                     return "Please Select Daily Cash Limit"
                 }),
-                coverduration: Yup.string(function() {
+                coverduration: Yup.string(function(value) {
+                    console.log("cover", value)
                     return "Please Select Cover Duration"
                 }).required(function() {
+                    
                     return "Please Select Cover Duration"
                 }),
                 // education_id: Yup.string(function() {
@@ -188,7 +199,7 @@ const validateAddress =  Yup.object().shape({
                 //     return "Please Select Education"
                 // }),
                 height: Yup.string().required("Please enter height")
-                .test("number&flotChecking",function()
+                .test("inch",function()
                 {return "Valid height"},
                 function(value){
                     if(value)
@@ -247,45 +258,75 @@ const validateAddress =  Yup.object().shape({
         }),
         othewise: Yup.string()
     }),
-    proposerName: Yup.string(function() {
-        return "Please enter proposer name"
-        }).notRequired(function() {
+    proposerName: Yup.string().when(['proposerAsInsured'],{
+        is: proposerAsInsured => proposerAsInsured == '0',
+        then :Yup.string(function() {
             return "Please enter proposer name"
+            }).notRequired(function() {
+                return "Please enter proposer name"
+            })
+            .min(3, function() {
+                return "Name must be minimum 3 chracters"
+            })
+            .max(40, function() {
+                return "Name must be maximum 40 chracters"
+            })
+            .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
+                return "Please enter valid name"
+            }).test(
+            "proposerAsInsured",
+            function() {
+                return "Please enter proposer name"
+            },
+            function (value) {
+                if (this.parent.proposerAsInsured == '0' && !value) {   
+                    return false;    
+                }
+                return true;
         })
-        .min(3, function() {
-            return "Name must be minimum 3 chracters"
-        })
-        .max(40, function() {
-            return "Name must be maximum 40 chracters"
-        })
-        .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
-            return "Please enter valid name"
-        }).test(
-        "proposerAsInsured",
-        function() {
+    }),
+    proposerLastName: Yup.string().when(['proposerAsInsured'],{
+        is: proposerAsInsured => proposerAsInsured == '0',
+        then :Yup.string(function() {
             return "Please enter proposer name"
-        },
-        function (value) {
-            if (this.parent.proposerAsInsured == '0' && !value) {   
-                return false;    
-            }
-            return true;
+            }).notRequired(function() {
+                return "Please enter proposer name"
+            })
+            .min(1, function() {
+                return "Name must be minimum 1 chracters"
+            })
+            .max(40, function() {
+                return "Name must be maximum 40 chracters"
+            })
+            .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {
+                return "Please enter valid name"
+            }).test(
+            "proposerAsInsured",
+            function() {
+                return "Please enter proposer name"
+            },
+            function (value) {
+                if (this.parent.proposerAsInsured == '0' && !value) {   
+                    return false;    
+                }
+                return true;
+        }),
     }),
-    proposercashlimit: Yup.string(function() {
-        return "Please Select Cash Limit"
-        }).notRequired(function() {
-            return "Please Select Cash Limit"
-        }).test(
-        "proposerAsInsured",
-        function() {
-            return "Please Select Cash Limit"
-        },
-        function (value) {
-            if (this.parent.proposerAsInsured == '0' && !value) {   
-                return false;    
-            }
-            return true;
-    }),
+    // proposercashlimit: Yup.string(function() {
+    //     return "Please Select Cash Limit"
+    //     }).notRequired(function() {
+    //         return "Please Select Cash Limit"
+    //     }).test(
+    //     "proposerAsInsured",
+    //     function() {
+    //         return "Please Select Cash Limit"
+    //     },
+    //     function (value) {
+    //         if (this.parent.proposerAsInsured == '0' && !value) {   
+    //             return false;    
+    //         }
+    //         return true;
+    // }),
     proposerDob: Yup.date()
         .notRequired( function() {
         return "Please enter proposer date of birth"
@@ -366,7 +407,11 @@ class dailycash_Address extends Component {
             titleList: [],
 			is_eia_account2: '',
 			tpaInsurance: [],
-            educationList:[]
+            educationList:[],
+            proposercoverduration : '',
+            proposercashlimit: '',
+            proposerCoverError : false,
+            proposercashlimitCoverError : false
 		}
 	}
 
@@ -545,10 +590,26 @@ class dailycash_Address extends Component {
 				 create_eia_account = values.is_eia_account2;
 			}
 
+            console.log("values.proposercoverduration", values.proposercoverduration)
+
+            if(values.proposercashlimit != ''){
+                this.setState({proposercashlimit: values.proposercashlimit})
+            }else{
+                this.setState({proposercashlimit:''});
+            }
+
+            if(values.proposercoverduration != ''){
+                this.setState({proposercoverduration: values.proposercoverduration})
+            }else{
+                this.setState({proposercoverduration:''});
+            }
+
         let formArr = []
         
         formArr['policy_holder_id'] = policyHolder_id;
         const family_members = values.family_members;
+
+        console.log("family_members", family_members);
         let proposerAsInsured = values.proposerAsInsured;
         sessionStorage.setItem('proposed_insured',proposerAsInsured);
  
@@ -556,6 +617,7 @@ class dailycash_Address extends Component {
         let family_member_id = []
         let gender = []
         let first_name = []
+        let last_name = []
         let cash_limit = []
         let cover_duration = []
         let education_id = []
@@ -565,11 +627,20 @@ class dailycash_Address extends Component {
         let pancard_no = []
         let salutation_id = []
 
+        for(let j=0;j<family_members.length;j++){
+            if(family_members[j].looking_for == 'self'){
+                this.setState({proposercoverduration : family_members[j].coverduration})
+                this.setState({proposercashlimit: family_members[j].cashlimit})
+
+            }
+        }
+
         for(let i=0;i<family_members.length;i++){
              looking_for.push(family_members[i].looking_for)
             family_member_id.push(family_members[i].family_member_id)
             gender.push(family_members[i].gender)
             first_name.push(family_members[i].fname)
+            last_name.push(family_members[i].lname)
             cash_limit.push(family_members[i].cashlimit)
             cover_duration.push(family_members[i].coverduration)
             education_id.push(family_members[i].education_id)
@@ -578,6 +649,22 @@ class dailycash_Address extends Component {
             salutation_id.push(family_members[i].salutation_id)
            dob.push(moment(family_members[i].dob).format("YYYY-MM-DD"))
            pancard_no.push(values.panNo)
+
+           if(this.state.proposercoverduration != ''){
+            if(this.state.proposercoverduration != family_members[i].coverduration){
+                this.setState({proposerCoverError : true})
+            }else{
+                this.setState({proposerCoverError : false})
+            }
+           }
+
+           if(this.state.proposercashlimit != ''){
+            if(family_members[i].cashlimit > this.state.proposercashlimit){
+                this.setState({proposercashlimitCoverError : true})
+            }else{
+                this.setState({proposercashlimitCoverError : false})
+            }
+           }
         }  
 
         formArr['looking_for'] = looking_for
@@ -585,6 +672,7 @@ class dailycash_Address extends Component {
         formArr['family_member_id'] = family_member_id
         formArr['gender'] = gender
         formArr['first_name'] = first_name
+        formArr['last_name'] = last_name
         formArr['cash_limit'] = cash_limit
         formArr['cover_duration'] = cover_duration
         formArr['education_id'] = education_id
@@ -620,6 +708,7 @@ class dailycash_Address extends Component {
         formArr['phoneNo'] = values.phoneNo;
         formArr['email'] = values.email;
         formArr['proposerName'] = values.proposerName;
+        formArr['proposerLastName'] = values.proposerLastName;
         formArr['proposercashlimit'] = values.proposercashlimit; 
         formArr['proposercoverduration'] = values.proposercoverduration;
         formArr['proposereducation_id'] = values.proposereducation_id;
@@ -646,35 +735,48 @@ class dailycash_Address extends Component {
         console.log("formObj_input--------- ", formObj)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(formObj)))
         this.props.loadingStart();
-        axios
-        .post(`daily-cash/insured-member-details`, formData)
-        .then(res => {
-            let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            console.log("decryptResp--------- ", decryptResp)
-           // if(res.data.completedStep == 4){
-                this.props.loadingStop();
-                if(decryptResp.error)
-                {
-                    actions.setSubmitting(false);
-                    swal(decryptResp.msg)
-                }
-                else
-                {
-                    this.props.history.push(`/dailycash_FullQuote/${productId}`);
-                }
-               
-           // }        
-        })
-        .catch(err => {
-            let decryptResp = JSON.parse(encryption.decrypt(err.data))
-            console.log("decrypt---Err---", decryptResp)
-            if(err.status == 401) {
-                swal("Session out. Please login")
-            }
-            else swal("Something wrong happened. Please try after some")
+
+        console.log("this.state.proposerCoverError", this.state.proposerCoverError)
+        
+        if(this.state.proposerCoverError){
+            this.props.loadingStop();
             actions.setSubmitting(false);
-        this.props.loadingStop();
-        });
+            swal("cover duration for all family member must be same as Propser/primary insured")
+        } else if(this.state.proposercashlimitCoverError){
+            this.props.loadingStop();
+            actions.setSubmitting(false);
+            swal("Cash limit of dependent cannot be more than cash limit of propser/primary insured")
+        }else{
+            axios
+            .post(`daily-cash/insured-member-details`, formData)
+            .then(res => {
+                let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decryptResp--------- ", decryptResp)
+            // if(res.data.completedStep == 4){
+                    this.props.loadingStop();
+                    if(decryptResp.error)
+                    {
+                        actions.setSubmitting(false);
+                        swal(decryptResp.msg)
+                    }
+                    else
+                    {
+                        this.props.history.push(`/dailycash_FullQuote/${productId}`);
+                    }
+                
+            // }        
+            })
+            .catch(err => {
+                let decryptResp = JSON.parse(encryption.decrypt(err.data))
+                console.log("decrypt---Err---", decryptResp)
+                if(err.status == 401) {
+                    swal("Session out. Please login")
+                }
+                else swal("Something wrong happened. Please try after some")
+                actions.setSubmitting(false);
+            this.props.loadingStop();
+            });
+        }
     }
 	
 	tpaInsuranceRepository = () => {
@@ -696,6 +798,7 @@ class dailycash_Address extends Component {
 		if (familyDetails.length > 0) {
 			return familyDetails.map(resource => ({
 				fname: resource.first_name ? resource.first_name:'',
+				lname: resource.last_name ? resource.last_name:'',
 				cashlimit: resource.cash_limit ? resource.cash_limit:'',
                 coverduration: resource.cover_duration ? resource.cover_duration:'',
                 education_id: resource.education_id ? resource.education_id:'',
@@ -801,6 +904,7 @@ class dailycash_Address extends Component {
             eia_account_no : policy_holder && policy_holder.eia_no ?  policy_holder.eia_no : '',
 
             proposerName : policy_holder && policy_holder.first_name ?  policy_holder.first_name : '',
+            proposerLastName : policy_holder && policy_holder.last_name ?  policy_holder.last_name : '',
             proposercashlimit : policy_holder && policy_holder.cash_limit ?  policy_holder.cash_limit : '',
             proposercoverduration : policy_holder && policy_holder.cover_duration ?  policy_holder.cover_duration : '',
             height : policy_holder && policy_holder.height ?  policy_holder.height : '',
@@ -809,11 +913,11 @@ class dailycash_Address extends Component {
             proposerDob : policy_holder && policy_holder.dob ?  new Date(policy_holder.dob) : '',
             proposerGender : policy_holder && policy_holder.gender ?  policy_holder.gender : '',
             netPremiumCheckCount: netPremiumCheck > 100000 ? 1 : 0,
-			
 			is_eia_account2:  is_eia_account2,
 			
 			tpaInsurance: policy_holder && policy_holder.T_Insurance_Repository_id ? policy_holder.T_Insurance_Repository_id : "",
         });
+        
 
         const {productId} = this.props.match.params
         return (
@@ -825,12 +929,10 @@ class dailycash_Address extends Component {
 						
 						
                             <aside className="left-sidebar">
- <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
-<SideNav />
- </div>
-</aside>
-							
-							
+                                    <div className="scroll-sidebar ps-container ps-theme-default ps-active-y">
+                                    <SideNav />
+                                </div>
+                            </aside>						
 							
                             <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 infobox arogyaa_address">
                                 <h4 className="text-center mt-3 mb-3">Hospital Daily Cash Policy</h4>
@@ -841,7 +943,9 @@ class dailycash_Address extends Component {
                                     validationSchema={validateAddress}
                                     >
                                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {                                    
-                                    return (
+                                   console.log("values",values)
+                                   console.log("error",errors)
+                                   return (
                                     <Form>
                                         <div className="d-flex flex-column flex-sm-column flex-md-column flex-lg-row justify-content-left m-b-15">
                                         <div className="proposr prsres m-r-60"><p>Is the Proposer same as insured</p></div>
@@ -923,6 +1027,24 @@ class dailycash_Address extends Component {
                                                         />
                                                             {errors.proposerName && touched.proposerName ? (
                                                         <span className="errorMsg">{errors.proposerName}</span>
+                                                        ) : null}
+                                                    </div>
+                                                </FormGroup>
+                                            </Col>
+                                            <Col sm={12} md={6} lg={3}>
+                                                <FormGroup>
+                                                    <div className="insurerName">
+                                                        <Field
+                                                            name="proposerLastName"
+                                                            type="text"
+                                                            placeholder="Last Name"
+                                                            autoComplete="off"
+                                                            onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                            onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                            value = {values.proposerLastName}
+                                                        />
+                                                            {errors.proposerLastName && touched.proposerLastName ? (
+                                                        <span className="errorMsg">{errors.proposerLastName}</span>
                                                         ) : null}
                                                     </div>
                                                 </FormGroup>
@@ -1034,7 +1156,7 @@ class dailycash_Address extends Component {
                                                                     <Field
                                                                         name={`family_members.${index}.fname`}
                                                                         type="text"
-                                                                        placeholder="Name"
+                                                                        placeholder="First Name"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1042,6 +1164,24 @@ class dailycash_Address extends Component {
                                                                     />
                                                                      {errors.family_members && errors.family_members[index] && errors.family_members[index].fname ? (
                                                                     <span className="errorMsg">{errors.family_members[index].fname}</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </FormGroup>
+                                                        </Col>
+                                                        <Col sm={12} md={6} lg={3}>
+                                                            <FormGroup>
+                                                                <div className="insurerName">
+                                                                    <Field
+                                                                        name={`family_members.${index}.lname`}
+                                                                        type="text"
+                                                                        placeholder="Last Name"
+                                                                        autoComplete="off"
+                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                        value = {values.family_members[index].lname}
+                                                                    />
+                                                                     {errors.family_members && errors.family_members[index] && errors.family_members[index].lname ? (
+                                                                    <span className="errorMsg">{errors.family_members[index].lname}</span>
                                                                     ) : null}
                                                                 </div>
                                                             </FormGroup>
@@ -1102,7 +1242,7 @@ class dailycash_Address extends Component {
                                                                     <Field
                                                                         name={`family_members.${index}.height`}
                                                                         type="text"
-                                                                        placeholder="Height(Inch)"
+                                                                        placeholder="Height(CM)"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1144,6 +1284,8 @@ class dailycash_Address extends Component {
                                                                             if(resource.relation_with=='self')
                                                                             {
                                                                                 setFieldValue(`proposercashlimit`, e.target.value);
+                                                                                this.setState({proposercashlimit : e.target.value})
+                                                                                
                                                                             }
                                                                             
                                                                             setFieldValue(`family_members.${index}.cashlimit`, e.target.value);
@@ -1175,6 +1317,7 @@ class dailycash_Address extends Component {
                                                                             if(resource.relation_with=='self')
                                                                             {
                                                                                 setFieldValue(`proposercoverduration`, e.target.value);
+                                                                                this.setState({proposercoverduration : e.target.value})
                                                                             }
                                                                             
                                                                             setFieldValue(`family_members.${index}.coverduration`, e.target.value);

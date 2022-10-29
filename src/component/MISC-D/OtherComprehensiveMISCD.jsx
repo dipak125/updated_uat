@@ -19,6 +19,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
+import {vahanValidation} from "../../shared/reUseFunctions";
 
 const menumaster_id = 7
 let encryption = new Encryption()
@@ -48,7 +49,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part: Yup.string().required('RequiredField')
+    chasis_no_last_part: Yup.string()
     .matches(/^([a-zA-Z0-9]*)$/, function() {
             return "InvalidNumber"
         })
@@ -59,7 +60,7 @@ const ComprehensiveValidation = Yup.object().shape({
             return "ChasisLastDigit"
         }),
 
-    engine_no: Yup.string().required('EngineRequired')
+    engine_no: Yup.string()
         .matches(/^[a-zA-Z0-9]*$/, function () {
             return "InvalidEngineNumber"
         })
@@ -70,7 +71,7 @@ const ComprehensiveValidation = Yup.object().shape({
             return "EngineMax"
         }),
 
-    chasis_no: Yup.string().required('ChasisRequired')
+    chasis_no: Yup.string()
         .matches(/^[a-zA-Z0-9]*$/, function () {
             return "InvalidChasisNumber"
         })
@@ -370,6 +371,10 @@ class OtherComprehensiveMISCD extends Component {
             chasis_no: "",
             chasiNo: '',
             engineNo: '',
+	     vahan_chasis_no:"",
+            vahan_engine_no:"",
+            vahan_message:"",
+            error:false,
             selectFlag: '',
             initialValue: {
                 registration_no: "",
@@ -396,7 +401,8 @@ class OtherComprehensiveMISCD extends Component {
             vehicle_age: "",
             depreciationPercentage: "",
             bodyIdvStatus: 1,
-            userIdvStatus: 1
+            userIdvStatus: 1,
+            vahan_verify:'0'
         };
     }
 
@@ -481,6 +487,7 @@ class OtherComprehensiveMISCD extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previouspolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+		let menumaster_id= decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster_id : ""
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let trailer_array = motorInsurance.trailers && motorInsurance.trailers != null ? motorInsurance.trailers : null
                 let registration_date = motorInsurance && motorInsurance.registration_date ? motorInsurance.registration_date : ""
@@ -577,8 +584,8 @@ class OtherComprehensiveMISCD extends Component {
 
 
                 this.setState({
-                    motorInsurance, add_more_coverage, request_data, vehicleDetails, bodySliderVal, sliderVal,is_fieldDisabled
-                   , showCNG: motorInsurance.cng_kit == 1 ? true : false,
+                    motorInsurance, add_more_coverage, request_data, vehicleDetails, bodySliderVal, sliderVal,is_fieldDisabled,menumaster_id,
+                    showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
                     no_of_claim: add_more_coverage_request_array.B00007 ? add_more_coverage_request_array.B00007.value : "",
@@ -586,6 +593,15 @@ class OtherComprehensiveMISCD extends Component {
                 })
                 this.props.loadingStop();
                 this.depreciation(values)
+                if(motorInsurance && motorInsurance.chasis_no_last_part) 
+                {
+                    this.setState({
+                        vahan_flag:1,
+                        vahan_engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
+                        vahan_chasis_no:motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
+                    })
+                }
+
 
             })
             .catch(err => {
@@ -682,13 +698,19 @@ class OtherComprehensiveMISCD extends Component {
             });
     };
 
-    getVahanDetails = async (values, setFieldTouched, setFieldValue, errors) => {
-
+    getVahanDetails = async (Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) => {
+        if(values.chasis_no_last_part.length<5)
+        {
+             swal("Please enter 5 digit chassis no")
+ 
+        }
+	 const {menumaster_id}=this.state
         const formData = new FormData();
         if (values.newRegistrationNo == "NEW") {
             formData.append("regnNo", values.newRegistrationNo);
             setFieldTouched('registration_no');
             setFieldValue('registration_no', values.newRegistrationNo);
+            this.setState({vahan_verify:"1"});
         }
         else {
             formData.append("regnNo", values.registration_no);
@@ -696,8 +718,9 @@ class OtherComprehensiveMISCD extends Component {
 
         formData.append("chasiNo", values.chasis_no_last_part);
         formData.append("policy_holder_id", this.state.request_data.policyholder_id);
-
-        if (errors.registration_no || errors.chasis_no_last_part) {
+        formData.append("menumaster_id",menumaster_id);
+        
+        if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
         else {
@@ -706,10 +729,29 @@ class OtherComprehensiveMISCD extends Component {
                 await axios
                     .post(`/getVahanDetails`, formData)
                     .then((res) => {
+                        let eng = res.data.data.engineNo && res.data.data.engineNo ? res.data.data.engineNo : Engine_no; 
+                        let chas = res.data.data.chasiNo && res.data.data.chasiNo ? res.data.data.chasiNo :Chasis_no;
+                        setFieldValue('engine_no', eng)
+                        setFieldValue('chasis_no', chas)
                         this.setState({
-                            vahanDetails: res.data,
-                            vahanVerify: true
+                                vahanDetails: res.data,
+                                vahanVerify: true,
+                                error:res.data.error,
+                                vahan_engine_no: res.data.data.engineNo,
+                                vahan_chasis_no:res.data.data.chasiNo,
+                                vahan_message:res.data.msg
                         });
+
+                        if(res.data.error==false)
+                        {
+                            this.setState({ vahan_verify:"1"
+                           });
+                        }
+                        else{
+                        this.setState({ vahan_verify:"0"
+                        });
+                        swal(res.data.msg)
+                        }
                         if (this.state.vahanDetails.data[0].chasiNo) {
                             this.setState({ chasiNo: this.state.vahanDetails.data[0].chasiNo })
                         }
@@ -721,9 +763,9 @@ class OtherComprehensiveMISCD extends Component {
                         setFieldTouched('vahanVerify')
                         setFieldValue('vahanVerify', true)
                         setFieldTouched('engine_no')
-                        setFieldValue('engine_no', this.state.engineNo)
+                       // setFieldValue('engine_no', this.state.engineNo)
                         setFieldTouched('chasis_no')
-                        setFieldValue('chasis_no', this.state.chasiNo)
+                       // setFieldValue('chasis_no', this.state.chasiNo)
 
                         this.props.loadingStop();
                     })
@@ -889,6 +931,10 @@ class OtherComprehensiveMISCD extends Component {
                         serverResponse: []
                     });
                 }
+                else if( res.data.data && res.data.data.ValidateResult && res.data.data.ValidateResult.code && res.data.data.ValidateResult.code == "VahanValidation" && res.data.data.ValidateResult.message)
+                {
+                     swal(res.data.data.ValidateResult.message)
+                }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
@@ -911,8 +957,21 @@ class OtherComprehensiveMISCD extends Component {
 
 
     handleSubmit = (values) => {
+        if(values.engine_no && values.chasis_no)
+        {
+
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
+        const  vahan_response=vahanValidation(this.state,values);
+        console.log("vahanValidation",vahan_response)
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal,error,vahan_chasis_no,vahan_engine_no,vahan_message,vahan_flag } = this.state
+        if(error === 1)
+        {
+            swal(vahan_message)
+        }
+        else{
+            if( vahan_response &&  vahan_response.error==false)
+            {
+
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
         let defaultBodySliderValue = 0
@@ -1030,7 +1089,17 @@ class OtherComprehensiveMISCD extends Component {
                     }
                 }
             }      
-        }      
+        } 
+    }else
+    {
+        swal( vahan_response.msg)
+    }  
+	
+    }
+}else{
+    swal("chassis no and engine are required")
+}
+  
     }
 
     onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
@@ -1303,7 +1372,7 @@ class OtherComprehensiveMISCD extends Component {
 
     render() {
         const { is_fieldDisabled,showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
-            moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
+            moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount,vahan_chasis_no,vahan_engine_no } = this.state
         const { productId } = this.props.match.params
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user) {
@@ -1352,18 +1421,21 @@ class OtherComprehensiveMISCD extends Component {
         let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        let  Engine_no=motorInsurance.engine_no ? motorInsurance.engine_no :  ""
+        let Chasis_no=motorInsurance.chasis_no ? motorInsurance.chasis_no :  ""
 
         let newInitialValues = {}
 
         if (selectFlag == '1') {
             newInitialValues = Object.assign(initialValue, {
                 registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
                 vahanVerify: vahanVerify,
-                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               newRegistrationNo:motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
                 B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006: vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
@@ -1392,12 +1464,13 @@ class OtherComprehensiveMISCD extends Component {
         else {
             newInitialValues = Object.assign(initialValue, {
                 registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
                 vahanVerify: vahanVerify,
-                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               newRegistrationNo:motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
                 PA_flag: '0',
                 PA_Cover: "",
                 PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
@@ -1637,7 +1710,8 @@ class OtherComprehensiveMISCD extends Component {
                                                                                                 name="registration_no"
                                                                                                 type="text"
                                                                                                 placeholder=""
-                                                                                                disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                                                //disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                                                disabled={true}
                                                                                                 autoComplete="off"
                                                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
@@ -1702,10 +1776,11 @@ class OtherComprehensiveMISCD extends Component {
                                                                                 </FormGroup>
                                                                             </Col>
                                                                             <Col sm={12} md={5} lg={2}>
-                                                                                <Button className="btn btn-primary vrifyBtn" onClick={!errors.chasis_no_last_part ? this.getVahanDetails.bind(this, values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
+                                                                                <Button className="btn btn-primary vrifyBtn" onClick={!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,Engine_no,Chasis_no, values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                                                                 {errors.vahanVerify ? (
                                                                                     <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                                                                 ) : null}
+                                                                                 {values.puc == '1' && this.state.vahan_verify!="1"? <span className="errorMsg">{"Please verify"}</span>:null}
                                                                             </Col>
                                                                         </Row>
 
@@ -2602,7 +2677,7 @@ class OtherComprehensiveMISCD extends Component {
                                                                     {serverResponse && serverResponse != "" ? (serverResponse.message ?
                                                                         <Button className={`proceedBtn`} type="submit"  >
                                                                             {phrases['Recalculate']}
-                                                                        </Button> : (values.puc == '1' ? <Button className={`proceedBtn`} type="submit"  >
+                                                                        </Button> : (values.puc == '1' && this.state.vahan_verify=="1" ? <Button className={`proceedBtn`} type="submit"  >
                                                                             {phrases['Continue']}
                                                                         </Button> : null)) : <Button className={`proceedBtn`} type="submit"  >
                                                                             {phrases['Recalculate']}

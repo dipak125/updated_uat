@@ -8,7 +8,7 @@ import {
     SUKHSAM_TRANSACTION_ID
 } from "../actions/actionTypes";
 
-
+//add registration type
 export const setSmeData = ( request ) => {
     return dispatch => {
         dispatch({
@@ -16,6 +16,7 @@ export const setSmeData = ( request ) => {
             payload: {
                 start_date:request.start_date,
                 end_date:request.end_date,
+		registration_type : request.registration_type,
                 policy_holder_id:request.policy_holder_id,
                 policy_holder_ref_no:request.policy_holder_ref_no,
                 request_data_id:request.request_data_id,
@@ -27,20 +28,22 @@ export const setSmeData = ( request ) => {
     }
 }
 
+//add registration type
 export const setSmeUpdateData = ( request ) => {
     return dispatch => {
         dispatch({
             type: SUKHSAM_FIRE_UPDATE,
             payload: {
                 start_date:request.start_date,
-                end_date:request.end_date
+                end_date:request.end_date,
+		registration_type : request.registration_type
             }
         });
     }
 }
 
 
-
+//Add policy type
 export const setSmeRiskData = ( request ) => {
     return dispatch => {
         dispatch({
@@ -51,6 +54,8 @@ export const setSmeRiskData = ( request ) => {
                 house_flat_no:request.house_flat_no,
                 pincode:request.pincode,
                 pincode_id:request.pincode_id,
+                policy_type : request.policy_type,
+                multipleAddress : request.multipleAddress,
                 buildings_si:request.buildings_si,
                 plant_machinary_si: request.plant_machinary_si,
                 furniture_fixture_si: request.furniture_fixture_si,
@@ -58,7 +63,8 @@ export const setSmeRiskData = ( request ) => {
                 finish_goods: request.finish_goods,
                 stock_wip: request.stock_wip,
                 content_sum_insured: request.content_sum_insured,
-                stock_sum_insured : request.stock_sum_insured
+                stock_sum_insured : request.stock_sum_insured,
+		multiple_fire_sum_insured : request.multiple_fire_sum_insured
             }
         });
     }

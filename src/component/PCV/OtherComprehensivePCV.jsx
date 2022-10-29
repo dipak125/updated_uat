@@ -19,6 +19,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 import { validRegistrationNumber } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
+import {vahanValidation} from "../../shared/reUseFunctions";
 
 const menumaster_id = 12
 let encryption = new Encryption()
@@ -48,7 +49,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part:Yup.string().required('RequiredField')
+    chasis_no_last_part:Yup.string()
     .matches(/^([a-zA-Z0-9]*)$/, function() {
         return "InvalidNumber"
     })
@@ -59,7 +60,7 @@ const ComprehensiveValidation = Yup.object().shape({
         return "ChasisLastDigit"
     }),
 
-    engine_no: Yup.string().required('EngineRequired')
+    engine_no: Yup.string()
         .matches(/^[a-zA-Z0-9]*$/, function () {
             return "InvalidEngineNumber"
         })
@@ -70,7 +71,7 @@ const ComprehensiveValidation = Yup.object().shape({
             return "EngineMax"
         }),
 
-    chasis_no: Yup.string().required('ChasisRequired')
+    chasis_no: Yup.string()
         .matches(/^[a-zA-Z0-9]*$/, function () {
             return "InvalidChasisNumber"
         })
@@ -438,6 +439,10 @@ class OtherComprehensivePCV extends Component {
             chasis_no: "",
             chasiNo: '',
             engineNo: '',
+	     vahan_chasis_no:"",
+            vahan_engine_no:"",
+            vahan_message:"",
+            error:false,
             selectFlag: '',
             initialValue: {
                 registration_no: "",
@@ -464,7 +469,8 @@ class OtherComprehensivePCV extends Component {
             vehicle_age: "",
             depreciationPercentage: "",
             bodyIdvStatus: 1,
-            userIdvStatus: 1
+            userIdvStatus: 1,
+            vahan_verify:'0'
         };
     }
 
@@ -543,10 +549,11 @@ class OtherComprehensivePCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-               // console.log("decrypt--fetchData-- ", decryptResp)
+                console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let previouspolicy = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.previouspolicy : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+		        let menumaster_id= decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster_id : ""
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let trailer_array = motorInsurance.trailers && motorInsurance.trailers != null ? motorInsurance.trailers : null
                 let registration_date = motorInsurance && motorInsurance.registration_date ? motorInsurance.registration_date : ""
@@ -554,6 +561,7 @@ class OtherComprehensivePCV extends Component {
                 let valid_previous_policy = motorInsurance ? motorInsurance.valid_previous_policy : "0"
                 let policytype_id = motorInsurance ? motorInsurance.policytype_id : ""
                 let vehicle_age = 0
+                let sub_class = vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.bodystyle && vehicleDetails.varientmodel.bodystyle.VEH_SUB_CLASS ? vehicleDetails.varientmodel.bodystyle.VEH_SUB_CLASS : ''
                 // let bodySliderVal = motorInsurance && motorInsurance.body_idv_value ? motorInsurance.body_idv_value : 0
                 let sliderVal = motorInsurance && motorInsurance.idv_value ? motorInsurance.idv_value : 0
 
@@ -642,7 +650,7 @@ class OtherComprehensivePCV extends Component {
 
 
                 this.setState({
-                    motorInsurance, add_more_coverage, request_data, vehicleDetails, sliderVal,
+                    motorInsurance, add_more_coverage, request_data, vehicleDetails, sliderVal,menumaster_id,sub_class,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
@@ -651,12 +659,33 @@ class OtherComprehensivePCV extends Component {
                 })
                 this.props.loadingStop();
                 this.fullQuote(values)
+                if(motorInsurance && motorInsurance.chasis_no_last_part) 
+                {
+                    this.setState({
+                        vahan_flag:1,
+                        vahan_engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
+                        vahan_chasis_no:motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
+                    })
+                }
+                let filter_coverage=[];
+               console.log("subclass",motorInsurance.subclass_id == 1,motorInsurance.subclass_id)
+                if(motorInsurance.subclass_id == 1)
+                {
+                    
+                    console.log("yes")
+                    filter_coverage= this.state.moreCoverage.filter(data=> data.code !== 'IMT23')
+                    this.setState({
+                       moreCoverage:filter_coverage 
+                    })
+                }
+                console.log("yes1",filter_coverage)
 
             })
             .catch(err => {
                 // handle error
                 this.props.loadingStop();
             })
+           
     }
 
     // depreciation = (values) => {
@@ -711,11 +740,13 @@ class OtherComprehensivePCV extends Component {
             .get(`gcv/coverage-list/${localStorage.getItem('policyHolder_id')}`)
             .then((res) => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                let Coverage = []
+                console.log("coverage",decryptResp)
+                let Coverage = decryptResp.data
                 let drv = []
+               
 
                 this.setState({
-                    moreCoverage: decryptResp.data,
+                    moreCoverage: Coverage,
                 });
                 this.getFuelList()
             })
@@ -726,15 +757,22 @@ class OtherComprehensivePCV extends Component {
                 });
                 this.props.loadingStop();
             });
+           
     };
 
-    getVahanDetails = async (values, setFieldTouched, setFieldValue, errors) => {
-
+    getVahanDetails = async (Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) => {
+        if(values.chasis_no_last_part.length<5)
+        {
+             swal("Please enter 5 digit chassis no")
+ 
+        }
+	 const {menumaster_id}=this.state
         const formData = new FormData();
         if (values.newRegistrationNo == "NEW") {
             formData.append("regnNo", values.newRegistrationNo);
             setFieldTouched('registration_no');
             setFieldValue('registration_no', values.newRegistrationNo);
+            this.setState({vahan_verify:"1"});
         }
         else {
             formData.append("regnNo", values.registration_no);
@@ -742,8 +780,9 @@ class OtherComprehensivePCV extends Component {
 
         formData.append("chasiNo", values.chasis_no_last_part);
         formData.append("policy_holder_id", this.state.request_data.policyholder_id);
-
-        if (errors.registration_no || errors.chasis_no_last_part) {
+        formData.append("menumaster_id",menumaster_id);
+        
+        if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
         else {
@@ -752,24 +791,46 @@ class OtherComprehensivePCV extends Component {
                 await axios
                     .post(`/getVahanDetails`, formData)
                     .then((res) => {
+                        console.log("data1",res.data.error)
+                       
+                        let eng = res.data.data.engineNo && res.data.data.engineNo ? res.data.data.engineNo : Engine_no 
+                        let chas = res.data.data.chasiNo && res.data.data.chasiNo ? res.data.data.chasiNo :Chasis_no
+                        setFieldValue('engine_no', eng)
+                        setFieldValue('chasis_no', chas)
                         this.setState({
                             vahanDetails: res.data,
-                            vahanVerify: true
+                            vahanVerify: true,
+                            error:res.data.error,
+                            vahan_engine_no: res.data.data.engineNo,
+                            vahan_chasis_no:res.data.data.chasiNo,
+                            vahan_message:res.data.msg
                         });
-                        if (this.state.vahanDetails.data[0].chasiNo) {
+
+                        if(res.data.error==false)
+                        {
+                            this.setState({ vahan_verify:"1"
+                           });
+                        }
+                        else{
+                        this.setState({ vahan_verify:"0"
+                        });
+                        swal(res.data.msg)
+                         }
+                        if (this.state.vahanDetails && this.state.vahanDetails.data[0] && this.state.vahanDetails.data[0].chasiNo) {
                             this.setState({ chasiNo: this.state.vahanDetails.data[0].chasiNo })
                         }
 
-                        if (this.state.vahanDetails.data[0].engineNo) {
+                        if (this.state.vahanDetails && this.state.vahanDetails.data[0] && this.state.vahanDetails.data[0].engineNo) {
                             this.setState({ engineNo: this.state.vahanDetails.data[0].engineNo })
                         }
+                  
 
                         setFieldTouched('vahanVerify')
                         setFieldValue('vahanVerify', true)
                         setFieldTouched('engine_no')
-                        setFieldValue('engine_no', this.state.engineNo)
+                        //setFieldValue('engine_no', this.state.engineNo)
                         setFieldTouched('chasis_no')
-                        setFieldValue('chasis_no', this.state.chasiNo)
+                        //setFieldValue('chasis_no', this.state.chasiNo)
 
                         this.props.loadingStop();
                     })
@@ -870,7 +931,7 @@ class OtherComprehensivePCV extends Component {
                 return false
             }
         }
-
+        console.log("post",post_data);
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios.post('pcv/full-quote', formData)
@@ -934,6 +995,10 @@ class OtherComprehensivePCV extends Component {
                         serverResponse: []
                     });
                 }
+                else if( res.data && res.data.ValidateResult && res.data.ValidateResult.code && res.data.ValidateResult.code == "VahanValidation" && res.data.ValidateResult.message)
+                {
+                     swal(res.data.ValidateResult.message)
+                }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
@@ -956,9 +1021,23 @@ class OtherComprehensivePCV extends Component {
 
 
     handleSubmit = (values) => {
+        if(values.engine_no && values.chasis_no)
+        {
+
         //console.log("error is coming")
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, bodySliderVal } = this.state
+        const  vahan_response=vahanValidation(this.state,values);
+            console.log("vahanValidation",vahan_response)
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage,vahan_flag ,bodySliderVal,error,vahan_chasis_no,vahan_engine_no,vahan_message } = this.state
+        if(error === 1)
+        {
+            swal(vahan_message)
+        }
+        else
+        {
+            if( vahan_response &&  vahan_response.error==false)
+        { 
+        
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_User) : 0
         let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
         let coverage_data = {}
@@ -994,7 +1073,7 @@ class OtherComprehensivePCV extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': menumaster_id,
-                'registration_no': values.registration_no,
+                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no :"",
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
@@ -1018,7 +1097,7 @@ class OtherComprehensivePCV extends Component {
             post_data = {
                 'policy_holder_id': localStorage.getItem('policyHolder_id'),
                 'menumaster_id': menumaster_id,
-                'registration_no': values.registration_no,
+                'registration_no': motorInsurance.registration_no ? motorInsurance.registration_no :"",
                 'chasis_no': values.chasis_no,
                 'chasis_no_last_part': values.chasis_no_last_part,
                 'cng_kit': values.cng_kit,
@@ -1033,7 +1112,7 @@ class OtherComprehensivePCV extends Component {
             }
         }
 
-       // console.log('post_data', post_data)
+        console.log('post_data', post_data)
 
         if (user_data && total_idv) {
             if(userTypes.includes(user_data.login_type) && add_more_coverage.indexOf('B00015') < 0){
@@ -1076,7 +1155,17 @@ class OtherComprehensivePCV extends Component {
                 }
                 }
             }      
-        }      
+        } 
+    }else
+    {
+        swal( vahan_response.msg)
+    } 
+	
+    }
+}else{
+    swal("chassis no and engine are required")
+}
+       
     }
 
     onRowSelect = (value, values, isSelect, setFieldTouched, setFieldValue) => {
@@ -1348,8 +1437,8 @@ class OtherComprehensivePCV extends Component {
 
 
     render() {
-        const { showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
-            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount } = this.state
+        const { sub_class,showCNG, is_CNG_account, vahanDetails, error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, validation_error,
+            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array, ncbDiscount,vahan_chasis_no,vahan_engine_no } = this.state
         const { productId } = this.props.match.params
         let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
         if (user_data.user) {
@@ -1398,18 +1487,21 @@ class OtherComprehensivePCV extends Component {
         let CNG_OD_flag = add_more_coverage_request_array.B00005 && add_more_coverage_request_array.B00005.value ? '1' : '0'
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
+        let  Engine_no=motorInsurance.engine_no ? motorInsurance.engine_no :  ""
+        let Chasis_no=motorInsurance.chasis_no ? motorInsurance.chasis_no :  ""
 
         let newInitialValues = {}
 
         if (selectFlag == '1') {
             newInitialValues = Object.assign(initialValue, {
-                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no.replace(/\s/g, '') : "",
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
                 vahanVerify: vahanVerify,
-                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               newRegistrationNo:motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
                 B00015: motorInsurance && motorInsurance.policy_for == '2' ? "" : "B00015",
                 // B00005 : vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 8 || vehicleDetails.varientmodel.fueltype.id == 9) ? "B00005" : "",
                 B00006: vehicleDetails && vehicleDetails.varientmodel && (vehicleDetails.varientmodel.fueltype.id == 3 || vehicleDetails.varientmodel.fueltype.id == 4) ? "B00006" : "",
@@ -1437,13 +1529,14 @@ class OtherComprehensivePCV extends Component {
         }
         else {
             newInitialValues = Object.assign(initialValue, {
-                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                registration_no: motorInsurance.registration_no ? motorInsurance.registration_no.replace(/\s/g, '') : "",
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
                 vahanVerify: vahanVerify,
-                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "",
+               newRegistrationNo:motorInsurance.registration_no &&  motorInsurance.registration_no == "NEW" ? motorInsurance.registration_no : "",
                 PA_flag: '0',
                 PA_Cover: "",
                 PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
@@ -1551,7 +1644,7 @@ class OtherComprehensivePCV extends Component {
                 <FormGroup>₹ - {Math.round(ncbDiscount)}</FormGroup>
             </Col></Row> : null
 
-        const policyCoveragIMT = fulQuoteResp && fulQuoteResp.PolicyLobList && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) > 0 ?
+        const policyCoveragIMT = fulQuoteResp && fulQuoteResp.PolicyLobList && Math.round(fulQuoteResp.PolicyLobList[0].PolicyRiskList[0].imt23prem) >0 ?
             <div>
                 <Row>
                     <Col sm={12} md={6}>
@@ -1685,6 +1778,7 @@ class OtherComprehensivePCV extends Component {
                                                                                                 type="text"
                                                                                                 placeholder=""
                                                                                                 autoComplete="off"
+                                                                                                disabled={true}
                                                                                                 onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                                                 onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                                                                 value={values.registration_no}
@@ -1747,7 +1841,7 @@ class OtherComprehensivePCV extends Component {
                                                                                 </FormGroup>
                                                                             </Col>
                                                                             <Col sm={12} md={5} lg={2}>
-                                                                                <Button className="btn btn-primary vrifyBtn" onClick={!errors.chasis_no_last_part ? this.getVahanDetails.bind(this, values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
+                                                                                <Button className="btn btn-primary vrifyBtn" onClick={!errors.chasis_no_last_part ? this.getVahanDetails.bind(this, Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                                                                 {errors.vahanVerify ? (
                                                                                     <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                                                                 ) : null}
@@ -1898,7 +1992,7 @@ class OtherComprehensivePCV extends Component {
 
                                                                 {moreCoverage && moreCoverage.length > 0 ? moreCoverage.map((coverage, qIndex) => (
                                                                     <Row key={qIndex}>
-                                                                        {(motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' && coverage.code != 'B00019' && coverage.code != 'B00073') 
+                                                                        { (motorInsurance && motorInsurance.policy_for == '2' && coverage.code != 'B00015' && coverage.code != 'B00018' && coverage.code != 'B00019' && coverage.code != 'B00073') 
                                                                             || (motorInsurance && motorInsurance.policy_for == '1') ?
                                                                             <Col sm={12} md={11} lg={5} key={qIndex + "a"} >
                                                                                 <label className="customCheckBox formGrp formGrp">{coverage.name}
@@ -2562,7 +2656,7 @@ class OtherComprehensivePCV extends Component {
                                                                     {serverResponse && serverResponse != "" ? (serverResponse.message ?
                                                                         <Button className={`proceedBtn`} type="submit"  >
                                                                             {phrases['Recalculate']}
-                                                                        </Button> : (values.puc == '1' ? <Button className={`proceedBtn`} type="submit"  >
+                                                                        </Button> : (values.puc == '1' && this.state.vahan_verify=="1" ? <Button className={`proceedBtn`} type="submit"  >
                                                                             {phrases['Continue']}
                                                                         </Button> : null)) : <Button className={`proceedBtn`} type="submit"  >
                                                                             {phrases['Recalculate']}

@@ -61,7 +61,8 @@ class Premium_sukhsam extends Component {
             previousPolicy: [],
             request_data: [],
             breakin_flag: 0,
-	     hide:0,
+	        hide:0,
+            riskLocationType : '',
             policyHolder_refNo: queryString.parse(this.props.location.search).access_id ? 
                                 queryString.parse(this.props.location.search).access_id : 
                                 localStorage.getItem("policy_holder_ref_no")
@@ -251,6 +252,12 @@ class Premium_sukhsam extends Component {
                     }
                 }
                 console.log("decryptResp -------->",decryptResp)
+                var riskLocationTypeData = decryptResp.data.policyHolder.sookshamainfo.risk_location_type ? decryptResp.data.policyHolder.sookshamainfo.risk_location_type : '';
+
+                this.setState({
+                    riskLocationType : riskLocationTypeData
+                })
+
                 if(decryptResp.data.policyHolder.step_no > 0){
     
                     this.props.setData({
@@ -636,7 +643,7 @@ class Premium_sukhsam extends Component {
                                                                                     <Col sm={12} md={6}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>GSTN:</FormGroup>
+                                                                                                <FormGroup>GSTIN:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{this.props.gstn_no}</FormGroup>
@@ -649,7 +656,7 @@ class Premium_sukhsam extends Component {
                                                                                     <Col sm={12} md={6}>
                                                                                         <Row>
                                                                                             <Col sm={12} md={6}>
-                                                                                                <FormGroup>Pan No.:</FormGroup>
+                                                                                                <FormGroup>Pan No:</FormGroup>
                                                                                             </Col>
                                                                                             <Col sm={12} md={6}>
                                                                                                 <FormGroup>{this.props.pan_no}</FormGroup>
@@ -700,7 +707,7 @@ class Premium_sukhsam extends Component {
                                                                             <Col sm={12} md={6}>
                                                                                 <Row>
                                                                                     <Col sm={12} md={6}>
-                                                                                        <FormGroup>Plot No.:</FormGroup>
+                                                                                        <FormGroup>Plot No:</FormGroup>
                                                                                     </Col>
                                                                                     <Col sm={12} md={6}>
                                                                                         <FormGroup>{this.props.com_plot_no}</FormGroup>
@@ -801,11 +808,24 @@ class Premium_sukhsam extends Component {
                                                             <h5 className="medihead">Exclusions: </h5>
                                                             <h4>
                                                                 <ul>
-                                                                    <li className="txtRegistr resmb-15">Shops on wheels</li>
+                                                                    {this.state.riskLocationType == 2 ? null:(
+                                                                        <>
+                                                                        <li className="txtRegistr resmb-15">Tiny on wheels</li>
+                                                                        <li className="txtRegistr resmb-15">Shops on wheels</li>
+                                                                        </>
+                                                                    )}
+
                                                                     <li className="txtRegistr resmb-15">Kutcha Construction</li>
                                                                     <li className="txtRegistr resmb-15">Basement Risks</li>
-                                                                    <li className="txtRegistr resmb-15">Shops dealing in Fire-Crackers / Arms / Ammunition, Precious Jewellery </li>
-                                                                    <li className="txtRegistr resmb-15">Godown / Standalone Storage Risks</li>
+
+                                                                    {this.state.riskLocationType == 2 ? null:(
+                                                                        <>
+                                                                            <li className="txtRegistr resmb-15">Shops dealing in Fire-Crackers / Arms / Ammunition, Precious Jewellery </li>
+                                                                            <li className="txtRegistr resmb-15">Godown / Standalone Storage Risks</li>
+                                                                        </>
+                                                                    )}
+                                                                    
+                                                                    
                                                                 </ul>
                                                             </h4>
                                                         </div>

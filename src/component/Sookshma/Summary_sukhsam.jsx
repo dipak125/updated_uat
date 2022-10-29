@@ -115,6 +115,7 @@ class Summary_sukhsam extends Component {
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
                         end_date:decryptResp.data.policyHolder.request_data.end_date,
+                        registration_type : decryptResp.data.policyHolder.sookshamainfo.policy_type,
                         
                         policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
@@ -132,6 +133,7 @@ class Summary_sukhsam extends Component {
 
                     this.props.setRiskData(
                         {
+                            policy_type : decryptResp.data.policyHolder.sookshamainfo.risk_location_type,
                             shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
@@ -139,6 +141,8 @@ class Summary_sukhsam extends Component {
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
+                            multipleAddress : risk_arr.multipleAddress.length > 0 ? risk_arr.multipleAddress : [],
+                            multiple_fire_sum_insured : risk_arr.multiple_fire_sum_insured.length > 0 ? risk_arr.multiple_fire_sum_insured : [],
 
                             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
                             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
@@ -266,16 +270,24 @@ class Summary_sukhsam extends Component {
                     </h6>
                 </span>
             ) : null;
-
+        
+        var sl = 1
+        var loc = 1
         const sme_Coverages =
             rawData && rawData.length > 0
                 ? rawData.map((listing, qIndex) => (
-                    <tr>
+                    <>
+                    {sl == 1 && listing.coverage.description == "Terrorism Premium for Section I" ? (<tr><th colSpan={2} style={{backgroundColor : "#eaeef1"}}>Location {loc} :-</th></tr>) : ''}
+                    <tr style={{borderBottom: sl == 2 ? "1px solid #d2d2d2" : ''}}>
                         <td style={({ width: "400px" })}>{listing.coverage.description} :</td>   
                         <td>{listing.premium == null ? 0 : Math.round(listing.premium)}</td>
                     </tr>
+                    <div style={{display: 'none'}}>{sl == 2 ? sl=1 : sl++}{sl==1 ? loc++ : loc}</div>
+                    </>
                 ))
                 :  null;
+
+        console.log("rawData", rawData);
 
         return (
             <>
@@ -355,6 +367,7 @@ class Summary_sukhsam extends Component {
                                                                                             </tr>
                                                                                         </thead>
                                                                                         <tbody>
+                                                                                           
                                                                                             {sme_Coverages}
                                                                                             <tr>
                                                                                                 <td style={({ width: "400px" })}>Other Cover Premium :</td>   
@@ -477,6 +490,8 @@ const mapStateToProps = (state) => {
         house_flat_no: state.sukhsam.house_flat_no,
         pincode: state.sukhsam.pincode,
         pincode_id: state.sukhsam.pincode_id,
+        multipleAddress : state.sukhsam.multipleAddress,
+        multiple_fire_sum_insured: state.sukhsam.multiple_fire_sum_insured,
         buildings_sum_insured: state.sukhsam.buildings_sum_insured,
         content_sum_insured: state.sukhsam.content_sum_insured,
         stock_sum_insured: state.sukhsam.stock_sum_insured,

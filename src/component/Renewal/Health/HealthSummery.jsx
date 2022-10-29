@@ -124,7 +124,12 @@ class HealthSummery extends Component {
                         localStorage.getItem("policyHolder_refNo"),
     ipaInfo: [],
     nomineeDetails: [],
-    nomineeLength: 0
+    nomineeLength: 0,
+    shop_building_name:"",
+    block_no:"",
+    street_name:"",
+    plot_no:"",
+    house_flat_no:"",
   };
 
   changePlaceHoldClassAdd(e) {
@@ -222,15 +227,40 @@ class HealthSummery extends Component {
             let menumaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster : {};
             let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []	
             let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.paymentgateway
-            console.log("pay")
+            let communication_address= decryptResp.data.policyHolder && decryptResp.data.policyHolder.address &&  decryptResp.data.policyHolder.address ? decryptResp.data.policyHolder.address : [];
+            let shop_building_name=""
+            let pincode_area=""
+            let street_name=""
+            let plot_no=""
+            let  pincode=""
+            if(communication_address)
+            {
+              console.log("string",communication_address)
+             let arr_address=communication_address.split(",")
+              console.log("array",arr_address)
+              
+              if(arr_address.length==8)
+              {
+                 shop_building_name=arr_address[1]
+                 street_name=arr_address[2]
+                 plot_no=arr_address[0]
+                 pincode_area=arr_address[3]
+                 console.log("hi1",shop_building_name,street_name,plot_no,pincode_area)
+                
+                 console.log("hi2",shop_building_name,street_name,plot_no,pincode_area)
+              }
+            }
+           console.log("hi",shop_building_name,street_name,plot_no,pincode_area,pincode)
             this.setState({	
-                policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,
+                policyHolder,vehicleDetails,request_data,menumaster,step_completed, bcMaster,	policyCoverage,shop_building_name,street_name,plot_no,pincode_area,
                 paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],	
                 nomineeDetails: request_data && request_data.nominee ? request_data.nominee[0]:[]	,
                 nomineeLength: request_data && request_data.nominee ? request_data.nominee.length : 0	
 
             })	
-            this.props.loadingStop();     	
+            console.log("ok")
+            this.props.loadingStop();   
+            //this.getSukshmaAddress();  	
         })	
         .catch(err => {	
             // handle error	
@@ -238,6 +268,31 @@ class HealthSummery extends Component {
         })	
 }	
 
+getSukshmaAddress =()=>{
+  let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
+  let encryption = new Encryption();	
+  this.props.loadingStart();
+  axios.get(`sookshama/details/${policyHolder_id}`).then(res=>{
+    let decryptResp = JSON.parse(encryption.decrypt(res.data));
+    console.log("sukshma1",decryptResp);
+    let risk_arr =decryptResp && decryptResp.data && decryptResp.data.policyHolder && 
+    decryptResp.data.policyHolder.sookshamainfo && decryptResp.data.policyHolder.sookshamainfo.risk_address 
+    && JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
+    console.log("sukshma",risk_arr)
+    this.setState({
+      shop_building_name:risk_arr.shop_building_name,
+       block_no:risk_arr.block_no,
+        street_name:risk_arr.street_name,
+       plot_no:risk_arr.plot_no,
+      house_flat_no:risk_arr.house_flat_no,
+    })
+    this.props.loadingStop();
+  }).catch(err=>{
+    this.props.loadingStop();
+  })
+
+
+}
 
 handleSubmit = (values) => {  
   const { policyHolder_refNo , policyHolder} = this.state
@@ -389,8 +444,19 @@ handleSubmit = (values) => {
                              { vehicleDetails && vehicleDetails.vehicletype_id == '12' || vehicleDetails && vehicleDetails.vehicletype_id == '5' ? static_relation_model[nomineeDetails.relation_with] : 
                                 (vehicleDetails && vehicleDetails.vehicletype_id == 13 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ipa_relation_name  : 
                                 (vehicleDetails && vehicleDetails.vehicletype_id == 14 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.gsb_appointee_relation  :
-                                  vehicleDetails && vehicleDetails.vehicletype_id == 10 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ksb_label : null) ) }
+                                  vehicleDetails && vehicleDetails.vehicletype_id == 10 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.ksb_label : 
+                                  vehicleDetails && vehicleDetails.vehicletype_id == 21 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.gsb_nominee_relation :
+                                  vehicleDetails && vehicleDetails.vehicletype_id == 22 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.gsb_nominee_relation :
+                                  vehicleDetails && vehicleDetails.vehicletype_id == 20 && nomineeDetails && nomineeDetails.relation ? nomineeDetails.relation.gsb_nominee_relation :null) ) }
                           </FormGroup> 
+                      </Col>
+                  </Row>
+                  <Row>
+                      <Col sm={12} md={6}>
+                          <FormGroup>Gender:</FormGroup>
+                      </Col>
+                      <Col sm={12} md={6}>
+                          <FormGroup>{ nomineeDetails ?  nomineeDetails.gender && nomineeDetails.gender == 'm'? "Male":"Female" : null}</FormGroup>
                       </Col>
                   </Row>
   
@@ -400,7 +466,7 @@ handleSubmit = (values) => {
               <p></p>
           </Row>
         </div>
-
+    //console.log("check1",nomineeDetails.appointee_name,nomineeDetails.length);
         const apointeeData = 
         <div>
           <Row>
@@ -410,7 +476,7 @@ handleSubmit = (values) => {
                           <FormGroup>Name:</FormGroup>
                       </Col>
                       <Col sm={12} md={6}>
-                          <FormGroup>{nomineeDetails && nomineeDetails.appointee_name ? nomineeDetails.appointee_name : null}</FormGroup>
+                          <FormGroup>{nomineeDetails  ? typeof(nomineeDetails.appointee_name)!= "undefined" ? nomineeDetails.appointee_name : null:null}</FormGroup>
                       </Col>
                   </Row>
     
@@ -578,18 +644,152 @@ handleSubmit = (values) => {
                                                   </div>
                                                 </Collapsible>
                                               </div>
+                                      {vehicleDetails && vehicleDetails.vehicletype_id == '19' ?
+                                        <div className="rghtsideTrigr">
+                                        <Collapsible trigger="Proposer Details" >
+                                            <div className="listrghtsideTrigr">
+                                                <div>
+                                                    {/* <strong>Proposer Details:</strong>
+                                                    <br/> */}
+                                                    {/* <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Title:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>{}</FormGroup>
+                                                                </Col>
+                                                            </Row>
 
+                                                        </Col>
+                                                    </Row> */}
+                                                    <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup> Name:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>{policyHolder.first_name}</FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row>
+                                                    {/* <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Last Name:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup></FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row> */}
+                                                    <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Email:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>{policyHolder.email_id}</FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Date Of Birth:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>{moment(policyHolder.dob).format('DD-MM-yyy')}</FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Mobile Number:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>{policyHolder.mobile}</FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Gender:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>{policyHolder.gender == 'm' ? "male" : "female"}</FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row>
+                                                    {/* <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>GSTIN:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup></FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row> */}
+                                                    {/* <Row>
+                                                        <Col sm={12} md={6}>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup>Pan No:</FormGroup>
+                                                                </Col>
+                                                                <Col sm={12} md={6}>
+                                                                    <FormGroup></FormGroup>
+                                                                </Col>
+                                                            </Row>
+
+                                                        </Col>
+                                                    </Row> */}
+                                                    <Row>
+                                                        <p></p>
+                                                    </Row>
+                                                </div>
+                                            </div>
+                                        </Collapsible>
+                                    </div>
+
+                                      :
                                               <div className="rghtsideTrigr custom_widthadd">
                                                 <Collapsible trigger=" Member Details">
                                                 <strong>Member Details :</strong>
                                                   <div className="listrghtsideTrigr">{memberDetails}</div>
                                                   <strong>Nominee Details :</strong>
                                                   <div className="listrghtsideTrigr">{nomineeData}</div>
-                                                  {console.log("nomineeDetails.appointee_name ---------- ", nomineeDetails.appointee_name)}
+                                                  {/* {console.log("nomineeDetails.appointee_name ---------- ", nomineeDetails.appointee_name)} */}
                                                   {nomineeDetails  && nomineeLength > 0 && nomineeDetails.is_appointee == 1 && nomineeDetails.appointee_name != 'null' ? <strong>Appointee Details :</strong> : null }
                                                   {nomineeDetails && nomineeLength > 0 &&  nomineeDetails.is_appointee == 1 && nomineeDetails.appointee_name != 'null' ? <div className="listrghtsideTrigr">{apointeeData}</div> : null }
                                                 </Collapsible>
                                               </div>
+
+                                       }
 
                                               <div className="rghtsideTrigr m-b-40">
                                                 <Collapsible trigger=" Contact information">
@@ -618,6 +818,90 @@ handleSubmit = (values) => {
                                                   </div>
                                                 </Collapsible>
                                               </div>
+
+                                              {vehicleDetails && vehicleDetails.vehicletype_id == '19' ?
+                                                <div className="rghtsideTrigr m-b-30">
+                                                <Collapsible trigger="Communication Details" >
+                                                    <div className="listrghtsideTrigr">
+                                                        <div>
+                                                            {/* <strong>Communication Details:</strong>
+                                                            shop_building_name:"",
+                                                                block_no:"",
+                                                                street_name:"",
+                                                                plot_no:"",
+                                                                house_flat_no:"",
+                                                            <br/> */}
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <Row>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>House/Building Name:</FormGroup>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>{this.state.shop_building_name}</FormGroup>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                            
+                                                                <Col sm={12} md={6}>
+                                                                    <Row>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>Street Name:</FormGroup>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>{this.state.street_name}</FormGroup>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <Row>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>Plot No:</FormGroup>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>{this.state.plot_no}</FormGroup>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <Row>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>Pincode:</FormGroup>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>{this.state.policyHolder.pincode}</FormGroup>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                <Col sm={12} md={6}>
+                                                                    <Row>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>Pincode Area:</FormGroup>
+                                                                        </Col>
+                                                                        <Col sm={12} md={6}>
+                                                                            <FormGroup>{this.state.pincode_area}</FormGroup>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </Row>
+                                                            <Row>
+                                                                <p></p>
+                                                            </Row>
+                                                        </div>
+                                                    </div>
+                                                </Collapsible>    
+                                            </div>
+                                              
+                                              :null
+                                            }
 
                                               <Row>
                                                   <Col sm={12} md={6}>
@@ -662,11 +946,11 @@ handleSubmit = (values) => {
 
                                               <div className="d-flex justify-content-left resmb">
 
-                                                {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
+                                                {/* {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                   <div>
                                                   <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
                                                   &nbsp;&nbsp;&nbsp;&nbsp;
-                                                  </div> : null }
+                                                  </div> : null } */}
 
                                               {request_data.quote_id && values.gateway != "" ? 
                                                 <Button type="submit"

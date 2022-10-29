@@ -113,7 +113,7 @@ class OtherDetails_sukhsam extends Component {
             'page_name': `OtherDetails_Sookshma/${productId}`,
             'policy_holder_id': this.props.policy_holder_id,
             'Commercial_consideration':'5',
-            'financial_party': values.financial_party,
+            'financial_party': values.financial_party == '1' ? 1 : 0,
             'is_claim': 0,
             'financial_modgaged' : values.financial_modgaged,
             'financer_name': values.financer_name
@@ -124,7 +124,7 @@ class OtherDetails_sukhsam extends Component {
         axios.post('sookshama/previous-policy-details',
         formData
         ).then(res=>{       
-            
+            console.log(encryption.decrypt(res.data));
             this.props.setSmeOthersDetails({
                 
                 Commercial_consideration:'5',
@@ -143,13 +143,15 @@ class OtherDetails_sukhsam extends Component {
                 'page_name': `OtherDetails_Sookshma/${productId}`,
     
             }
+
+            console.log(post_data_new);
             formDataNew.append('enc_data',encryption.encrypt(JSON.stringify(post_data_new)))
                        
             axios.post('/sookshama/quote',
             formDataNew
             ).then(res=>{
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-                console.log("decryptRespQuote-------->",decryptResp)
+                console.log("decryptRespQuote-------->",decryptResp.data)
                 if(decryptResp.error == false && decryptResp.data && decryptResp.data.QuotationNo) {
                     actions.setSubmitting(false);
                     this.props.loadingStop();
@@ -223,6 +225,7 @@ class OtherDetails_sukhsam extends Component {
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
                         end_date:decryptResp.data.policyHolder.request_data.end_date,
+                        registration_type : decryptResp.data.policyHolder.sookshamainfo.policy_type, 
                         
                         policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
@@ -237,9 +240,10 @@ class OtherDetails_sukhsam extends Component {
                 if(decryptResp.data.policyHolder.step_no == 1 || decryptResp.data.policyHolder.step_no > 1){
 
                     let risk_arr = JSON.parse(decryptResp.data.policyHolder.sookshamainfo.risk_address);
-
+                    console.log("risk_arr", risk_arr);
                     this.props.setRiskData(
                         {
+                            policy_type : decryptResp.data.policyHolder.sookshamainfo.risk_location_type,
                             shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
@@ -247,6 +251,8 @@ class OtherDetails_sukhsam extends Component {
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
+                            multipleAddress : risk_arr.multipleAddress.length > 0 ? risk_arr.multipleAddress : [],
+                            multiple_fire_sum_insured : risk_arr.multiple_fire_sum_insured.length > 0 ? risk_arr.multiple_fire_sum_insured : [],
 
                             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
                             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
@@ -256,6 +262,7 @@ class OtherDetails_sukhsam extends Component {
                             stock_wip:decryptResp.data.policyHolder.sookshamainfo.stock_wip,
                             content_sum_insured: decryptResp.data.policyHolder.sookshamainfo.total_sum_insured,
                             stock_sum_insured : decryptResp.data.policyHolder.sookshamainfo.fire_stock_si
+                            
                         }
                     );
 
@@ -346,15 +353,17 @@ class OtherDetails_sukhsam extends Component {
             is_claim: this.props.is_claim,
             previous_policy_check: this.props.previous_policy_check,
             financial_modgaged : this.props.financial_modgaged,
-            financer_name: this.props.financer_name
-            
+            financer_name: this.props.financer_name,
+            multipleAddress : this.props.multipleAddress ? this.props.multipleAddress : [],
+            multiple_fire_sum_insured : this.props.multiple_fire_sum_insured ? this.props.multiple_fire_sum_insured : []
         });
         
         const {productId} = this.props.match.params  
         const {insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID,suggestions, vehicleDetails, RTO_location} = this.state
 
-        
+        var slNo = 1
+
         return (
             <>
                 <BaseComponent>
@@ -478,7 +487,13 @@ class OtherDetails_sukhsam extends Component {
                                                             <div className="brandhead">
                                                                 <h4 >COVERAGE DETAILS: &nbsp;&nbsp;&nbsp; SECTION 2 - BURGLARY</h4>
                                                             </div>
-                                                        </div>   
+                                                        </div>  
+                                                        <Row>
+                                                            <Col sm={6}>
+                                                                <h4 className="fs-18 m-b-30">Location {slNo}</h4>
+                                                            </Col>
+                                                        </Row> 
+
                                                         <Row>  
                                                             <Col sm={6} md={4} lg={4}>
                                                             <label>
@@ -532,6 +547,82 @@ class OtherDetails_sukhsam extends Component {
                                                                 </FormGroup>
                                                             </Col>                    
                                                         </Row>
+
+                                                        {
+                                                            values.multiple_fire_sum_insured.length > 0 && values.multiple_fire_sum_insured.map((dynamicValue, index) =>{
+                                                                console.log(dynamicValue);
+                                                                return(
+                                                                    <>
+                                                                        <Row>
+                                                                            <Col sm={6}>
+                                                                                <h4 className="fs-18 m-b-30">Location {index === 0 ?  slNo + 1: index+2}</h4>
+                                                                            </Col>
+                                                                        </Row>
+                                                                        <Row>  
+                                                                            <Col sm={6} md={4} lg={4}>
+                                                                                <label>
+                                                                                  Burglary: Contents Sum Insured
+                                                                                </label>
+                                                                            </Col>
+                                                                        
+                                                                            <Col sm={6} md={4} lg={4}>
+                                                                                <FormGroup>
+                                                                                <div className="insurerName">
+                                                                                    <Field
+                                                                                        name={`multiple_fire_sum_insured[${index}]Contents_Sum_Insured`}
+                                                                                        type="text"
+                                                                                        placeholder="Contents Sum Insured"
+                                                                                        autoComplete="off"
+                                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                        value = {dynamicValue.content_sum_insured ? Math.round(dynamicValue.content_sum_insured) : 0}     
+                                                                                        disabled={true}                                                                       
+                                                                                    />
+                                                                                    {
+                                                                                        errors.multiple_fire_sum_insured && 
+                                                                                        errors.multiple_fire_sum_insured[index] &&
+                                                                                        errors.multiple_fire_sum_insured[index].content_sum_insured &&
+                                                                                        touched.multiple_fire_sum_insured[index].content_sum_insured ? (
+                                                                                        <span className="errorMsg">{errors.multiple_fire_sum_insured[index].content_sum_insured}</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>
+                                                                            </Row>
+                                                                            <Row>
+                                                                                    <Col sm={6} md={4} lg={4}>
+                                                                                <label>
+                                                                                Burglary: Stocks Sum Insured
+                                                                                </label>
+                                                                                </Col>
+                                                                            <Col sm={6} md={4} lg={4}>
+                                                                                <FormGroup>
+                                                                                    <div className="insurerName">
+                                                                                    <Field
+                                                                                        name={`multiple_fire_sum_insured[${index}]Stocks_Sum_Insured`}
+                                                                                        type="text"
+                                                                                        placeholder="Stocks Sum Insured"
+                                                                                        autoComplete="off"
+                                                                                        onFocus={e => this.changePlaceHoldClassAdd(e)}
+                                                                                        onBlur={e => this.changePlaceHoldClassRemove(e)}
+                                                                                        value = {dynamicValue.stock_sum_insured ? Math.round(dynamicValue.stock_sum_insured) : 0}
+                                                                                        disabled={true}                                                                              
+                                                                                    />
+                                                                                    {
+                                                                                        errors.multiple_fire_sum_insured && 
+                                                                                        errors.multiple_fire_sum_insured[index] &&
+                                                                                        errors.multiple_fire_sum_insured[index].stock_sum_insured &&
+                                                                                        touched.multiple_fire_sum_insured[index].stock_sum_insured ? (
+                                                                                        <span className="errorMsg">{errors.multiple_fire_sum_insured[index].stock_sum_insured}</span>
+                                                                                        ) : null}
+                                                                                    </div>
+                                                                                </FormGroup>
+                                                                            </Col>                    
+                                                                        </Row> 
+                                                                    </>
+                                                                )
+                                                            })
+                                                        }
                                                     </Col>
                                                 </Row>
 
@@ -591,6 +682,8 @@ const mapStateToProps = state => {
 
       content_sum_insured: state.sukhsam.content_sum_insured,
       stock_sum_insured: state.sukhsam.stock_sum_insured,
+      multipleAddress : state.sukhsam.multipleAddress,
+      multiple_fire_sum_insured : state.sukhsam.multiple_fire_sum_insured,
 
       financial_party: state.sukhsam.financial_party,
       is_claim: state.sukhsam.is_claim,

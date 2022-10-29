@@ -913,8 +913,8 @@ class VehicleDetailsGCV extends Component {
         let newInitialValues = Object.assign(initialValue, {
             registration_date: motorInsurance && motorInsurance.registration_date ? new Date(motorInsurance.registration_date) : "",
             location_id: motorInsurance && motorInsurance.location_id && location_reset_flag == 0 ? motorInsurance.location_id : "",
-            //previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
-            //previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
+            previous_start_date: previousPolicy && previousPolicy.start_date ? new Date(previousPolicy.start_date) : "",
+            previous_end_date: previousPolicy && previousPolicy.end_date ? new Date(previousPolicy.end_date) : "",
             previous_policy_name: previousPolicy && previousPolicy.name ? previousPolicy.name : "",
             insurance_company_id: previousPolicy && previousPolicy.insurancecompany && previousPolicy.insurancecompany.Id ? previousPolicy.insurancecompany.Id : "",
             previous_city: previousPolicy && previousPolicy.city ? previousPolicy.city : "",
@@ -1340,8 +1340,8 @@ class VehicleDetailsGCV extends Component {
                                                                                     <FormGroup>
                                                                                         <DatePicker
                                                                                             name="previous_start_date"
-                                                                                            minDate={new Date(minDate)}
-                                                                                            maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                                            //minDate={new Date(minDate)}
+                                                                                           // maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                                             dateFormat="dd MMM yyyy"
                                                                                             placeholderText={phrases['PPSD']}
                                                                                             peekPreviousMonth

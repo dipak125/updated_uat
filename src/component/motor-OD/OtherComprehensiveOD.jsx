@@ -19,7 +19,7 @@ import swal from 'sweetalert';
 import moment from "moment";
 import {  validRegistrationNumber,compareStartEndYear } from "../../shared/validationFunctions";
 import {  userTypes } from "../../shared/staticValues";
-
+import {vahanValidation} from "../../shared/reUseFunctions";
 
 let translation = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : []
 
@@ -55,7 +55,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part:Yup.string().required('RequiredField')
+    chasis_no_last_part:Yup.string()
     .matches(/^([a-zA-Z0-9]*)$/, function() {
         return "InvalidNumber"
     })
@@ -66,7 +66,7 @@ const ComprehensiveValidation = Yup.object().shape({
         return "ChasisLastDigit"
     }),
 
-    engine_no:Yup.string().required('EngineRequired')
+    engine_no:Yup.string()
     .matches(/^[a-zA-Z0-9]*$/, function() {
         return "InvalidEngineNumber"
     })
@@ -77,7 +77,7 @@ const ComprehensiveValidation = Yup.object().shape({
         return "EngineMax"
     }),
 
-    chasis_no:Yup.string().required('ChasisRequired')
+    chasis_no:Yup.string()
     .matches(/^[a-zA-Z0-9]*$/, function() {
         return "InvalidChasisNumber"
     })
@@ -320,6 +320,10 @@ class OtherComprehensiveOD extends Component {
             chasis_no: "",
             chasiNo:'',
             engineNo:'',
+	     vahan_chasis_no:"",
+            vahan_engine_no:"",
+            vahan_message:"",
+            error:false,
             selectFlag: '',
             initialValue: {
                 registration_no: "",
@@ -339,7 +343,8 @@ class OtherComprehensiveOD extends Component {
             ncbDiscount: 0,
             no_of_claim:4,
             policy_for:1,
-            tyre_rim_array : []
+            tyre_rim_array : [],
+            vahan_verify:'0'
         };
     }
 
@@ -408,6 +413,7 @@ class OtherComprehensiveOD extends Component {
                 console.log("decrypt--fetchData-- ", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+                 let menumaster_id= decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster_id : ""
                 let values = []
                 let add_more_coverage = motorInsurance && motorInsurance.add_more_coverage != null ? motorInsurance.add_more_coverage.split(",") : ['B00015']
                 add_more_coverage = add_more_coverage.flat()
@@ -427,13 +433,21 @@ class OtherComprehensiveOD extends Component {
                 values.B00003_description = add_more_coverage_request_array.B00003 ? add_more_coverage_request_array.B00003.description : ""
 
                 this.setState({
-                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,sliderVal,
+                    motorInsurance, add_more_coverage,request_data,geographical_extension,add_more_coverage_request_array,sliderVal,menumaster_id,
                     showCNG: motorInsurance.cng_kit == 1 ? true : false,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',
                     vehicleRegDate
                 })
                 this.props.loadingStop();
+                if(motorInsurance && motorInsurance.chasis_no_last_part) 
+                {
+                    this.setState({
+                        vahan_flag:1,
+                        vahan_engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
+                        vahan_chasis_no:motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
+                    })
+                }
                 this.fullQuote(values)
             })
             .catch(err => {
@@ -460,13 +474,20 @@ class OtherComprehensiveOD extends Component {
           });
       };
 
-    getVahanDetails = async(values, setFieldTouched, setFieldValue, errors) => {
+    getVahanDetails = async(Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) => {
+        if(values.chasis_no_last_part.length<5)
+        {
+             swal("Please enter 5 digit chassis no")
+ 
+        }
+       const {menumaster_id}=this.state
 
         const formData = new FormData();
         if(values.newRegistrationNo == "NEW") {
             formData.append("regnNo", values.newRegistrationNo);
             setFieldTouched('registration_no');
             setFieldValue('registration_no', values.newRegistrationNo);
+            this.setState({vahan_verify:"1"});
         }
         else {
             formData.append("regnNo", values.registration_no);
@@ -474,6 +495,7 @@ class OtherComprehensiveOD extends Component {
 
         formData.append("chasiNo", values.chasis_no_last_part);
         formData.append("policy_holder_id", this.state.request_data.policyholder_id);
+        formData.append("menumaster_id",menumaster_id);
         
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
@@ -484,13 +506,32 @@ class OtherComprehensiveOD extends Component {
                 await axios
                 .post(`/getVahanDetails`,formData)
                 .then((res) => {
+                    console.log("data1",res.data)
+                    let eng = res.data.data.engineNo && res.data.data.engineNo ? res.data.data.engineNo : Engine_no;
+                        let chas = res.data.data.chasiNo && res.data.data.chasiNo ? res.data.data.chasiNo :Chasis_no
+                        setFieldValue('engine_no', eng)
+                        setFieldValue('chasis_no', chas)
                     this.setState({
                     vahanDetails: res.data,
-                    vahanVerify:  true 
-                });
-                if(this.state.vahanDetails.data[0].chasiNo){
-                    this.setState({chasiNo: this.state.vahanDetails.data[0].chasiNo})
-                }
+                    vahanVerify: true ,
+                    error:res.data.error,
+                    vahan_engine_no: res.data.data.engineNo,
+                    vahan_chasis_no:res.data.data.chasiNo,
+                    vahan_message:res.data.msg
+                    });
+                    if(res.data.error==false)
+                    {
+                        this.setState({ vahan_verify:"1"
+                           });
+                    }
+                    else{
+                        this.setState({ vahan_verify:"0"
+                    });
+                    swal(res.data.msg)
+                    }
+                    if(this.state.vahanDetails.data[0].chasiNo){
+                        this.setState({chasiNo: this.state.vahanDetails.data[0].chasiNo})
+                    }
 
                 if(this.state.vahanDetails.data[0].engineNo){
                     this.setState({engineNo: this.state.vahanDetails.data[0].engineNo})
@@ -499,9 +540,9 @@ class OtherComprehensiveOD extends Component {
                 setFieldTouched('vahanVerify')
                 setFieldValue('vahanVerify', true)
                 setFieldTouched('engine_no')
-                setFieldValue('engine_no', this.state.engineNo)
+                //setFieldValue('engine_no', this.state.engineNo)
                 setFieldTouched('chasis_no')
-                setFieldValue('chasis_no', this.state.chasiNo)
+               // setFieldValue('chasis_no', this.state.chasiNo)
 
                 this.props.loadingStop();
                 })
@@ -695,6 +736,10 @@ class OtherComprehensiveOD extends Component {
                         serverResponse: []
                     });
                 }
+                else if( res.data && res.data.ValidateResult && res.data.ValidateResult.code && res.data.ValidateResult.code == "VahanValidation" && res.data.ValidateResult.message)
+                {
+                     swal(res.data.ValidateResult.message)
+                }
                 else {
                     this.setState({
                       fulQuoteResp: [],add_more_coverage,
@@ -714,8 +759,22 @@ class OtherComprehensiveOD extends Component {
 
 
     handleSubmit = (values) => {
+        if(values.engine_no && values.chasis_no)
+        {
+
         const { productId } = this.props.match.params
-        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, geographical_extension } = this.state
+        const  vahan_response=vahanValidation(this.state,values);
+        console.log("vahanValidation",vahan_response)
+        const { motorInsurance, PolicyArray, sliderVal, add_more_coverage, geographical_extension,error,vahan_chasis_no,vahan_engine_no,vahan_message,vahan_flag } = this.state
+        console.log("check12",motorInsurance.policy_type == 1,motorInsurance.policy_type,typeof(motorInsurance.policy_type))
+        if(error === 1)
+        {
+            swal(vahan_message)
+        }
+       else{
+        if( vahan_response &&  vahan_response.error==false)
+        {
+            
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let coverage_data = {}
         let total_idv = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].SumInsured) : 0
@@ -803,6 +862,10 @@ class OtherComprehensiveOD extends Component {
             if (decryptResp.error == false) {
                 this.props.history.push(`/Additional_detailsOD/${productId}`);
             }
+            else
+            {
+                swal(decryptResp.msg)
+            }
         })
         .catch(err => {
             // handle error
@@ -810,8 +873,18 @@ class OtherComprehensiveOD extends Component {
         })
         }
         else{
-            swal("chasis no mismatch")
+            swal("Chassis no mismatch")
         }
+    }else
+    {
+        swal( vahan_response.msg)
+    }
+    }
+}else {
+    swal("chassis no and engine are required")
+}
+	
+   
     }
 
     onRowSelect = (value, isSelect, setFieldTouched, setFieldValue, values) => {
@@ -1059,7 +1132,7 @@ class OtherComprehensiveOD extends Component {
 
     render() {
         const {validation_error, policy_for,vahanDetails,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, geographical_extension,ncbDiscount,
-            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array} = this.state
+            moreCoverage, sliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage, add_more_coverage_request_array,vahan_chasis_no,vahan_engine_no} = this.state
         const {productId} = this.props.match.params 
         let defaultSliderValue = PolicyArray.length > 0 ? Math.round(PolicyArray[0].PolicyRiskList[0].IDV_Suggested) : 0
         let sliderValue = sliderVal
@@ -1067,6 +1140,8 @@ class OtherComprehensiveOD extends Component {
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
         let maxIDV = PolicyArray.length > 0 ? Math.floor(max_IDV_suggested) : null
+        let  Engine_no=motorInsurance.engine_no ? motorInsurance.engine_no :  ""
+        let Chasis_no=motorInsurance.chasis_no ? motorInsurance.chasis_no :  ""
         if(Number.isInteger(min_IDV_suggested) == false ) {
             minIDV = PolicyArray.length > 0 ? Math.floor(PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested) : null           
             minIDV = minIDV + 1;
@@ -1093,10 +1168,10 @@ class OtherComprehensiveOD extends Component {
         if(selectFlag == '1') {
              newInitialValues = Object.assign(initialValue, {
                 registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
                 vahanVerify: vahanVerify,
                 newRegistrationNo: motorInsurance.registration_no ? motorInsurance.registration_no : "",
                 B00015: "B00015",
@@ -1117,12 +1192,13 @@ class OtherComprehensiveOD extends Component {
         else {
             newInitialValues = Object.assign(initialValue, {
                 registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
-                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
+                chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
                 chasis_no_last_part: motorInsurance.chasis_no_last_part ? motorInsurance.chasis_no_last_part : "",
                 add_more_coverage: motorInsurance.add_more_coverage ? motorInsurance.add_more_coverage : "",
-                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : (engine_no ? engine_no : ""),
+                engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
                 vahanVerify: vahanVerify,
-                newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
+               // newRegistrationNo: localStorage.getItem('registration_number') == "NEW" ? localStorage.getItem('registration_number') : "", 
+               newRegistrationNo: motorInsurance.registration_no ? motorInsurance.registration_no : "",
                 PA_flag: '0',
                 PA_Cover: "",
                 PA_cover_flag: motorInsurance && motorInsurance.pa_flag ? motorInsurance.pa_flag : '0',
@@ -1368,10 +1444,11 @@ class OtherComprehensiveOD extends Component {
                                                 <Col sm={12} md={2} lg={2}>
                                                     <FormGroup>
                                                     
-                                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
+                                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                                         {errors.vahanVerify ? (
                                                                 <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                                             ) : null}
+                                                             {values.puc == '1' && this.state.vahan_verify!="1"? <span className="errorMsg">{"Please verify"}</span>:null}
                                                     </FormGroup>
                                                 </Col>
                                         </Row>
@@ -1907,7 +1984,7 @@ class OtherComprehensiveOD extends Component {
                                                     { serverResponse && serverResponse != "" ? (serverResponse.message ? 
                                                     <Button className={`proceedBtn`} type="submit"  >
                                                         {phrases['Recalculate']}
-                                                    </Button> : (values.puc == '1' ?  <Button className={`proceedBtn`} type="submit"  >
+                                                    </Button> : (values.puc == '1'  && this.state.vahan_verify=="1"?  <Button className={`proceedBtn`} type="submit"  >
                                                         {phrases['Continue']}
                                                     </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
                                                         {phrases['Recalculate']}

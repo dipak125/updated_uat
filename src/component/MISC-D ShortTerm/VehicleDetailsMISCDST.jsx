@@ -1251,8 +1251,8 @@ class VehicleDetailsMISCD extends Component {
                                                                                     <FormGroup>
                                                                                         <DatePicker
                                                                                             name="previous_start_date"
-                                                                                            minDate={new Date(minDate)}
-                                                                                            maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
+                                                                                           // minDate={new Date(minDate)}
+                                                                                           // maxDate={values.previous_policy_name == '3' ? new Date(maxDatePYPST) : new Date(maxDatePYP)}
                                                                                             dateFormat="dd MMM yyyy"
                                                                                             placeholderText={phrases['PPSD']}
                                                                                             peekPreviousMonth

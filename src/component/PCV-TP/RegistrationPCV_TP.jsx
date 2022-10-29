@@ -214,7 +214,7 @@ class RegistrationPCV_TP extends Component {
                 reg_number_part_three: values.reg_number_part_three,
                 reg_number_part_four: values.reg_number_part_four
             }
-            regNumber = values.reg_number_part_one + values.reg_number_part_two + values.reg_number_part_three + values.reg_number_part_four
+            regNumber = `${values.reg_number_part_one} ${values.reg_number_part_two} ${values.reg_number_part_three} ${values.reg_number_part_four}`
         }
         else {
             registration_part_numbers = {
@@ -282,7 +282,7 @@ class RegistrationPCV_TP extends Component {
                 }
             }
 
-           // console.log('post_data', post_data)
+            console.log('post_data', post_data)
             formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
 
             this.props.loadingStart();
@@ -666,9 +666,12 @@ class RegistrationPCV_TP extends Component {
                                                                         // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                                         >
                                                                             <option value="">{phrases['SelectProduct']}</option>
-                                                                            {subVehicleList.map((subVehicle, qIndex) => (
+                                                                            {/* {subVehicleList.map((subVehicle, qIndex) => (
                                                                                 <option value={subVehicle.subclass_id} key={qIndex}
                                                                                 >{subVehicle.subclass_title}</option>
+                                                                            ))} */}
+                                                                            {subVehicleList.map((subVehicle, qIndex) => ( 
+                                                                                <option hidden = {subVehicle.status == 1 ? false : true } value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
                                                                             ))}
                                                                         </Field>
                                                                         {errors.subclass_id && touched.subclass_id ? (

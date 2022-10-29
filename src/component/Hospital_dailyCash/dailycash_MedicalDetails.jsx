@@ -50,6 +50,8 @@ class dailycash_MedicalDetails extends Component {
         question_answer: [],
         flag: false,
         selected_answer:[],
+        checkbox: "",
+        checkboxValid: false,
         selected_question:[],
         validation_message:"",
         show:false,
@@ -71,6 +73,17 @@ class dailycash_MedicalDetails extends Component {
     buy_policy = (productId) => {
         this.props.history.push(`/dailycash_Health/${productId}`);
     } 
+
+    updateCheckbox = ({ name, checked }) => {
+        this.setState(
+          (prev) => ({
+            checkbox: checked,
+            selectedCheckBox: checked
+              ? prev.selectedCheckBox + 1
+              : prev.selectedCheckBox - 1
+          }),
+        );
+      };
 
     handleClose=()=>{
         this.setState({ show: false });
@@ -162,7 +175,7 @@ class dailycash_MedicalDetails extends Component {
                     //formData.append(familyMembers[i].value);
                 }
                 if(cnt==0){
-                    // swal("Please select a family member");
+                    //swal("Please select a family member");
                 }
            }
            
@@ -186,11 +199,13 @@ class dailycash_MedicalDetails extends Component {
         const questionClass = document.getElementsByClassName('questionClass');
         let count = 0
         let checkFamily = []
+        let familydata = []
         let selectCheck = []
         for(let i=0;i<questionClass.length;i++){
             if(questionClass[i].checked){  
                let classId = questionClass[i].name[questionClass[i].name.length-1]
                let familyMembers=`familyMembers${classId}`
+               //familydata.push(familyMembers)
                let familyMembersClass = document.getElementsByClassName(familyMembers);
                 if(questionClass[i].value == 'y'){
                     selectCheck.push(questionClass[i].value)       
@@ -198,11 +213,15 @@ class dailycash_MedicalDetails extends Component {
                for(let j=0;j<familyMembersClass.length;j++){
                     if(familyMembersClass[j].checked && questionClass[i].value == 'y'){                        
                         checkFamily.push(true)
-                         break
+                        console.log(familyMembersClass[i]);
+                        break
                     }          
                }  
                count++;                   
-            }           
+            }//else {
+            //     swal("Please select a family member");
+            //     return
+            // }           
         }
 
         let qlength = this.state.questionList ? this.state.questionList.length:0;
@@ -212,10 +231,19 @@ class dailycash_MedicalDetails extends Component {
         }    
         else {
             let q = questionClass.length/2
-            //console.log("selectCheck------------- ", selectCheck) 
-            //console.log("checkFamily------------- ", checkFamily)
-            //console.log("checkFamily----q--------- ", q)
-            //console.log("count----q--------- ", count)
+            console.log("selectCheck------------- ", selectCheck) 
+            console.log("checkFamily------------- ", this.state.selectedCheckBox)
+            console.log("checkFamily----q--------- ", q)
+            console.log("count----q--------- ", checkFamily)
+            console.log(this.state.checkbox);
+            if(selectCheck.length > 0){
+                if(!this.state.checkbox){
+                    swal('Please select family members');
+                    return false
+                }
+               
+            }
+            
             
             if(count == q){
                 if(this.state.isForwarded){
@@ -223,7 +251,7 @@ class dailycash_MedicalDetails extends Component {
                 }            
             }
             else if(count != q){
-                swal('Please select family members');        
+                swal('Please answer all of the questions');   //swal('Please select family members'); 
             }
             else{
                 swal('Please answer all of the questions');
@@ -454,13 +482,14 @@ class dailycash_MedicalDetails extends Component {
         let initialValues = {}
         let selectedQuestion = [];
         //initialValues[`smoker_flag`]=0
+        
 
         if(questionList && flag && questionList.length > 0) {
             questionList.map((question, qIndex) => {
             if(question_answer && question_answer.length > 0) {
                 question_answer.map((answer, aIndex) => {
                 initialValues[`question_id_${answer.question_id}`] = answer.response;
-                if(answer.question_id == 11)
+                if(answer.response == 'y' && answer.question_id == 11) //if(answer.question_id == 11)
                 {
                     initialValues[`smoker_flag`] = 1;
                     initialValues['smoker_flag_status'] = answer.question_value;
@@ -606,7 +635,9 @@ class dailycash_MedicalDetails extends Component {
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             checked = {this.state.selected_family_members.includes(`${question.id}~${resource.id}`)}
                                            // checked={(values[`question_id_${question.id}`] == 'y' && values[`family_members_${question.id}`] && values[`family_members_${question.id}`].includes(resource.id)) ? 'checked' : ''}                                            
+                                            //checked={(values[`question_id_${question.id}`] == 'y' && this.state.selected_family_members.includes(`${question.id}~${resource.id}`)) ? 'checked' : ''}                                            
                                             onClick = {(e) => {
+                                                this.updateCheckbox(e.target)
                                                 setFieldValue(`family_members.${question.id}.${index}.${resource.relation_with}`, e.target.value);
                                                 //alert(e.target.checked)
                                                // e.target.checked  ? e.target.checked = '':e.target.checked='checked'
@@ -633,6 +664,7 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')} 
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                this.updateCheckbox(e.target)
                                                 //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
                                                 if(question.id == '11')
                                                 {
@@ -650,10 +682,11 @@ class dailycash_MedicalDetails extends Component {
                                             className={`familyMembers${question.id}`}
                                             name={`family_members.${question.id}.${index}.${resource.relation_with}`}
                                             value={resource.id} id={`family_members.${question.id}.${index}.${resource.relation_with}`}
-                                            checked = {this.state.selected_family_members.includes(`${question.id}~${resource.id}`)}
+                                            //checked = {this.state.selected_family_members.includes(`${question.id}~${resource.id}`)}
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                this.updateCheckbox(e.target)
                                                // this.setState({true_family_member_id:values[`family_members_${question.id}`]})
                                                 if(question.id == '11')
                                                 {
@@ -679,6 +712,7 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                this.updateCheckbox(e.target)
                                                 //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
                                                 if(question.id == '11')
                                                 {
@@ -699,6 +733,7 @@ class dailycash_MedicalDetails extends Component {
                                             //checked = {values[`family_members_${question.id}`] && values[`family_members_${question.id}`].length && values[`family_members_${question.id}`].indexOf(resource.id) && (values[`question_id_${question.id}`]=='y')}
                                             onClick = {(e) => {
                                                 this.setAnswer(e,question.id)
+                                                this.updateCheckbox(e.target)
                                                 //this.setState({true_family_member_id:values[`family_members_${question.id}`]})
                                                 if(question.id == '11')
                                                 {
@@ -758,7 +793,7 @@ class dailycash_MedicalDetails extends Component {
                                 </FormGroup>
                                </div>:null}
                                 <div className="regisBox medpd">
-                                    <h3 className="medihead">No Medical Test upto the Age of 55 for People with No Medical History </h3>
+                                    <h3 className="medihead">No Medical Test upto the Age of 45 for People with No Medical History </h3>
                                 </div>
                             </Col>
                         </Row>

@@ -89,7 +89,16 @@ class MotorSummery extends Component {
         e.target.value.length === 0 && element.classList.remove('active');	
     }	
     additionalDetails = (productId) => {	
-        this.props.history.push(`/AdditionalDetails_GCV/${productId}`);	
+        const{renewalinfo}=this.state
+       
+        if(renewalinfo && renewalinfo.policy_type && renewalinfo.policy_type === 1)
+        {
+            this.props.history.push(`/MotorCoverages`);
+        }
+        else if(renewalinfo && renewalinfo.policy_type && renewalinfo.policy_type !== 1)
+        {
+            this.props.history.push(`/Renewal`);
+        }	
     }
     getPolicyHolderDetails = () => {
         let policyHolder_id = 0
@@ -241,12 +250,37 @@ class MotorSummery extends Component {
           .catch((err) => {	
             this.props.loadingStop();	
           });	
-      };	
+      };
+      
+      getRenewal =()=>{
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
+        axios.get(`renewal/policy-details/${policyHolder_id}`)	
+        .then(res => {	
+            // let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            let decryptResp = res.data
+            console.log("decrypt", decryptResp)	
+            
+            let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];	
+            this.setState({
+                ...this.state,
+                renewalinfo:policyHolder.renewalinfo && policyHolder.renewalinfo
+            })
+           
+           
+            this.props.loadingStop();
+            // this.getAccessToken(motorInsurance)       	
+        })	
+        .catch(err => {	
+            // handle error	
+            this.props.loadingStop();	
+        })	
+     }
     	
     componentDidMount() {	
         // this.fetchData()	
         this.fetchRelationships()	
         this.getPolicyHolderDetails();
+        this.getRenewal()
     }	
     render() {	
         const { policyHolder, show, paymentgateway, motorInsurance, error, error1, paymentStatus, bcMaster,policyCoverage,	
@@ -444,7 +478,7 @@ class MotorSummery extends Component {
                                                                                             </Row>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
-                                                                                                <FormGroup>{ menumaster ? phrases[vehicleBrand[menumaster]] : null}:</FormGroup>
+                                                                                                <FormGroup>{phrases['Brand']}</FormGroup>
                                                                                                 </Col>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclebrand && vehicleDetails.vehiclebrand.name ? vehicleDetails.vehiclebrand.name : ""}</FormGroup>	
@@ -452,7 +486,7 @@ class MotorSummery extends Component {
                                                                                             </Row>	
                                                                                             <Row>	
                                                                                                 <Col sm={12} md={6}>	
-                                                                                                    <FormGroup>{ menumaster ? phrases[vehicleModel[menumaster]] : null}</FormGroup>	
+                                                                                                    <FormGroup>{ phrases['Model']}</FormGroup>	
                                                                                                 </Col>	
                                                                                                 <Col sm={12} md={6}>	
                                                                                                     <FormGroup>{vehicleDetails && vehicleDetails.vehiclemodel && vehicleDetails.vehiclemodel.description ? vehicleDetails.vehiclemodel.description+" "+vehicleDetails.varientmodel.varient : ""}</FormGroup>	
@@ -740,7 +774,7 @@ class MotorSummery extends Component {
                                                             </Row>	
                                                             <Row>&nbsp;</Row>	
                                                             <div className="d-flex justify-content-left resmb">	
-                                                                {/* <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>	 */}
+                                                                <Button className="backBtn" type="button" onClick={this.additionalDetails.bind(this, productId)}>{phrases['Back']}</Button>	
                                                             {bcMaster && bcMaster.eligible_for_payment_link == 1 ?
                                                                 <div>
                                                                 <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>	

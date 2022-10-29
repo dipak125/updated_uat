@@ -328,7 +328,9 @@ class TwoWheelerOtherComprehensive extends Component {
     
                         let totOD = {}
                         totOD.PolicyBenefitList = [{
-                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - ncbAmt,
+                            BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium'])  - ncbAmt <=100 ? 100
+                             : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']) - ncbAmt,
+                           
                             // BeforeVatPremium : Math.round(policyCoverage[0]['PolicyBenefitList'][0]['BeforeVatPremium']),
                             ProductElementCode : 'TOTALOD'
                         }]
@@ -383,6 +385,10 @@ class TwoWheelerOtherComprehensive extends Component {
                         validation_error: validationErrors,
                         serverResponse: []
                     });
+                }
+                else if( res.data && res.data.ValidateResult && res.data.ValidateResult.code && res.data.ValidateResult.code == "VahanValidation" && res.data.ValidateResult.message)
+                {
+                     swal(res.data.ValidateResult.message)
                 }
                 else {
                     this.setState({
@@ -713,7 +719,7 @@ class TwoWheelerOtherComprehensive extends Component {
         newInnitialArray.PA_Cover = PA_Cover
         newInnitialArray.tyre_cover_flag = tyre_cover_flag
         let newInitialValues = Object.assign(initialValue, newInnitialArray );
-
+        console.log("cove1",policyCoverage)
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.PolicyBenefitList ? coverage.PolicyBenefitList.map((benefit, bIndex) => (
@@ -824,7 +830,7 @@ class TwoWheelerOtherComprehensive extends Component {
                                         validationSchema={ComprehensiveValidation}
                                         >
                                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-// console.log("values ---------------- ", values)
+                                        console.log("values ---------------- ", values)
                                             return (
                                                 <Form>
                                                     <Row>

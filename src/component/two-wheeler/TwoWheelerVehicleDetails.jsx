@@ -846,11 +846,14 @@ class TwoWheelerVehicleDetails extends Component {
         const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID, suggestions, vehicleDetails, RTO_location, maxRegnDate, request_data, fastlane ,fastlanelog,is_fieldDisabled} = this.state
 
+            let default_start = new Date()
+            let defaut_end = moment(moment(default_start).add(12, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
+
         console.log("fast", fastlane)
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
-        let new_policy_duration = request_data && request_data.duration ? request_data.duration : ""
-        let pol_start_date = request_data && request_data.start_date ? new Date(request_data.start_date) : ""
-        let pol_end_date = request_data && request_data.end_date ? new Date(request_data.end_date) : ""
+        let new_policy_duration = request_data && request_data.duration ? request_data.duration : "12"
+        let pol_start_date = request_data && request_data.start_date ? new Date(request_data.start_date) : default_start
+        let pol_end_date = request_data && request_data.end_date ? new Date(request_data.end_date) : new Date(defaut_end)
         let policy_type_id = motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
         let lapse_duration = motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : ""
 
@@ -872,7 +875,7 @@ class TwoWheelerVehicleDetails extends Component {
             // puc: motorInsurance && motorInsurance.puc ? motorInsurance.puc : "",
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
             // new_policy_duration: policy_type_id == '1' ? '12' : new_policy_duration,
-            new_policy_duration: request_data && request_data.duration ? request_data.duration : "",
+            new_policy_duration: request_data && request_data.duration ? request_data.duration : "12",
             pol_start_date: (policy_type_id == '1' || policy_type_id == '3') ? addDays(new Date(), 1) : pol_start_date,
             // pol_end_date: policy_type_id == '1' ? moment().add(12, 'month') : pol_end_date,
             pol_end_date: pol_end_date ? pol_end_date : ""
@@ -962,14 +965,14 @@ class TwoWheelerVehicleDetails extends Component {
                                                                             <FormGroup>
                                                                                 <DatePicker
                                                                                     name="registration_date"
-                                                                                    minDate={new Date(minRegnDate)}
-                                                                                    maxDate={new Date(maxRegnDate)}
+                                                                                    minDate={values.policy_type_id == '1' ? new Date() :new Date(minRegnDate)}
+                                                                                    maxDate={values.policy_type_id == '1' ? new Date() :new Date(maxRegnDate)}
                                                                                     autoComplete="off"
                                                                                     dateFormat="dd MMM yyyy"
                                                                                     placeholderText={phrases['RegDate']}
                                                                                     peekPreviousMonth
                                                                                     peekPreviousYear
-                                                                                    disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                                                    //disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                                     showMonthDropdown
                                                                                     showYearDropdown
                                                                                     dropdownMode="select"
@@ -989,7 +992,7 @@ class TwoWheelerVehicleDetails extends Component {
                                                                                                 setFieldValue('pol_start_date', addDays(new Date(),1) );
                                                                                         }
                                                                                         if(ageObj.whatIsCurrentMonth(values.registration_date) <= 5  ){
-                                                                                                let date1 = addDays(new Date(),1)
+                                                                                                let date1 = new Date();
                                                                                                 let date2 = moment(moment(date1).add(12, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
                                                                                                 setFieldValue('pol_start_date', date1 ); 
                                                                                                 setFieldValue('new_policy_duration', 12 );         

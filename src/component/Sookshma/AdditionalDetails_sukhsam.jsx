@@ -58,9 +58,12 @@ const initialValue = {
 // VALIDATION :-----------------------
 const vehicleRegistrationValidation = Yup.object().shape({
     salutation_id: Yup.string().required('Title is required').nullable(),
-    first_name: Yup.string().required('First Name is required').min(3, function() {return "First name must be 3 characters"}).max(40,function() {
+    first_name: Yup.string().required('First Name is required')
+    .min(3, function() {return "First name must be 3 characters"})
+    .max(40,function() {
         return "Full name must be maximum 40 characters"
-    }).matches(/^[A-Za-z]+$/, function() {return "Please enter valid first name"}).nullable(),
+    })
+    .matches(/^[a-zA-Z]+([\s]?[a-zA-Z]+)$/, function() {return "Please enter valid first name"}).nullable(),
     // last_name: Yup.string().notRequired('Last Name is required').min(1, function() {return "Last name must be 1 characters"}).max(40, function() {return "Full name must be maximum 40 characters"})
     // .matches(/^[A-Za-z]+$/, function() {
     //     return "Please enter valid last name"
@@ -534,6 +537,7 @@ class AdditionalDetails_sukhsam extends Component {
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
                         end_date:decryptResp.data.policyHolder.request_data.end_date,
+                        registration_type : decryptResp.data.policyHolder.sookshamainfo.policy_type,
                         
                         policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
@@ -550,6 +554,7 @@ class AdditionalDetails_sukhsam extends Component {
 
                     this.props.setRiskData(
                         {
+                            policy_type : decryptResp.data.policyHolder.sookshamainfo.risk_location_type,
                             shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
@@ -557,6 +562,7 @@ class AdditionalDetails_sukhsam extends Component {
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
+                            multipleAddress : risk_arr.multipleAddress.length > 0 ? risk_arr.multipleAddress : [],
 
                             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
                             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
@@ -934,7 +940,6 @@ class AdditionalDetails_sukhsam extends Component {
                                                             onBlur={e => this.changePlaceHoldClassRemove(e)}
                                                             onKeyUp={e=> this.fetchAreadetails(e,setFieldValue,setFieldTouched)}
                                                             value={values.pincode}
-                                                            maxLength="6"
                                                            
                                                         />
                                                         {errors.pincode && touched.pincode ? (

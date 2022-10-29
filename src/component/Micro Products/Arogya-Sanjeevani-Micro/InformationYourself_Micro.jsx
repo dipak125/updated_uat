@@ -46,12 +46,19 @@ const initialValues = {
     insureList: "",
     occupation_id: "",
     occupation_description: "",
+    refrence_no:"",
 
 }
 
 
 
 const vehicleInspectionValidation = Yup.object().shape({
+    refrence_no: Yup.string()
+                 .when('refrence_no_check',{
+                    is: refrence_no_check => refrence_no_check ==1,
+                    then: Yup.string().required("Required field"),
+                    othewise: Yup.string()
+                 }),
     gender: Yup.string().required('Please select gender'),
     occupation_id: Yup.string().required("Please select occupation type"),
     occupation_description: Yup.string()
@@ -917,6 +924,7 @@ class InformationYourself_Micro extends Component {
             let user_id = ""
             if (user_data) {
                 user_id = JSON.parse(encryption.decrypt(user_data.user));
+                console.log("test",user_id)
             }
 
             post_data['menumaster_id'] = menumaster_id
@@ -927,6 +935,11 @@ class InformationYourself_Micro extends Component {
             post_data['product_id'] = this.props.match.params.productId
             post_data['bc_agent_id'] = user_id.master_user_id
             post_data['bcmaster_id'] = user_id.bc_master_id
+            if(this.state.user_id1==12){
+                post_data['refrence_no'] = values.refrence_no
+            }
+            
+            
             let arr_date = []
             for (let i = 0; i < dob.length; i++) {
                 let date_of_birth = dob[i] ? dob[i] : familyMembers[i].dob;
@@ -1108,18 +1121,23 @@ class InformationYourself_Micro extends Component {
         this.props.loadingStart();
         axios.get(`policy-holder/${policyHolder_id}`)
             .then(res => {
+                console.log("data",res.data.data)
                 let family_members = res.data.data.policyHolder && res.data.data.policyHolder.request_data && res.data.data.policyHolder.request_data.family_members ? res.data.data.policyHolder.request_data.family_members : []
                 let addressDetails = JSON.parse(res.data.data.policyHolder.address)
                 let is_eia_account = res.data.data.policyHolder.is_eia_account
                 let gender = res.data.data.policyHolder.gender
                 let validateCheck = family_members && family_members.length > 0 ? 1 : 0;
                 let policyHolder = res.data.data.policyHolder ? res.data.data.policyHolder : []
+                
+               
+              
                 this.setState({
                     familyMembers: family_members,
                     addressDetails,
                     is_eia_account,
                     gender,
-                    validateCheck, policyHolder
+                    validateCheck, policyHolder,
+                   
                 })
                 this.setStateForPreviousData(family_members);
             })
@@ -1159,6 +1177,16 @@ class InformationYourself_Micro extends Component {
             .catch((err) => {
                 this.props.loadingStop();
             });
+            let user_data1 = sessionStorage.getItem("user_data") ? JSON.parse(sessionStorage.getItem("user_data")) : "";
+            let user_id1 = ""
+            if (user_data1) {
+                user_id1 = JSON.parse(user_data1.master_user_id);
+                    
+                console.log("test",user_id1)
+            }
+            this.setState({
+                user_id1:user_id1
+            })
     };
 
     handleChange = (e) => {
@@ -1236,6 +1264,9 @@ class InformationYourself_Micro extends Component {
         let display_looking_for_arr = display_looking_for && display_looking_for.length > 0 ? display_looking_for : (sessionStorage.getItem('display_looking_for') ? JSON.parse(sessionStorage.getItem('display_looking_for')) : []);
         let display_dob_arr = display_dob && display_dob.length > 0 ? display_dob : (sessionStorage.getItem('display_dob') ? JSON.parse(sessionStorage.getItem('display_dob')) : []);
         let display_gender_arr = display_gender && display_gender.length > 0 ? display_gender : (localStorage.getItem('display_gender') ? JSON.parse(localStorage.getItem('display_gender')) : []);
+        let refrence_no= this.state.user_id1 == 12 ? 1 : 0;
+       
+console.log("data1",policyHolder)
 
         const newInitialValues = Object.assign(initialValues, {
             check_input: validateCheck ? validateCheck : 0,
@@ -1263,7 +1294,10 @@ class InformationYourself_Micro extends Component {
             dob_8: display_dob_arr[8] ? new Date(display_dob_arr[8]) : "",
             insureList: insureListPrev ? insureListPrev.toString() : (insureList ? insureList : ''),
             occupation_id: policyHolder ? policyHolder.occupation_id : "",
-            occupation_description: (policyHolder && policyHolder.occupation_description != null) ? policyHolder.occupation_description : ""
+            refrence_no_check: refrence_no,
+            occupation_description: (policyHolder && policyHolder.occupation_description != null) ? policyHolder.occupation_description : "",
+            refrence_no:(policyHolder && policyHolder.zero_mass_refrence_no != null) ? policyHolder.zero_mass_refrence_no : "",
+
         });
         const options =
             occupationList && occupationList.length > 0 ? occupationList.map((insurer, qIndex) => (
@@ -1292,9 +1326,35 @@ class InformationYourself_Micro extends Component {
                                                 onSubmit={this.handleFormSubmit}
                                                 validationSchema={vehicleInspectionValidation}>
                                                 {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                                                        console.log("values",values)
+                                                        console.log("error",errors)
                                                     return (
                                                         <Form>
+                                                            {this.state.user_id1==12 ? 
+                                                             <div className="row formSection">
+                                                                <label className="col-md-4">Refrence No:</label>
+                                                                <div className="col-md-4">
+                                                                    <Field
+                                                                        name="refrence_no"
+                                                                        type="text"
+                                                                        autoComplete="off"
+                                                                        value={values.refrence_no}
+                                                                        className="formGrp"
+                                                                        onChange={(e) => {
+                                                                            setFieldValue('refrence_no', e.target.value);
+                                                                            
+                                                                           
+                                                                        }}
+                                                                    >
+                                                                       
+                                                                    </Field>
+                                                                    {errors.refrence_no  ? (
+                                                                        <span className="errorMsg">{errors.refrence_no}</span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </div> 
+                                                            : null}
+
                                                             <div className="row formSection">
                                                                 <label className="col-md-4">Gender:</label>
                                                                 <div className="col-md-4">

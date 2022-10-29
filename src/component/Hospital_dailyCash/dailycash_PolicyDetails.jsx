@@ -61,15 +61,16 @@ const relationArr = {
 12:"Grandmother",
 13:"Husband",
 14:"Wife",
-15:"Brother In Law",
-16:"Sister In Law",
-17:"Uncle",
-18:"Aunty",
-19:"Ex-Wife",
-20:"Ex-Husband",
-21:"Employee",
-22:"Niece",
-23:"Nephew"
+15:"Child",
+16:"Brother In Law",
+17:"Sister In Law",
+18:"Uncle",
+19:"Aunty",
+20:"Ex-Wife",
+21:"Ex-Husband",
+22:"Employee",
+23:"Niece",
+24:"Nephew"
 }
 
 const insuredRelationArr = {
@@ -153,11 +154,33 @@ class dailycash_PolicyDetails extends Component {
         let request_data = decryptResp.data.policyHolder && decryptResp.data.policyHolder.request_data ? decryptResp.data.policyHolder.request_data : {};
         let paymentgateway = decryptResp.data.policyHolder && decryptResp.data.policyHolder.bcmaster && decryptResp.data.policyHolder.bcmaster.bcpayment
 
+        let user_data = sessionStorage.getItem("users") ? JSON.parse(sessionStorage.getItem("users")) : "";
+        let paymentButton = false
+        let smsButton = false
+
+        if (user_data) {
+            user_data = JSON.parse(encryption.decrypt(user_data.user));
+
+            if( user_data.user_type == "RAP" && user_data.bc_master_id == "5" && user_data.login_type == "4" ) {
+                paymentButton =  true
+                smsButton = false
+            }
+            else if(user_data.login_type == "4") {
+                paymentButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? false : true
+                smsButton = bcMaster && bcMaster.eligible_for_otp_screen == 1 ? true : false
+            }
+            else {
+                paymentButton = true
+                smsButton = false
+            }
+        }
+
+
         this.setState({
           policyHolderDetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [],
           addressArray: decryptResp.data.policyHolder && decryptResp.data.policyHolder.address ? addressArray : null,
           familyMember: decryptResp.data.policyHolder.request_data.family_members,
-          refNumber: decryptResp.data.policyHolder.reference_no,
+          refNumber: decryptResp.data.policyHolder.reference_no, paymentButton, smsButton,
           paymentStatus: decryptResp.data.policyHolder.payment ? decryptResp.data.policyHolder.payment[0] : [],
           nomineedetails: decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data.nominee[0]:[],
           bcMaster, menumaster, request_data,paymentgateway
@@ -306,6 +329,16 @@ sendPaymentLink = () => {
       </div>
   ) :null
 
+  const LocationArea =  policyHolderDetails.location ? (
+      <div>
+        <Row>
+          <Col sm = {12} md ={6}>
+            <FormGroup>{policyHolderDetails.location}</FormGroup>
+          </Col>
+        </Row>
+      </div>
+  ): null
+
     const items =
     policyHolderDetails.request_data ? policyHolderDetails.request_data.family_members.map((member, qIndex) => {
             return (
@@ -318,7 +351,7 @@ sendPaymentLink = () => {
                       <FormGroup>Name:</FormGroup>
                     </Col>
                     <Col sm={12} md={6}>
-                      <FormGroup>{member.first_name}</FormGroup>
+                      <FormGroup>{`${member.first_name} ${member.last_name}`}</FormGroup>
                     </Col>
                   </Row>
 
@@ -562,7 +595,8 @@ sendPaymentLink = () => {
                                                     </Col>
                                                     <Col sm={12} md={6} lg={3}>
                                                       <FormGroup>
-                                                        {menumaster && menumaster.name ? menumaster.name : null}
+                                                        {/* {menumaster && menumaster.name ? menumaster.name : null} */}
+                                                        Hospital Daily Cash 
                                                       </FormGroup>
                                                     </Col>
                                                   </Row>
@@ -674,6 +708,16 @@ sendPaymentLink = () => {
                                                       </Col>
                                                     </Row>
 
+                                                    <Row>
+                                                      <Col sm={12} md={6} lg={3}>
+                                                        Area :
+                                                      </Col>
+
+                                                      <Col sm={12} md={6} lg={3}>
+                                                        {LocationArea}
+                                                      </Col>
+                                                    </Row>
+
                                                   </Col>
                                                 </Row>
                                               </div>
@@ -737,23 +781,39 @@ sendPaymentLink = () => {
                                             >
                                               Back
                                             </button>
-                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 && hide == 0?
+                                          {bcMaster && bcMaster.eligible_for_payment_link == 1 && fulQuoteResp.QuotationNo && hide == 0?
+                                            // <div>
+                                            //   <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                            //   &nbsp;&nbsp;&nbsp;&nbsp;
+                                            // </div> : null }
                                             <div>
-                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  Send Payment Link  </Button>
+                                              <Button type="button" className="proceedBtn" onClick = {this.sendPaymentLink.bind(this)}>  {phrases['PaymentLink']}  </Button>
                                               &nbsp;&nbsp;&nbsp;&nbsp;
                                             </div> : null }
 
-                                          {values.gateway && hide == 0?
-                                            <Button className="backBtn" type="submit" >{phrases['MakePayment']}</Button>
-                                          : null}
+                                            {smsButton === true && fulQuoteResp.QuotationNo && hide == 0 ?
+                                            <Button className="backBtn" type="button" onClick={this.handleModal.bind(this)}>{phrases['SendSMS']}</Button>
+                                            : null}
 
-                                          {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true && hide == 0? 
+                                          {/* {values.gateway && hide == 0?
+                                            <Button className="backBtn" type="submit" >{phrases['MakePayment']}</Button>
+                                          : null} */}
+
+                                          {/* {fulQuoteResp.QuotationNo && values.gateway != "" && serverResponse && paymentButton === true && hide == 0? 
                                            <Button type="submit"
                                               className="proceedBtn"
                                             >
                                               Make Payment
-                                            </Button> : null
-                                          } 
+                                            </Button> 
+                                            : null
+                                          }  */}
+                                          {fulQuoteResp.QuotationNo && values.gateway != "" && paymentButton === true && hide == 0 ?
+                                            <Button type="submit"
+                                                className="proceedBtn"
+                                            >
+                                                {phrases['MakePayment']}
+                                            </Button> 
+                                            : null}
                                           </div>
                                           </Row>
                                         </Col>
@@ -773,6 +833,7 @@ sendPaymentLink = () => {
                                );
                            }}
                      </Formik>
+                     {smsButton === true && fulQuoteResp.QuotationNo ?
                      <Modal className="" bsSize="md"
                       show={show}
                       onHide={this.handleClose}>
@@ -790,7 +851,8 @@ sendPaymentLink = () => {
                               </Suspense>
                           </Modal.Body>
                       </div>
-                  </Modal>
+                    </Modal>
+                    : null }
                   <Footer />
               </div>
             </div>

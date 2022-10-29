@@ -239,12 +239,13 @@ class arogya_SelectDuration extends Component {
                 let insuredAmountDetails = policyHolderDetails && policyHolderDetails.arogyatopupsuminsured ? policyHolderDetails.arogyatopupsuminsured : {}
 
                 values['polStartDate'] = policyDetails && policyDetails.start_date ? moment(policyDetails.start_date).format("YYYY-MM-DD") : new Date()
-                values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : moment(addDays(new Date(), (365 * 2) - 1)).format("YYYY-MM-DD")
+               // values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : moment(addDays(new Date(), (365 * 2) - 1)).format("YYYY-MM-DD")
                 values['slider_sum_insured'] = insuredAmountDetails && insuredAmountDetails.insured_amount ? parseInt(insuredAmountDetails.insured_amount) : defaultSliderVal
                 values['slider_deductible'] = policyDetails && policyDetails.deductible ? parseInt(policyDetails.deductible) : defaultdeductibleSliderValue
                 values['slider_tenure'] = policyDetails && policyDetails.tenure_year ? parseInt(policyDetails.tenure_year) : defaulttenureSliderValue
                 values['opd_premium'] = policyDetails && policyDetails.opd_premium_amount_id ? policyDetails.opd_premium_amount_id : 1
-
+                values['polEndDate'] = policyDetails && policyDetails.end_date ? moment(policyDetails.end_date).format("YYYY-MM-DD") : moment(fourwheelerODEndDate(values.polStartDate,values.slider_tenure)).format("YYYY-MM-DD")
+               
                 this.quote(values)   
             })
             .catch(err => {
@@ -468,7 +469,7 @@ class arogya_SelectDuration extends Component {
 
         const newInitialValues = Object.assign(initialValues, {
             polStartDate: start_date ? start_date : new Date(),
-            polEndDate: end_date ? end_date : addDays(start_date ? new Date(start_date) : new Date(), (365 * 2) - 1),
+            polEndDate: end_date ? end_date : addDays(start_date ? new Date(start_date) : new Date(), (365 * 2)),
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? Math.floor(policyHolderDetails.request_data.sum_insured) : initialValues.insureValue
             // insureValue: policyHolderDetails && policyHolderDetails.request_data && policyHolderDetails.request_data.sum_insured ? sum_assured[policyHolderDetails.request_data.sum_insured] : initialValues.insureValue,
 
@@ -549,11 +550,11 @@ class arogya_SelectDuration extends Component {
                                                                                     placeholderText="Start Date"
                                                                                     dropdownMode="select"
                                                                                     className="datePckr"
-                                                                                    onChange={(value) => {
+                                                                                    onChange={async (value) => {
                                                                                         setFieldTouched("polStartDate");
                                                                                         setFieldValue("polStartDate", value);
-                                                                                        // setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1));
-                                                                                        setFieldValue("polEndDate", fourwheelerODEndDate(values.polStartDate,values.slider_tenure));
+                                                                                         //setFieldValue("polEndDate", addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1));
+                                                                                        setFieldValue("polEndDate", moment(fourwheelerODEndDate(value,values.slider_tenure)).format("YYYY-MM-DD"));
                                                                                         this.handleChange(value);
                                                                                     }}
                                                                                     selected={values.polStartDate}
@@ -577,12 +578,14 @@ class arogya_SelectDuration extends Component {
                                                                                     disabled={true}
                                                                                     className="datePckr"
                                                                                     // selected={addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1)}
-                                                                                    selected={fourwheelerODEndDate(values.polStartDate,values.slider_tenure)}                                                                                   
+                                                                                    selected={fourwheelerODEndDate(values.polStartDate,values.slider_tenure)} 
+                                                                                                                                                                      
                                                                                     
                                                                                 />
                                                                                 {errors.polEndDate && touched.polEndDate ? (
                                                                                     <span className="errorMsg">{errors.polEndDate}</span>
                                                                                 ) : null}
+                                                                               
                                                                             </FormGroup>
                                                                         </Col>
                                                                     </Row>

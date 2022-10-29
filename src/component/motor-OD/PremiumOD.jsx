@@ -106,7 +106,8 @@ class PremiumOD extends Component {
     handleSubmit = (values) => {    
         const { refNumber , policyHolder,activePolicy,request_data} = this.state
         const { productId } = this.props.match.params
-        if(Math.floor(moment(activePolicy.end_date).diff(request_data.end_date, 'days', true)) >= 0 ){
+        console.log("kind",activePolicy.end_date,moment(request_data.end_date).format("YYYY-MM-DD"),Math.floor(moment(activePolicy.end_date).diff(request_data.end_date, 'days', true)))
+        if(Math.floor(moment(activePolicy.end_date).diff(moment(request_data.end_date).format("YYYY-MM-DD"), 'days', true)) >= 0 ){
             paymentGateways(values, policyHolder, refNumber, productId)
         }
         else {
@@ -127,8 +128,8 @@ class PremiumOD extends Component {
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
-                let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[1] : {};
-                let activePolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[0] : {};
+                let previousPolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[0] : {};
+                let activePolicy = decryptResp.data.policyHolder && decryptResp.data.policyHolder.previouspolicyforsaod && decryptResp.data.policyHolder.previouspolicyforsaod.length == 2 ? decryptResp.data.policyHolder.previouspolicyforsaod[1] : {};
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {}
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let bcMaster = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.bcmaster : {};

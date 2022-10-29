@@ -644,7 +644,7 @@ class AdditionalDetailsPCV_TP extends Component {
             post_data['salutation_id'] = '5'
         }
             
-       // console.log('post_data', post_data);
+        console.log('post_data', post_data);
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
@@ -784,7 +784,8 @@ class AdditionalDetailsPCV_TP extends Component {
             this.props.loadingStart();
             axios.get('relations')
             .then(res=>{
-                let relation = res.data.data ? res.data.data : []                        
+                let relation = res.data.data ? res.data.data : []  
+                console.log("rel",relation)                      
                 this.setState({
                     relation
                 });
@@ -918,7 +919,7 @@ class AdditionalDetailsPCV_TP extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-                            // console.log("values=",values)
+                             console.log("values=",values)
                             // console.log("error",errors)
                         return (
                         <Form>
@@ -1610,6 +1611,7 @@ class AdditionalDetailsPCV_TP extends Component {
                                                         >
                                                         <option value="">{phrases['NomineeRelation']}</option>
                                                         { relation.map((relations, qIndex) => 
+                                                        
                                                             <option value={relations.id} key={qIndex}>{relations.pcv_relation_name}</option>                                        
                                                         )}
                                                         </Field>     

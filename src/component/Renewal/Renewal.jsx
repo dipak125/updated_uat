@@ -209,7 +209,7 @@ class renewal extends Component {
                                                                     <Field
                                                                         name="policy_number"
                                                                         type="text"
-                                                                        placeholder="policy number"
+                                                                        placeholder="Policy Number"
                                                                         autoComplete="off"
                                                                         onFocus={e => this.changePlaceHoldClassAdd(e)}
                                                                         onBlur={e => this.changePlaceHoldClassRemove(e)}

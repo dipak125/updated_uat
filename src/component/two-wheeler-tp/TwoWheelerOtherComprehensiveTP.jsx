@@ -299,6 +299,10 @@ class TwoWheelerOtherComprehensive extends Component {
                         serverResponse: []
                     });
                 }
+                else if( res.data && res.data.ValidateResult && res.data.ValidateResult.code && res.data.ValidateResult.code == "VahanValidation" && res.data.ValidateResult.message)
+                {
+                     swal(res.data.ValidateResult.message)
+                }
                 else {
                     this.setState({
                         fulQuoteResp: [], add_more_coverage,
@@ -449,6 +453,7 @@ class TwoWheelerOtherComprehensive extends Component {
         let PA_flag = motorInsurance && (motorInsurance.pa_cover == null || motorInsurance.pa_cover == "") ? '0' : '1'
         let PA_Cover = motorInsurance &&  motorInsurance.pa_cover != null ? motorInsurance.pa_cover : ''
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+       
 
         if(selectFlag == '1') {
             initialValue = {

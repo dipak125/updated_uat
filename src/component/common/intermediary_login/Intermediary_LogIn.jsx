@@ -20,6 +20,11 @@ import queryString from 'query-string';
 import swal from 'sweetalert';
 import axios from "../../../shared/axios";
 import axiosExternal from "../../../shared/axiosExternal";
+import UserAgent from 'user-agents';
+
+
+
+
 
 const initialValues = {
     userId: "",
@@ -97,13 +102,30 @@ class Intermediary_LogIn extends Component {
             this.props.loadingStop();
           });
       }
-
+//checking
     componentDidMount() {
+   
         localStorage.clear()
         sessionStorage.removeItem('logo')
         let bodyClass = [];
         bodyClass.length && document.body.classList.remove(...bodyClass);
         document.body.classList.add("loginBody");
+
+        if(queryString.parse(this.props.location.search).authentication_token) {
+            this.Zero_mass_login();
+            // sessionStorage.removeItem('bcLoginData');
+            // sessionStorage.setItem('logo', "CSC.svg");
+            // let encryption = new Encryption();
+            // let csc_id = encryption.decrypt(queryString.parse(this.props.location.search).csc_id);          
+            // csc_id = csc_id.replace(/["]/g, "");
+            // let csc_type = queryString.parse(this.props.location.search).type
+            // sessionStorage.setItem('csc_id', csc_id);
+            // sessionStorage.setItem('type', csc_type);
+            // let bcLoginData = {}
+            // bcLoginData.agent_id = ""
+            // bcLoginData.bc_agent_id = ""
+            // this.callLogin(bcLoginData);          
+        }
 
     }
 
@@ -140,6 +162,54 @@ class Intermediary_LogIn extends Component {
         return result;
     }
 
+    Zero_mass_login =() =>{
+         // console.log('values', value);
+         return new Promise(resolve => {
+            setTimeout(() => {
+                let values = {}
+                let bcLoginData = {}
+                let encryption = new Encryption();
+                bcLoginData.agent_id = 0
+                bcLoginData.token = ""
+                bcLoginData.user_info  =  { data: {user : {username:""}} }
+                sessionStorage.setItem('bcLoginData', encryption.encrypt(JSON.stringify(bcLoginData)));
+
+                this.props.loadingStart();
+                values.rememberMe = this.state.rememberMe;
+                values.emailAddress= "test@gmail.com";
+                values.password= "12345";
+                values.bc_id= sessionStorage.getItem('csc_id')
+                values.user_type= sessionStorage.getItem('type')
+                this.props.onFormSubmit(values,
+                    () => {
+                        this.props.loadingStop();
+                        this.callFetchPhrase()
+                        // if(this.callFetchPhrase()  ){
+                            // this.props.history.push('/Products')
+                            // setTimeout(
+                            //     function() {
+                            //         this.props.history.push('/Products')
+                            //         // window.location.reload(true);   
+                            //     }
+                            //     .bind(this),
+                            //     300
+                            // );
+                        // }
+                    },
+                    (err) => {
+                        this.props.loadingStop();
+                        if (err.data.error) {
+                            this.setState({ errMsg: err.data.error });
+                        } else {
+                            // console.log(err.data);
+                        }
+                    }
+                );
+                //actions.setSubmitting(false);
+            }
+            , 20)
+        })
+    }
 
     handle_AutoSubmit = (value, actions) => {
         // console.log('values', value);

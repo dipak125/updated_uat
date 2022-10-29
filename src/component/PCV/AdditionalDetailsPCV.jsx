@@ -923,7 +923,8 @@ class AdditionalDetailsPCV extends Component {
                         validationSchema={ownerValidation}
                         >
                         {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                       console.log("values",values)
+                       console.log("err",errors);
                         return (
                         <Form>
                         <Row>

@@ -513,13 +513,14 @@ class MotorCoverages extends Component {
     }
 
 
-    fetchData = () => {
+    fetchData = async() => {
         const { productId } = this.props.match.params
         let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
         let encryption = new Encryption();
         axios.get(`renewal/policy-details/${policyHolder_id}`)	
             .then(res => {
                 // let decryptResp = JSON.parse(encryption.decrypt(res.data))
+                console.log("decrypt",res.data)
                 let decryptResp = res.data
                 let add_more_coverage = []
                 let add_more_coverage_request_array = []
@@ -534,20 +535,30 @@ class MotorCoverages extends Component {
                 let sliderVal = request_data && request_data.IDV_Suggested ? parseInt(request_data.IDV_Suggested) : ""
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let policyCoverage = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.renewalcoverage ? decryptResp.data.policyHolder.renewalinfo.renewalcoverage : []
+                
                 policyCoverage.map((coverage,Index) => {
                     add_more_coverage.push(coverage.cover_type_id)
                     coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 && coverage.renewalsubcoverage.map((benefit, bIndex) => (
                         benefit.interest_premium && parseInt(benefit.interest_premium) != 0 ? add_more_coverage.push(benefit.interest_id) : null
-                        // add_more_coverage.push(benefit.interest_id)
+                         //add_more_coverage.push(benefit.interest_id)
                         ))
                 })
-
+                
                 add_more_coverage_request_array = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
-                add_more_coverage_request_array = add_more_coverage_request_array && add_more_coverage_request_array.policySOABO.insuredSOABOList.policyCtSOABOList
+                add_more_coverage_request_array = add_more_coverage_request_array && add_more_coverage_request_array.policySOABO && add_more_coverage_request_array.policySOABO.insuredSOABOList && add_more_coverage_request_array.policySOABO.insuredSOABOList.policyCtSOABOList
+                
+                console.log("addMore",add_more_coverage);
+                console.log("request12",add_more_coverage_request_array);
                 
                 temp_additional_coverage_extention = decryptResp.data.policyHolder && decryptResp.data.policyHolder.renewalinfo && decryptResp.data.policyHolder.renewalinfo.quote_response ? JSON.parse(decryptResp.data.policyHolder.renewalinfo.quote_response) : []
-                temp_additional_coverage_extention = temp_additional_coverage_extention && temp_additional_coverage_extention.policySOABO.insuredSOABOList.dynamicObjectList
+                temp_additional_coverage_extention = temp_additional_coverage_extention && temp_additional_coverage_extention.policySOABO && temp_additional_coverage_extention.policySOABO.insuredSOABOList && temp_additional_coverage_extention.policySOABO.insuredSOABOList.dynamicObjectList
+
+                console.log("check",Array.isArray(temp_additional_coverage_extention)== true,Array.isArray(temp_additional_coverage_extention))
+                if(Array.isArray(temp_additional_coverage_extention)== true)
+                {
+                    console.log("yes array")
                 temp_additional_coverage_extention.map((geoCoverage,index)=> {
+                   
                     if(geoCoverage.bizTableName == "Extention_Country" && geoCoverage.dynamicAttributeVOList && geoCoverage.dynamicAttributeVOList.valueMap 
                     &&(geoCoverage.dynamicAttributeVOList.valueMap.Bangladesh == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Bhutan == '1'
                     || geoCoverage.dynamicAttributeVOList.valueMap.Maldives == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Nepal == '1'
@@ -573,7 +584,7 @@ class MotorCoverages extends Component {
                         }
                     }
                 })
-
+               
                 temp_additional_coverage_extention.map((moreCoverage,index)=> {
                     if(moreCoverage.bizTableName == "TrailerDetails" && moreCoverage.dynamicAttributeVOList && moreCoverage.dynamicAttributeVOList.valueMap ) {
                         var tempVal={B00007:{
@@ -584,7 +595,45 @@ class MotorCoverages extends Component {
                         additional_coverage.push(tempVal) 
                     }
                 })
-
+            }
+            else{
+                console.log("not array")
+                let geoCoverage=temp_additional_coverage_extention
+                if(geoCoverage.bizTableName == "Extention_Country" && geoCoverage.dynamicAttributeVOList && geoCoverage.dynamicAttributeVOList.valueMap 
+                &&(geoCoverage.dynamicAttributeVOList.valueMap.Bangladesh == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Bhutan == '1'
+                || geoCoverage.dynamicAttributeVOList.valueMap.Maldives == '1' || geoCoverage.dynamicAttributeVOList.valueMap.Nepal == '1'
+                || geoCoverage.dynamicAttributeVOList.valueMap.Pakistan == '1' || geoCoverage.dynamicAttributeVOList.valueMap.SriLanka == '1')) {
+                    add_more_coverage.push("geographical_extension")
+                    if(geoCoverage.dynamicAttributeVOList.valueMap.Bangladesh == '1'){
+                        geographical_extension.push("GeoExtnBangladesh")
+                    }
+                    if(geoCoverage.dynamicAttributeVOList.valueMap.Bhutan == '1'){
+                        geographical_extension.push("GeoExtnBhutan")
+                    }
+                    if(geoCoverage.dynamicAttributeVOList.valueMap.Maldives == '1'){
+                        geographical_extension.push("GeoExtnMaldives")
+                    }
+                    if(geoCoverage.dynamicAttributeVOList.valueMap.Nepal == '1'){
+                        geographical_extension.push("GeoExtnNepal")
+                    }
+                    if(geoCoverage.dynamicAttributeVOList.valueMap.Pakistan == '1'){
+                        geographical_extension.push("GeoExtnPakistan")
+                    }
+                    if(geoCoverage.dynamicAttributeVOList.valueMap.SriLanka == '1'){
+                        geographical_extension.push("GeoExtnSriLanka")
+                    }
+                }
+                let moreCoverage=temp_additional_coverage_extention
+                if(moreCoverage.bizTableName == "TrailerDetails" && moreCoverage.dynamicAttributeVOList && moreCoverage.dynamicAttributeVOList.valueMap ) {
+                    var tempVal={B00007:{
+                        value: moreCoverage.dynamicAttributeVOList.valueMap.NoOfTrailers,
+                        description: moreCoverage.dynamicAttributeVOList.valueMap.NoOfTrailers
+                    }}
+                    this.setState({no_of_claim : moreCoverage.dynamicAttributeVOList.valueMap.NoOfTrailers})
+                    additional_coverage.push(tempVal) 
+                }
+            }
+               
                 add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
                     value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 && value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
                         // console.log("subValue-------------- ", subValue)
@@ -604,7 +653,7 @@ class MotorCoverages extends Component {
                         }
                     })
                 }) 
-
+                console.log("list21",policyCoverage);
                 add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
                     // console.log("subValue-------------- ", subValue)
                     if(value.coverTypeId == '900009555') {
@@ -624,7 +673,7 @@ class MotorCoverages extends Component {
                         })  
                     }
                 }) 
-                
+                console.log("list2",policyCoverage);
                 this.setState({
                     motorInsurance, request_data, vehicleDetails,policyCoverage,add_more_coverage,add_more_coverage_request_array,geographical_extension,
                     selectFlag: motorInsurance && motorInsurance.add_more_coverage != null ? '0' : '1',sliderVal,additional_coverage,vehicleRegDate,
@@ -633,11 +682,25 @@ class MotorCoverages extends Component {
                 })
                 this.props.loadingStop();
                 // this.getAccessToken(values)
+                let filter_coverage=[];
+                console.log("subclass",motorInsurance.subclass_id == 1,motorInsurance.subclass_id)
+                 if(motorInsurance.subclass_id == 1)
+                 {
+                     
+                     console.log("yes")
+                     filter_coverage= this.state.moreCoverage.filter(data=> data.code !== 'IMT23')
+                     this.setState({
+                        moreCoverage:filter_coverage 
+                     })
+                 }
+                 console.log("yes1",filter_coverage)
             })
             .catch(err => {
                 // handle error
+                console.log("error2",err)
                 this.props.loadingStop();
             })
+            
     }
 
   
@@ -669,7 +732,7 @@ class MotorCoverages extends Component {
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
             let moreCoverage = decryptResp.data
             console.log("decryptResp--getMoreCoverage-- ", moreCoverage)
-
+            moreCoverage=moreCoverage.filter(data=> data.code !="B00009")
             this.setState({
             moreCoverage: moreCoverage
             });
@@ -973,20 +1036,27 @@ class MotorCoverages extends Component {
         return field_array
 
     }
+    
 
-
+    back=()=>{
+        this.props.history.push(`/Renewal`);
+    }
 
     componentDidMount() {
         this.getMoreCoverage()
+        
     }
 
 
     render() {
         const {add_more_coverage, additional_coverage, request_data,error, policyCoverage, vahanVerify, selectFlag, fulQuoteResp, PolicyArray, fuelList, depreciationPercentage, vehicleDetails, geographical_extension,
             moreCoverage, sliderVal, bodySliderVal, motorInsurance, serverResponse, engine_no, chasis_no, initialValue, add_more_coverage_request_array,ncbDiscount} = this.state
+            console.log("initial1",initialValue);
+            console.log("list0",policyCoverage)
         const {productId} = this.props.match.params 
         let vehicletype_id = vehicleDetails ? vehicleDetails.vehicletype_id : ""
         let defaultSliderValue = sliderVal
+        console.log("slider",sliderVal);
         let min_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MinIDV_Suggested : 0
         let max_IDV_suggested = PolicyArray.length > 0 ? PolicyArray[0].PolicyRiskList[0].MaxIDV_Suggested : 0
         let minIDV = min_IDV_suggested
@@ -1007,6 +1077,7 @@ class MotorCoverages extends Component {
 
         let covList = add_more_coverage ? add_more_coverage.toString() : ""
         covList = covList ? covList.split(",") : ""
+       
         
         let newInnitialArray = {}
         let fuel_type = vehicleDetails && vehicleDetails.varientmodel && vehicleDetails.varientmodel.fueltype  ? vehicleDetails.varientmodel.fueltype.id : ""
@@ -1014,7 +1085,7 @@ class MotorCoverages extends Component {
         let trailer_flag= add_more_coverage.indexOf("700001865") > 0 || add_more_coverage.indexOf("900000005") > 0 ? '1' : '0' 
         let tyre_cover_flag = add_more_coverage.indexOf("900009555") > 0 ? '1' : '0' 
         let pa_coolie_flag= add_more_coverage.indexOf("900001147") > 0 ? '1' : '0'
-        let electric_flag= add_more_coverage.indexOf("700001865") > 0  || add_more_coverage.indexOf("700000342") > 0 || add_more_coverage.indexOf("900000002") > 0  ? '1' : '0'
+        let electric_flag= add_more_coverage.indexOf("700001865") > 0  || add_more_coverage.indexOf("700000342") > 0 || add_more_coverage.indexOf("900000002") > 0  || add_more_coverage.indexOf("700001862") > 0 ? '1' : '0'
         let nonElectric_flag= add_more_coverage.indexOf("700001862") > 0 || add_more_coverage.indexOf("700000341") > 0 || add_more_coverage.indexOf("900000001") > 0  ? '1' : '0'  
         let hospital_cash_OD_flag= add_more_coverage_request_array.B00020 && add_more_coverage_request_array.B00020.value ? '1' : '0'
         let hospital_cash_PD_flag= add_more_coverage_request_array.B00022 && add_more_coverage_request_array.B00022.value ? '1' : '0'
@@ -1031,6 +1102,7 @@ class MotorCoverages extends Component {
         let newInitialValues = {}
 
         if(selectFlag == '1') {
+            console.log("initial",initialValue);
              newInitialValues = Object.assign(initialValue, {
                 registration_no: motorInsurance.registration_no ? motorInsurance.registration_no.replace(/ /g,'') : "",
                 chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
@@ -1068,6 +1140,7 @@ class MotorCoverages extends Component {
             });
         }
         else {
+            console.log("initial",initialValue);
                  newInitialValues = Object.assign(initialValue, {
                     registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
                     chasis_no: motorInsurance.chasis_no ? motorInsurance.chasis_no : (chasis_no ? chasis_no : ""),
@@ -1105,7 +1178,7 @@ class MotorCoverages extends Component {
 
        
 // For setting up updated value from database----------
-
+console.log("cov",covList)
         for (var i = 0 ; i < covList.length; i++) {
             newInnitialArray[covList[i]] = covList[i];
         }    
@@ -1143,52 +1216,65 @@ class MotorCoverages extends Component {
         newInnitialArray.GeoExtnSriLanka = geographical_extension ? geographical_extension[geographical_extension.indexOf("GeoExtnSriLanka")] : ""
         
         // built array of insuredSOABOList=>policyCtSOABOList
+        console.log("request12",add_more_coverage_request_array);
         add_more_coverage_request_array && add_more_coverage_request_array.length>0 && add_more_coverage_request_array.map((value,index) => {   
             if(value && value.policyCtAcceSOABOList && value.policyCtAcceSOABOList.length>0 ){ 
                 value.policyCtAcceSOABOList.map((subValue,subIndex)=>{
                     // console.log("subValue-------------- ", subValue)
+                    // newInnitialArray[subValue.interestId] = subValue.interestId
                     if(subValue.interestId == '700000351') {
                         newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoofPaidDrivers_BT
+                       
                     }
                     if(subValue.interestId == '900000687' || subValue.interestId == '900000743' ) {
                         newInnitialArray['B00013_value'] = subValue.fieldValueMap.NoOfPersons
+                       
                     }
                     if(subValue.interestId == '900000688' || subValue.interestId == '900000742') {
                         newInnitialArray['B00012_value'] = subValue.fieldValueMap.NoOfPersons
+                       
                     }
                     if(subValue.interestId == '700001865' || subValue.interestId == '900000005') {
                         newInnitialArray['B00007_description'] = subValue.calTotoalSumInsured
+                       
                     }
 
                     if(subValue.interestId == '700001862') {
                         newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                        
                     }
                     if(subValue.interestId == '700000342') {
                         newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
+                       
                     }
                     if( subValue.interestId == '900000002') {
                         newInnitialArray['B00004_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00004_description'] = subValue.fieldValueMap.AccessoryDescripton2_BT
+                       
                     }
                     
                     if(subValue.interestId == '700001861' ) {
                         newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                       
                     }
                     if( subValue.interestId == '900000001') {
                         newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton2_BT
+                        
                     }
                     if(subValue.interestId == '700000341' ) {
                         newInnitialArray['B00003_value'] = subValue.calTotoalSumInsured
                         newInnitialArray['B00003_description'] = subValue.fieldValueMap.AccessoryDescripton3_BT
+                       
                     }        
 
                     if(subValue.interestId == '900001147') {
                         newInnitialArray['B00073_value'] = subValue.fieldValueMap.SumInsured_BT
                         newInnitialArray['B00073_description'] = subValue.fieldValueMap.No_of_Cleaner_conductor_coolie
+                        
                     }
                     if(subValue.interestId == '900000695' || subValue.interestId == '700000353' || subValue.interestId == '700000452' ) {
                         newInnitialArray['PA_Cover_OD'] = subValue.totoalSumInsured
@@ -1196,12 +1282,17 @@ class MotorCoverages extends Component {
                     if(subValue.interestId == '700000453' || subValue.interestId == '700000354' || subValue.interestId == '700000941' ) { 
                         newInnitialArray['PA_Cover'] = subValue.fieldValueMap.SumInsured_BT
                     }
+                    if(subValue.interestId == '700000449') {
+                        newInnitialArray['700000449'] = '700000449'
+                        newInnitialArray['B00009_value'] = subValue.calTotoalSumInsured
+                        newInnitialArray['B00009_description'] = subValue.fieldValueMap.AccessoryDescripton1_BT
+                    }
 
 
                 })     
             } 
             else if(value.hasOwnProperty("policyCtAcceSOABOList")) {
-                if(value.policyCtAcceSOABOList.interestId == '700000452' || value.policyCtAcceSOABOList.interestId == '700000353' || value.policyCtAcceSOABOList.interestId == '900000750') {
+                if(value.policyCtAcceSOABOList.interestId == '700000452' || value.policyCtAcceSOABOList.interestId == '700000353' || value.policyCtAcceSOABOList.interestId == '900000750' || value.policyCtAcceSOABOList.interestId == '900000695') {
                     newInnitialArray['PA_Cover_OD'] =  value.policyCtAcceSOABOList.calTotoalSumInsured
                 }
             }
@@ -1220,18 +1311,32 @@ class MotorCoverages extends Component {
 
         newInitialValues = Object.assign(initialValue, newInnitialArray );
 
+        if(policyCoverage && policyCoverage.length > 0)
+        { 
+           
+            policyCoverage.map(coverage=>{
+                if(coverage.annual_premium !=0 && coverage.cover_name == "Inclus_of_IMT_23_PO")
+                {
+                    newInitialValues = Object.assign(newInitialValues, {Inclus_of_IMT_23_PO :"Inclus_of_IMT_23_PO"} );
+                }
+            })
+        }
+
+
 // -------------------------------------------------------
         let OD_TP_premium = serverResponse.PolicyLobList ? serverResponse.PolicyLobList[0].PolicyRiskList[0] : []
         let TRAILOR_OD_PREMIUM = 0
 
         let productCount = 1;
         let ncbCount = 1;
-
+        console.log("list1",policyCoverage)
         const policyCoverageList =  policyCoverage && policyCoverage.length > 0 ?
             policyCoverage.map((coverage, qIndex) => (
                 coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                    parseInt(benefit.interest_premium) != 0 ?
+                    
+                    (parseInt(benefit.interest_premium) != 0  ) ?
                     <div>
+                        {console.log("interest",benefit.interest_name,benefit.interest_premium)}
                         <Row>
                             <Col sm={12} md={6}>
                                 <FormGroup>{benefit.interest_name}</FormGroup>
@@ -1256,11 +1361,11 @@ class MotorCoverages extends Component {
             </div> 
             : null
         )) : null  
-
+        console.log("renewal",policyCoverageList)
         const premiumBreakup = policyCoverage && policyCoverage.length > 0 ?
         policyCoverage.map((coverage, qIndex) => (
             coverage.renewalsubcoverage && coverage.renewalsubcoverage.length > 0 ? coverage.renewalsubcoverage.map((benefit, bIndex) => (
-                    (parseInt(benefit.interest_premium) != 0 ) ?
+                    (parseInt(benefit.interest_premium) != 0   ) ?
                     <tr>
                         <td>{benefit.interest_name}:</td>
                         <td>₹ {Math.round(benefit.interest_premium)}</td>
@@ -1352,7 +1457,8 @@ class MotorCoverages extends Component {
                     // validationSchema={ComprehensiveValidation}
                     >
                     {({ values, errors, setFieldValue, setFieldTouched, isValid, isSubmitting, touched }) => {
-
+                        console.log("values",values)
+                        console.log("error",errors);
                     return (
                         <Form>
                         <Row>
@@ -1494,7 +1600,7 @@ class MotorCoverages extends Component {
                                     min= {minIDV}
                                     max= {maxIDV}
                                     step= '1'
-                                    disabled = {(this.state.userIdvStatus == 0)? "disabled" : ""}
+                                   // disabled = {(this.state.userIdvStatus == 0)? "disabled" : ""}
                                     value={defaultSliderValue}
                                     disabled = {true}
                                     onChange= {(e) =>{
@@ -1545,7 +1651,7 @@ class MotorCoverages extends Component {
                                         min= {minBodyIDV}
                                         max= {maxBodyIDV}
                                         step= '1'
-                                        disabled = {(this.state.bodyIdvStatus == 0)? "disabled" : ""}
+                                        //disabled = {(this.state.bodyIdvStatus == 0)? "disabled" : ""}
                                         value={defaultBodySliderValue}
                                         disabled = {true}
                                         onChange= {(e) =>{
@@ -1588,7 +1694,7 @@ class MotorCoverages extends Component {
                                                     // if( e.target.checked == false && values[coverage.ebao_code] == '700000353') {
                                                     //     swal(phrases.SwalIRDAI)
                                                     // }
-                                                    this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
+                                                    // this.onRowSelect(e.target.value, values, e.target.checked, setFieldTouched, setFieldValue)         
                                                 }
                                                 }
                                                 checked = {values[coverage.ebao_code] == coverage.ebao_code && coverage.ebao_code != null? true : false}
@@ -2262,6 +2368,9 @@ class MotorCoverages extends Component {
                                         </Button>  : null)) : <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Recalculate']}
                                         </Button>} */}
+                                         <Button className={`proceedBtn`} type="button" onClick={this.back.bind()} >
+                                            {phrases['Back']}
+                                        </Button>
                                             <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Continue']}
                                         </Button>

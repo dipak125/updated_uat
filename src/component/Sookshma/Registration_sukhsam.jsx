@@ -22,13 +22,14 @@ const maxDateEnd = moment().add(15, 'day').calendar();
 
 
 const initialValues = {
-    policy_type: '1',
+    registration_type: null,
     pol_start_date:null
 }
 
 const vehicleRegistrationValidation = Yup.object().shape({
     pol_start_date: Yup.date().required("Please select both policy start date & time").nullable(),
     pol_end_date: Yup.date().required("Please select both policy end date & time").nullable(),
+    registration_type: Yup.string().required("Please select a type").nullable(),
 })
 
 
@@ -64,18 +65,19 @@ class Registration_sukhsam extends Component {
         let policy_holder_ref_no = localStorage.getItem("policy_holder_ref_no") ? localStorage.getItem("policy_holder_ref_no"):0;
         let encryption = new Encryption();
 
-        if(this.props.policy_holder_ref_no == null && policy_holder_ref_no != ''){
+        if(policy_holder_ref_no != ''){
             
             this.props.loadingStart();
             axios.get(`sookshama/details/${policy_holder_ref_no}`)
             .then(res=>{              
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));
-
+                console.log("fetch Data",decryptResp);
                 if(decryptResp.data.policyHolder.step_no > 0){
 
                     this.props.setData({
                         start_date:decryptResp.data.policyHolder.request_data.start_date,
-                        end_date:decryptResp.data.policyHolder.request_data.end_date,               
+                        end_date:decryptResp.data.policyHolder.request_data.end_date,  
+                        registration_type : decryptResp.data.policyHolder.sookshamainfo.policy_type,          
                         policy_holder_id:decryptResp.data.policyHolder.id,
                         policy_holder_ref_no:policy_holder_ref_no,
                         request_data_id:decryptResp.data.policyHolder.request_data.id,
@@ -92,13 +94,17 @@ class Registration_sukhsam extends Component {
 
                     this.props.setRiskData(
                         {
-                            house_building_name:risk_arr.house_building_name,
+                            policy_type : decryptResp.data.policyHolder.sookshamainfo.risk_location_type,
+                            shop_building_name:risk_arr.shop_building_name,
                             block_no:risk_arr.block_no,
                             street_name:risk_arr.street_name,
                             plot_no:risk_arr.plot_no,
                             house_flat_no:risk_arr.house_flat_no,
                             pincode:decryptResp.data.policyHolder.sookshamainfo.pincode,
                             pincode_id:decryptResp.data.policyHolder.sookshamainfo.pincode_id,
+                            multipleAddress : risk_arr.multipleAddress.length > 0 ? risk_arr.multipleAddress : [],
+                            multiple_fire_sum_insured : risk_arr.multiple_fire_sum_insured > 0 ? risk_arr.multiple_fire_sum_insured : [],
+                            
 
                             buildings_si:decryptResp.data.policyHolder.sookshamainfo.buildings_si,
                             plant_machinary_si:decryptResp.data.policyHolder.sookshamainfo.plant_machinary_si,
@@ -175,6 +181,7 @@ class Registration_sukhsam extends Component {
     }
 
     handleSubmit=(values, actions)=>{
+        //console.log("NEW OR OLD",values);
         const {productId} = this.props.match.params;
         const formData = new FormData();
         let encryption = new Encryption();
@@ -206,6 +213,9 @@ class Registration_sukhsam extends Component {
         post_data['pol_start_date'] = pol_start_date
         post_data['pol_end_date'] = pol_end_date
 
+        //add policy type (new or Roll over)
+        post_data['policy_type'] = values.registration_type
+
         this.props.loadingStart();
         
         if(this.props.policy_holder_id != null){
@@ -220,9 +230,12 @@ class Registration_sukhsam extends Component {
                 if (decryptResp.error === false )
                 {
                 this.props.loadingStop();
+
+                //add policy type
                 this.props.setDataUpdate({
                     start_date:values.pol_start_date,
-                    end_date:values.pol_end_date
+                    end_date:values.pol_end_date,
+                    registration_type : values.registration_type
                 });
                 this.props.history.push(`/RiskDetails_Sookshma/${productId}`);
             } else {
@@ -234,22 +247,24 @@ class Registration_sukhsam extends Component {
             catch(err=>{
                 this.props.loadingStop();
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));
-                console.log('decryptErr-----', decryptResp)
+                //console.log('decryptErr-----', decryptResp)
                 actions.setSubmitting(false);
             })
         }else{
             formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+            //console.log('enc_data',encryption.encrypt(JSON.stringify(post_data)));
             axios.post('sookshama/policy-info',
             formData
             ).then(res=>{     
                 let decryptResp = JSON.parse(encryption.decrypt(res.data));   
-                console.log('decryptResp-----', decryptResp)
+                //console.log('decryptResp-----', decryptResp)
                 if (decryptResp.error === false ){
                     localStorage.setItem('policy_holder_ref_no',decryptResp.data.policyHolder_refNo);
                     this.props.loadingStop();
                     this.props.setData({
                         start_date:values.pol_start_date,
-                        end_date:values.pol_end_date,                
+                        end_date:values.pol_end_date,      
+                        registration_type : values.registration_type,          
                         policy_holder_id:decryptResp.data.policyHolder_id,
                         policy_holder_ref_no:decryptResp.data.policyHolder_refNo,
                         request_data_id:decryptResp.data.request_data_id,
@@ -267,7 +282,7 @@ class Registration_sukhsam extends Component {
             }).
             catch(err=>{
                 let decryptResp = JSON.parse(encryption.decrypt(err.data));   
-                console.log('decryptErr-----', decryptResp)
+                //console.log('decryptErr-----', decryptResp)
                 this.props.loadingStop();
                 actions.setSubmitting(false);
             })
@@ -277,11 +292,15 @@ class Registration_sukhsam extends Component {
 
     render() {
         const {motorInsurance} = this.state
+        
         const newInitialValues = Object.assign(initialValues,{
             pol_start_date:this.props.start_date != null? new Date(this.props.start_date): null,
-            pol_end_date:this.props.end_date != null? new Date(this.props.end_date): null
+            pol_end_date:this.props.end_date != null? new Date(this.props.end_date): null,
+            registration_type : this.props.registration_type !=null ? this.props.registration_type : ''
         })
 
+
+        let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
         return (
             <>
@@ -348,8 +367,49 @@ class Registration_sukhsam extends Component {
 
                                             <div className="d-flex justify-content-left">
                                                 <div className="brandhead">
+                                                    <p>{phrases['TellAboutPolicy']}</p>
+
+                                                    <div className="d-inline-flex m-b-15">
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='registration_type'
+                                                                    value='1'
+                                                                    key='1'
+                                                                    checked={values.registration_type == '1' ? true : false}
+                                                                    onChange={() => {
+                                                                        setFieldValue('registration_type', '1');
+                                                                    }}
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['NewPolicy']}</span>
+                                                            </label>
+                                                        </div>
+
+                                                        <div className="p-r-25">
+                                                            <label className="customRadio3">
+                                                                <Field
+                                                                    type="radio"
+                                                                    name='registration_type'
+                                                                    value='2'
+                                                                    key='1'
+                                                                    checked={values.registration_type == '2' ? true : false}
+                                                                    onChange={() => {
+                                                                        setFieldValue('registration_type', '2');
+                                                                    }}
+                                                                />
+                                                                <span className="checkmark " /><span className="fs-14"> {phrases['RollOver']}</span>
+                                                            </label>
+                                                        </div>
+
+                                                        {errors.registration_type && touched.registration_type ? (
+                                                            <span className="errorMsg">{errors.registration_type}</span>
+                                                        ) : null}
+                                                    </div>
                                                 </div>
                                             </div>
+
+
                                             <div className="brandhead"> 
                                                 <h4 className="fs-18 m-b-30">POLICY INFORMATION</h4>
                                             </div>
@@ -466,6 +526,7 @@ const mapStateToProps = state => {
       loading: state.loader.loading,
       start_date: state.sukhsam.start_date,
       end_date: state.sukhsam.end_date,
+      registration_type: state.sukhsam.registration_type,
       policy_holder_id: state.sukhsam.policy_holder_id,
       policy_holder_ref_no:state.sukhsam.policy_holder_ref_no,
       request_data_id:state.sukhsam.request_data_id,

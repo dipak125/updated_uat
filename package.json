@@ -21,9 +21,12 @@
     "env-cmd": "^8.0.2",
     "form": "^0.2.4",
     "formik": "^2.1.4",
+    "internal-ip": "^7.0.0",
+    "ip": "^1.1.8",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.33",
     "prop-types": "^15.6.2",
+    "public-ip": "^6.0.1",
     "query-string": "^6.13.1",
     "react": "^16.12.0",
     "react-autosuggest": "^10.0.2",
@@ -57,6 +60,7 @@
     "redux-thunk": "^2.3.0",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.3.0",
+    "user-agents": "^1.0.1181",
     "yup": "^0.26.6"
   },
   "scripts": {

@@ -166,7 +166,7 @@ fetchSubVehicle=()=>{
     axios.get(`gcv/sub-vehical-list/${menumaster_id}`)
         .then(res=>{
             let decryptResp = JSON.parse(encryption.decrypt(res.data))
-            //console.log("decrypt--fetchSubVehicle------ ", decryptResp)
+            console.log("decrypt--fetchSubVehicle------ ", decryptResp)
 
             let subVehicleList = decryptResp.data        
             this.setState({ 
@@ -204,7 +204,7 @@ handleSubmit=(values)=>{
                 reg_number_part_three: values.reg_number_part_three,
                 reg_number_part_four: values.reg_number_part_four
             } 
-            regNumber = values.reg_number_part_one+values.reg_number_part_two+values.reg_number_part_three+values.reg_number_part_four
+            regNumber = `${values.reg_number_part_one} ${values.reg_number_part_two} ${values.reg_number_part_three} ${values.reg_number_part_four}`
         }
         else {
             registration_part_numbers  = {
@@ -272,7 +272,7 @@ handleSubmit=(values)=>{
             } 
         }
 
-        //.log('post_data', post_data)
+        console.log('post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
     
         this.props.loadingStart();
@@ -338,7 +338,7 @@ handleSubmit=(values)=>{
                 'fastlaneLog_id': this.state.fastLaneData && this.state.fastLaneData.fastlaneLog_id ? this.state.fastLaneData.fastlaneLog_id : fastlanelog && fastlanelog.id ? fastlanelog.id : ""
             } 
         }
-        //console.log('post_data', post_data)
+        console.log('post_data', post_data)
         formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
         this.props.loadingStart();
         axios
@@ -652,9 +652,12 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                             // value={ageObj.whatIsCurrentMonth(values.registration_date) < 7 ? 6 : values.previous_policy_name}
                                                         >
                                                             <option value="">{phrases['SelectProduct']}</option>
-                                                            {subVehicleList.map((subVehicle, qIndex) => ( 
+                                                            {/* {subVehicleList.map((subVehicle, qIndex) => ( 
                                                                 <option value={subVehicle.subclass_id} key={qIndex} 
                                                                 >{subVehicle.subclass_title}</option>
+                                                            ))} */}
+                                                            {subVehicleList.map((subVehicle, qIndex) => ( 
+                                                                <option hidden = {subVehicle.status == 1 ? false : true } value= {subVehicle.subclass_id}>{subVehicle.subclass_title}</option>
                                                             ))}
                                                 
                                                         </Field>

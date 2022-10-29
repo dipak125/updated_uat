@@ -1093,6 +1093,7 @@ class arogya_InformationYourself extends Component {
                 axios
                     .post(`arogya-topup/update-yourself`, formData)
                     .then(res => {
+                        
                         let decryptResp = JSON.parse(encryption.decrypt(res.data))
                         console.log("decrypt", decryptResp)
                         localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);
@@ -1121,6 +1122,7 @@ class arogya_InformationYourself extends Component {
                 axios
                     .post(`/arogya-topup/yourself`, formData)
                     .then(res => {
+                        
                         let decryptResp = JSON.parse(encryption.decrypt(res.data))
                         console.log("decrypt", decryptResp)
                         localStorage.setItem('policyHolder_id', decryptResp.data.policyHolder_id);

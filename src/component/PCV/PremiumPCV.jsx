@@ -114,7 +114,7 @@ class PremiumPCV extends Component {
         axios.get(`pcv/policy-holder/details/${policyHolder_id}`)
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
-                //console.log("decrypt", decryptResp)
+                console.log("decrypt", decryptResp)
                 let motorInsurance = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.motorinsurance : {}
                 let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
@@ -247,6 +247,7 @@ class PremiumPCV extends Component {
 
 
     fullQuote = ( access_token, motorInsurance, vehicleDetails) => {
+        console.log("hi12")
         const formData = new FormData();
         let encryption = new Encryption();
         const {previousPolicy, request_data, policyHolder} = this.state
@@ -254,6 +255,7 @@ class PremiumPCV extends Component {
         trailer_array = trailer_array ? JSON.parse(trailer_array) : []
 
         let breakInService = this.breakinService(motorInsurance, previousPolicy, request_data, policyHolder,vehicleDetails)
+        console.log("hlw2",breakInService)
         breakInService.then((value)=> {
             const post_data = {
                 'ref_no':this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0',
@@ -318,10 +320,11 @@ class PremiumPCV extends Component {
     }
 
     breakinService = (motorInsurance,previousPolicy, request_data, policyHolder,vehicleDetails) => {
-        
-        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
-        let valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : motorInsurance.valid_previous_policy;
         let dateDiff = 0
+        dateDiff = previousPolicy && previousPolicy.end_date ? Math.floor(moment().diff(previousPolicy.end_date, 'days', true)) : 1;
+        let policy_type_id= motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : ""
+        let valid_previous_policy = motorInsurance.policytype_id && motorInsurance.policytype_id == '1' ? '0' : dateDiff>0 ? '0': motorInsurance.valid_previous_policy;
+        
         return new Promise((resolve, reject) => {
             console.log("pType",valid_previous_policy,policyHolder.break_in_status,policy_type_id)
             if((valid_previous_policy == '0' && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") || (policy_type_id == "3" && policyHolder.break_in_status != "Vehicle Recommended and Reports Uploaded") ){
@@ -333,8 +336,9 @@ class PremiumPCV extends Component {
                 //if=condition====(dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3" || valid_previous_policy == '0') && !(wheels_capacity == 3 && carrying_capacity <= 4)
                
                 console.log("break1",wheels_capacity,carrying_capacity)
+                console.log("break12",dateDiff,previousPolicyName,policy_type_id,valid_previous_policy)
                 if((dateDiff > 0 || previousPolicyName == "2" || policy_type_id == "3" || valid_previous_policy == '0') && !(wheels_capacity == 3 && carrying_capacity <= 4) ) {   
-                    console.log("pType",policy_type_id != "1",policy_type_id)
+                    console.log("hlw3",policy_type_id != "1",policy_type_id)
                     if(policy_type_id != "1"){
                     const formData1 = new FormData();
                     let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'
@@ -389,11 +393,17 @@ class PremiumPCV extends Component {
                     })
                 }
                 else {
+                   
                     resolve({'inspectionNumber' :"" , 'inspection' : 0})
                 }
             }
+            else{
+                console.log("hlw4")
+                resolve({'inspectionNumber' :"" , 'inspection' : 0})
+            }
         }
             else {
+                
                 resolve({'inspectionNumber' :"" , 'inspection' : 0})
             }
         })
@@ -823,7 +833,7 @@ class PremiumPCV extends Component {
                                                                                         <Col sm={12} md={6}>
                                                                                         {nomineedetails && relation.map((relations, qIndex) =>
                                                                                         relations.id == nomineedetails.relation_with ?
-                                                                                            <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
+                                                                                            <FormGroup key={qIndex}>{relations.pcv_relation_name}</FormGroup> : null
                                                                                         )}
                                                                                         </Col>
                                                                                     </Row>
@@ -865,7 +875,7 @@ class PremiumPCV extends Component {
                                                                                             <Col sm={12} md={6}>
                                                                                             {nomineedetails && nomineedetails.appointee_relation_with && relation.map((relations, qIndex) =>
                                                                                             relations.id == nomineedetails.appointee_relation_with ?
-                                                                                                <FormGroup key={qIndex}>{relations.name}</FormGroup> : null
+                                                                                                <FormGroup key={qIndex}>{relations.pcv_relation_name}</FormGroup> : null
                                                                                             )}
                                                                                             </Col>
                                                                                         </Row>

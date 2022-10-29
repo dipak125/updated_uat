@@ -18,6 +18,7 @@ class BrandTable extends Component {
 
     setTables=(brandList)=>{
         const {selectBrandFunc} = this.props;
+        console.log("brand",brandList)
       //  const products = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 		let rowContents = [];
         const contents = brandList && brandList.reduce((acc, p, i) => {

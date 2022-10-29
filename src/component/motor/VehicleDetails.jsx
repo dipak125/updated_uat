@@ -757,6 +757,8 @@ class VehicleDetails extends Component {
         const { insurerList, showClaim, previous_is_claim, motorInsurance, previousPolicy,
             CustomerID, suggestions, vehicleDetails, RTO_location, request_data,fastlanelog,is_fieldDisabled } = this.state
             
+            let default_start = new Date()
+            let defaut_end = moment(moment(default_start).add(12, 'month')).subtract(1, 'day').format('YYYY-MM-DD')
             
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
 
@@ -775,9 +777,9 @@ class VehicleDetails extends Component {
             policy_type_id: motorInsurance && motorInsurance.policytype_id ? motorInsurance.policytype_id : "",
             lapse_duration: motorInsurance && motorInsurance.lapse_duration ? motorInsurance.lapse_duration : "",
             duration: previousPolicy && previousPolicy.duration ? previousPolicy.duration : "",
-            new_policy_duration: request_data && request_data.duration ? request_data.duration : "",
-            pol_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : "",
-            pol_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : "",
+            new_policy_duration: request_data && request_data.duration ? request_data.duration : "12",
+            pol_start_date: request_data && request_data.start_date ? new Date(request_data.start_date) : default_start,
+            pol_end_date: request_data && request_data.end_date ? new Date(request_data.end_date) : new Date(defaut_end),
         });
 
         const inputCustomerID = {
@@ -831,9 +833,9 @@ class VehicleDetails extends Component {
                                                                                 <FormGroup>
                                                                                     <DatePicker
                                                                                         name="registration_date"
-                                                                                        minDate={new Date(minRegnDate)}
+                                                                                        minDate={values.policy_type_id == '1' ? new Date() : new Date(minRegnDate)}
                                                                                         //maxDate={new Date(maxRegnDate)}
-                                                                                        maxDate={values.policy_type_id == '3' ? new Date(maxDate) : new Date(maxRegnDate) }
+                                                                                        maxDate={values.policy_type_id == '3' ? new Date(maxDate) : values.policy_type_id == '1' ? new Date() : new Date(maxDate) }
                                                                                         dateFormat="dd MMM yyyy"
                                                                                         disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
                                                                                         placeholderText={phrases['RegDate']}

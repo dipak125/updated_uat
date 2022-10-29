@@ -25,7 +25,7 @@ import {
     checkGreaterStartEndTimes, validRegistrationNumber
   } from "../../shared/validationFunctions";
 
-
+  import {vahanValidation} from "../../shared/reUseFunctions";
 let encryption = new Encryption();
 
 const ageObj = new PersonAge();
@@ -77,7 +77,7 @@ const ComprehensiveValidation = Yup.object().shape({
 
     puc: Yup.string().required("Please verify pollution certificate to proceed"),
 
-    chasis_no_last_part:Yup.string().required('RequiredField')
+    chasis_no_last_part:Yup.string()
     .matches(/^([a-zA-Z0-9]*)$/, function() {
         return "InvalidNumber"
     })
@@ -88,7 +88,7 @@ const ComprehensiveValidation = Yup.object().shape({
         return "ChasisLastDigit"
     }),
 
-    engine_no:Yup.string().required('EngineRequired')
+    engine_no:Yup.string()
     .matches(/^[a-zA-Z0-9]*$/, function() {
         return "InvalidEngineNumber"
     })
@@ -99,7 +99,7 @@ const ComprehensiveValidation = Yup.object().shape({
         return "EngineMax"
     }),
 
-    chasis_no:Yup.string().required('ChasisRequired')
+    chasis_no:Yup.string()
     .matches(/^[a-zA-Z0-9]*$/, function() {
         return "InvalidChasisNumber"
     })
@@ -280,11 +280,16 @@ class FourWheelerVerifyTP extends Component {
             regno:'',
             chasiNo:'',
             engineNo:'',
+	     vahan_chasis_no:"",
+            vahan_engine_no:"",
+            vahan_message:"",
+            error:false,
             length:15,
             insurerList: [],
             vehicleDetails: [],
             step_completed: "0",
-            request_data: []
+            request_data: [],
+            vahan_verify:'0'
         };
 
     changePlaceHoldClassAdd(e) {
@@ -331,13 +336,22 @@ class FourWheelerVerifyTP extends Component {
                 let vehicleDetails = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.vehiclebrandmodel : {};
                 let step_completed = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.step_no : "";
                 let request_data = decryptResp.data.policyHolder ? decryptResp.data.policyHolder.request_data : {};
+		let menumaster_id= decryptResp.data.policyHolder ? decryptResp.data.policyHolder.menumaster_id : ""
                 this.getInsurerList()
                 this.setState({
-                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,is_fieldDisabled,
+                    motorInsurance, previousPolicy,vehicleDetails,step_completed,request_data,fastlanelog,is_fieldDisabled,menumaster_id,
                     vahanVerify: motorInsurance.chasis_no && motorInsurance.engine_no ? true : false
                 })
                
                 this.props.loadingStop();
+                if(motorInsurance && motorInsurance.chasis_no_last_part) 
+                {
+                    this.setState({
+                        vahan_flag:1,
+                        vahan_engine_no: motorInsurance.engine_no ? motorInsurance.engine_no : "",
+                        vahan_chasis_no:motorInsurance.chasis_no ? motorInsurance.chasis_no : "",
+                    })
+                }
             })
             .catch(err => {
                 // handle error
@@ -347,13 +361,20 @@ class FourWheelerVerifyTP extends Component {
    
 
 
-    getVahanDetails = async(values, setFieldTouched, setFieldValue, errors) => {
+    getVahanDetails = async(Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) => {
+        if(values.chasis_no_last_part.length<5)
+        {
+             swal("Please enter 5 digit chassis no")
+ 
+        }
+       const {menumaster_id}=this.state
 
         const formData = new FormData();
         if(values.newRegistrationNo == "NEW") {
             formData.append("regnNo", values.newRegistrationNo);
             setFieldTouched('registration_no');
             setFieldValue('registration_no', values.newRegistrationNo);
+            this.setState({vahan_verify:"1"});
         }
         else {
             formData.append("regnNo", values.registration_no);
@@ -361,20 +382,40 @@ class FourWheelerVerifyTP extends Component {
 
         formData.append("chasiNo", values.chasis_no_last_part);
         formData.append("policy_holder_id", this.state.request_data.policyholder_id);
+        formData.append("menumaster_id",menumaster_id);
         
         if(errors.registration_no || errors.chasis_no_last_part) {
             swal("Please provide correct Registration number and Chasis number")
         }
         else {
-            if(values.newRegistrationNo != "NEW") {
+            if(values.registration_no  != "NEW") {
                 this.props.loadingStart()
                 await axios
                 .post(`/getVahanDetails`,formData)
                 .then((res) => {
+                    console.log("data1",res.data)
+                    let eng = res.data.data.engineNo && res.data.data.engineNo ? res.data.data.engineNo : Engine_no;
+                    let chas = res.data.data.chasiNo && res.data.data.chasiNo ? res.data.data.chasiNo :Chasis_no;
+                    setFieldValue('engine_no', eng)
+                    setFieldValue('chasis_no', chas)
                     this.setState({
                     vahanDetails: res.data,
-                    vahanVerify:  true 
+                    vahanVerify: true ,
+                    error:res.data.error,
+                    vahan_engine_no: res.data.data.engineNo,
+                    vahan_chasis_no:res.data.data.chasiNo,
+                    vahan_message:res.data.msg
                     });
+                    if(res.data.error==false)
+                    {
+                        this.setState({ vahan_verify:"1"
+                           });
+                    }
+                    else{
+                        this.setState({ vahan_verify:"0"
+                    });
+                    swal(res.data.msg)
+                    }
 
                     if(this.state.vahanDetails.data[0].chasiNo){
                         this.setState({chasiNo: this.state.vahanDetails.data[0].chasiNo})
@@ -387,9 +428,9 @@ class FourWheelerVerifyTP extends Component {
                     setFieldTouched('vahanVerify')
                     setFieldValue('vahanVerify', true)
                     setFieldTouched('engine_no')
-                    setFieldValue('engine_no', this.state.engineNo)
+                    //setFieldValue('engine_no', this.state.engineNo)
                     setFieldTouched('chasis_no')
-                    setFieldValue('chasis_no', this.state.chasiNo)
+                    //setFieldValue('chasis_no', this.state.chasiNo)
 
                     this.props.loadingStop();
                 })
@@ -439,9 +480,20 @@ class FourWheelerVerifyTP extends Component {
 
 
     handleSubmit = (values) => {
+        if(values.engine_no && values.chasis_no)
+        {
+
         const { productId } = this.props.match.params
-        const { motorInsurance, request_data } = this.state
-        
+        const  vahan_response=vahanValidation(this.state,values);
+        console.log("vahanValidation",vahan_response)
+        const { motorInsurance, request_data,error,vahan_chasis_no,vahan_engine_no,vahan_message ,vahan_flag } = this.state
+        if(error === 1)
+        {
+            swal(vahan_message)
+        }
+        else{
+            if( vahan_response &&  vahan_response.error==false)
+            {
         const formData = new FormData();
         let encryption = new Encryption();
         let post_data = {}
@@ -506,6 +558,15 @@ class FourWheelerVerifyTP extends Component {
         {
             swal("Chassis no mismatch")
         }
+    }else
+    {
+        swal( vahan_response.msg)
+    }
+    }
+}else{
+    swal("chassis no and engine are required")
+}
+  
     }
 
 
@@ -523,9 +584,11 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
 
 
     render() {
-        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog,is_fieldDisabled} = this.state
+        const {insurerList, vahanDetails, error, vehicleDetails, vahanVerify, previousPolicy, motorInsurance, step_completed,fastlanelog,is_fieldDisabled,vahan_chasis_no,vahan_engine_no} = this.state
         const {productId} = this.props.match.params 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+        let  Engine_no=motorInsurance.engine_no ? motorInsurance.engine_no :  ""
+        let Chasis_no=motorInsurance.chasis_no ? motorInsurance.chasis_no :  ""
 
         let newInitialValues = Object.assign(initialValue, {
             registration_no: motorInsurance.registration_no ? motorInsurance.registration_no : "",
@@ -618,7 +681,8 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                                         name='registration_no' 
                                                         autoComplete="off"
                                                         className="premiumslid"
-                                                        disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                        //disabled={is_fieldDisabled && is_fieldDisabled == "true" ? true :false}
+                                                        disabled={true}
                                                         value= {values.registration_no}
                                                         maxLength={this.state.length}
                                                         onInput={e=>{
@@ -674,10 +738,11 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                 <Col sm={12} md={6} lg={2}>
                                     <FormGroup>
                                     
-                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
+                                        <Button className="btn btn-primary vrifyBtn" onClick= {!errors.chasis_no_last_part ? this.getVahanDetails.bind(this,Engine_no,Chasis_no,values, setFieldTouched, setFieldValue, errors) : null}>{phrases['Verify']}</Button>
                                         {errors.vahanVerify ? (
                                                 <span className="errorMsg">{phrases[errors.vahanVerify]}</span>
                                             ) : null}
+                                            { this.state.vahan_verify!="1"? <span className="errorMsg">{"Please verify"}</span>:null}
                                     </FormGroup>
                                 </Col>
                                 </Row>
@@ -992,7 +1057,7 @@ regnoFormat = (e, setFieldTouched, setFieldValue) => {
                                         <Button className={`backBtn`} type="button"  onClick= {this.otherComprehensive.bind(this,productId)}>
                                         {phrases['Back']}
                                         </Button> 
-                                        {values.puc == '1' ? 
+                                        {values.puc == '1' && this.state.vahan_verify=="1"? 
                                         <Button className={`proceedBtn`} type="submit"  >
                                             {phrases['Continue']}
                                         </Button>

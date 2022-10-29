@@ -780,7 +780,12 @@ const FiaGateway = Loadable({
     loading: () => loadingContent
 });
 
+// **************** AISECT Pyment Gateway ***********************
 
+const AisectGateway = Loadable({
+    loader: () => import(/*webpackChunkName: "Products" */"../common/Aisect_gateway.jsx"),
+    loading: () => loadingContent
+});
 
 
 //  ************ Renewal ******************
@@ -1125,6 +1130,9 @@ class Routes extends Component {
 
                         {/************ FIA Payment Gateway ******************/}
                         <PrivateRoute exact path="/Fia_gateway/:productId" component={FiaGateway} />
+
+                        {/************ AISECT Payment Gateway ******************/}
+                        <PrivateRoute exact path="/Aisect_gateway/:productId" component={AisectGateway} />
 
 
                         <PrivateRoute exact path="/UnderMaintenance" component={UnderMaintenance} />

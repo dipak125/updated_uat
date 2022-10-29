@@ -48,13 +48,54 @@ export const currentEndDate = (value) => {
     }
     
 }
-export const fourwheelerODEndDate = (value,tenure) => {
+export const vahanValidation =(value,values)=>{
+    console.log("vahan_response",value,values)
+    let vahan_response={
+        error:"",
+        msg:""
+    }
 
+    const { motorInsurance, PolicyArray, sliderVal,vahan_flag, add_more_coverage, geographical_extension,error,vahan_chasis_no,vahan_engine_no,vahan_message } = value
+    if(error == true)
+    {
+        vahan_response.msg="Can not proceed";
+        vahan_response.error=true; 
+    }
+    else if(motorInsurance.policytype_id == 1 && motorInsurance.registration_no === "NEW" ){
+        vahan_response.msg="Success";
+        vahan_response.error=false; 
+    }
+   else if(vahan_flag==1 ||  error == false )
+    {
+        // if( vahan_chasis_no && vahan_chasis_no == values.chasis_no)
+        // {
+        //     if( vahan_engine_no && vahan_engine_no == values.engine_no)
+        //     {
+        //         vahan_response.msg="Success";
+        //         vahan_response.error=false; 
+        //     }
+        //     else{
+        //         vahan_response.msg="Engine no is not matching";
+        //         vahan_response.error=true; 
+        //     }
+        // }
+        // else{
+        //     vahan_response.msg="Chassis no is not matching";
+        //     vahan_response.error=true;
+        // }
+        vahan_response.msg="Success";
+        vahan_response.error=false; 
+    }
+    return vahan_response;
+}
+export const fourwheelerODEndDate =  (value,tenure) => {
+    console.log("dyyy1",value,tenure)
     if(value && tenure){
         var day =  value.getDate() - 1
         var month = value.getMonth()
         var year =   value.getFullYear() + parseInt(tenure)
         var endDate = new Date(year,month,day)
+        console.log("dyyy1",endDate)
         return endDate
     }
     
@@ -69,6 +110,8 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
     let encryption = new Encryption();
     if (user_data) {
         user_id = JSON.parse(encryption.decrypt(user_data.user));
+        console.log("inter",user_id)
+        console.log("valuesvalues",values)
         not_access_in =  user_id.not_access_in
         not_access_in.length > 0 && not_access_in.map((accessValue, index) => {
             if(accessValue.name == "payment") {
@@ -87,6 +130,9 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 if(values.slug == "razorpay") {
                     Razor_payment_renewal(refNumber)
                 }
+                if(values.slug == "PPINL") {
+                    paypoint_payment(refNumber)
+                }
                 if(values.slug == "sahi_wallet") {
                     window.location.href = `#/Sahipay_gateway/${productId}?access_id=${refNumber}` 
                 }
@@ -95,6 +141,10 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 }
                 if(values.slug == "fia_global") {
                     window.location.href = `#/Fia_gateway/${productId}?access_id=${refNumber}` 
+                }
+
+                if(values.slug == "Aisect_global") {
+                    window.location.href = `#/Aisect_gateway/${productId}?access_id=${refNumber}` 
                 }
                 
             }
@@ -119,6 +169,10 @@ export const paymentGateways = (values,policyHolder,refNumber, productId) => {
                 }
                 if(values.slug == "fia_global") {
                     window.location.href = `#/Fia_gateway/${productId}?access_id=${refNumber}` 
+                }
+
+                if(values.slug == "Aisect_global") {
+                    window.location.href = `#/Aisect_gateway/${productId}?access_id=${refNumber}` 
                 }
             }
         }

@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import BaseComponent from '../../BaseComponent';
 import SideNav from '../../common/side-nav/SideNav';
 import Footer from '../../common/footer/Footer';
@@ -42,11 +42,14 @@ const actionFormatter = (refObj) => (cell, row, enumObject) => {
             {row.microbatchstatus.id && row.microbatchstatus.id == 5 ?
             (<span
                 href="#"
-                onClick={() => refObj.GPAFileDownload(cell)
-                }
+                //onClick={() => refObj.GPAFileDownload(cell)}
+                onClick={() => refObj.getTableData(cell)}
                 id="tooltip-1"
             >
-                <Button type="button" >
+                <Button 
+                    type="button" 
+                    //onClick={()=> refObj.handleShow()}
+                >
                     Download
                 </Button>
             </span>) : null}
@@ -103,6 +106,10 @@ const paymentStatusFormatter = (refObj) => (cell, row, enumObject) => {
 class GPA_File_Micro extends Component {
     constructor(props) {
         super(props);
+
+        this.handleShow = this.handleShow.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+
         this.state = {
             KSBbranches: [],
             clickedKSBStatus: "",
@@ -110,8 +117,60 @@ class GPA_File_Micro extends Component {
             clickedKSBAction: "",
             resmessage: "",
             reserror: false,
-            ksbFileList: []
+            show: false,
+            ksbFileList: [],
+            downloadData: []
         };
+    }
+
+    handleShow() {
+        if(this.state.downloadData.length > 0){
+            this.setState({ show: true });
+        }
+        
+    }
+
+    handleClose() {
+        this.setState({ show: false });
+        this.setState({ downloadData: [] });
+    }
+
+    getTableData = async(batchIdData)=>{
+        console.log("batchId",batchIdData);
+        this.setState({batchId: batchIdData});
+        // this.state.downloadData = [
+        //     "UP00095_26052022_1.zip",
+        //     "UP00095_26052022_2.zip",
+        //     "UP00095_26052022_3.zip",
+        //     "UP00095_26052022_4.zip",
+        //     "UP00095_26052022_1.zip",
+        //     "UP00095_26052022_2.zip",
+        //     "UP00095_26052022_3.zip",
+        //     "UP00095_26052022_4.zip",
+        //     "UP00095_26052022_1.zip",
+        //     "UP00095_26052022_2.zip",
+        //     "UP00095_26052022_3.zip",
+        //     "UP00095_26052022_4.zip",
+        //     "UP00095_26052022_5.zip"
+        // ];
+        this.props.loadingStart();
+        await axios.get(`group-excel/list-zip-policy-pdf/${batchIdData}`)
+        .then(resp =>{
+            console.log(resp);
+            if(resp.data.error === false){
+                this.props.loadingStop();
+                this.setState({
+                    downloadData: resp.data.data
+                })
+                this.handleShow();
+            }else {
+                this.props.loadingStop();
+                swal("No Batch Available")
+            }
+        })
+        .catch(err =>{
+            console.log(err)
+        })
     }
     
 
@@ -506,6 +565,54 @@ class GPA_File_Micro extends Component {
                         </div>
                     </div>
                 </BaseComponent>
+
+                {this.state.downloadData && this.state.downloadData.length>0 ? (
+                    <Modal className="customModal" bsSize="md"
+                        show={this.state.show}
+                        onHide={this.handleClose}>
+                        <Modal.Header closeButton className="custmModlHead modalhd">
+                            <div className="cntrbody">
+                                <h3>Batch No : {this.state.batchId} </h3>                           
+                            </div>
+                        </Modal.Header>
+                        <Modal.Body>
+                        <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>File Name:</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {this.state.downloadData && this.state.downloadData.length>0 ? 
+                                        this.state.downloadData.map((data, index)=>(
+                                            <>
+                                                <tr>
+                                                    <td>{data}</td>
+                                                    <td>
+                                                        <Button type="button" onClick={()=>this.GPAFileDownload(data)}>
+                                                            Download
+                                                        </Button>
+                                                    </td>
+                                                </tr>                                    
+                                            </>
+                                        ))
+                                        :(
+                                            <>
+                                                <tr>
+                                                    <td col='2'>No Data Found</td>
+                                                </tr>
+                                            </>
+                                        )
+
+                                    }
+                                    
+                                </tbody>
+                            </table>
+                        
+                        </Modal.Body>
+                    </Modal>
+                ):null}
             </>
         );
     }

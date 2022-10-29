@@ -230,7 +230,7 @@ class SelectBrandPCV extends Component {
                             }
                             else
                             {
-                                this.update();
+                                //this.update();
                             }
                            
                         }
@@ -283,7 +283,7 @@ class SelectBrandPCV extends Component {
         this.props.loadingStart();
         axios.get(`pcv/vehicle/model-with-varient/${brand_id}/${policyHolder_id}`).then(res => {
             let decryptResp = JSON.parse(encryption.decrypt(res.data));
-            //console.log('varient', decryptResp)
+            console.log('varient', decryptResp)
 
             let selectedBrandDetails = decryptResp && decryptResp.data ? decryptResp.data : {};
             let brandModelList = decryptResp && decryptResp.data.brand_models ? decryptResp.data.brand_models : [];
@@ -444,7 +444,7 @@ class SelectBrandPCV extends Component {
        }
    }
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
-       // console.log("Post Date---------- ", post_data) 
+        console.log("Post Date---------- ", post_data) 
         this.props.loadingStart();
         
         if(check === 0)

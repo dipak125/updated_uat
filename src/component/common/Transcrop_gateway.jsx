@@ -84,8 +84,17 @@ class Transcrop_gateway extends Component {
     }
 
     additionalDetails = (productId) => {
-
-        if(productId == 11) {
+       const{renewalinfo}=this.state
+       
+        if(renewalinfo && renewalinfo.policy_type && renewalinfo.policy_type === 1)
+        {
+            this.props.history.push(`/MotorSummery`);  
+        }
+        else if(renewalinfo && renewalinfo.policy_type && renewalinfo.policy_type !== 1)
+        {
+            this.props.history.push(`/HealthSummery`);
+        }
+        else if(productId == 11) {
             this.props.history.push(`/Premium_MISCD/${productId}`);
         }
         else if(productId == 9) {
@@ -232,10 +241,34 @@ class Transcrop_gateway extends Component {
                 this.props.loadingStop();
             })
     }
+     getRenewal =()=>{
+        let policyHolder_id = this.state.policyHolder_refNo ? this.state.policyHolder_refNo : '0'	
+        axios.get(`renewal/policy-details/${policyHolder_id}`)	
+        .then(res => {	
+            // let decryptResp = JSON.parse(encryption.decrypt(res.data))
+            let decryptResp = res.data
+            console.log("decrypt", decryptResp)	
+            
+            let policyHolder = decryptResp.data.policyHolder ? decryptResp.data.policyHolder : [];	
+            this.setState({
+                ...this.state,
+                renewalinfo:policyHolder.renewalinfo && policyHolder.renewalinfo
+            })
+           
+           
+            this.props.loadingStop();
+            // this.getAccessToken(motorInsurance)       	
+        })	
+        .catch(err => {	
+            // handle error	
+            this.props.loadingStop();	
+        })	
+     }
 
 
     componentDidMount() {
         this.fetchData()
+        this.getRenewal()
     }
 
     render() {

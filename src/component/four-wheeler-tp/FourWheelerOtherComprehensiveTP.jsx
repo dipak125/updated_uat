@@ -298,6 +298,10 @@ class TwoWheelerOtherComprehensive extends Component {
                         serverResponse: []
                     });
                 }
+                else if( res.data && res.data.ValidateResult && res.data.ValidateResult.code && res.data.ValidateResult.code == "VahanValidation" && res.data.ValidateResult.message)
+                {
+                     swal(res.data.ValidateResult.message)
+                }
                 else {
                     this.setState({
                       fulQuoteResp: [],add_more_coverage,

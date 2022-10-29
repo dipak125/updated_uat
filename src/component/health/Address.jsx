@@ -554,7 +554,7 @@ class Address extends Component {
 
 		formArr['create_eia_account'] = create_eia_account;
         formArr['tpaInsurance'] = values.tpaInsurance;	
-		
+		console.log("post_data",formArr);
 
         let formObj = {}
         Object.assign(formObj,formArr);

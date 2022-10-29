@@ -18,7 +18,8 @@ class HeaderTop extends Component {
         bc_d: {},
 		user_data: {},
         phrases: [],
-        toggle1: true
+        toggle1: true,
+        profileBatch : ''
     }
 
 
@@ -79,7 +80,43 @@ class HeaderTop extends Component {
             user_data = JSON.parse(encryption.decrypt(user_data));  
             this.setState({user_data})
         }
+        this.getProfileBatchName();
     }
+
+    getProfileBatchName = () => {
+        // due to cors-policy and base url of uat has changed, I am unable to access the axios
+        
+        // axios.get(`profiling-csc-user/profile_batch_name`,{},{
+        //     headers:{
+        //         'Access-Control-Allow-Origin' : '*'
+        //     }
+	    // })        
+        //   .then((response) => {
+        //     console.log("response of profile batch", response);
+        //     const val = response.data;
+        //     this.setState({
+        //       profileBatch: val.msg,
+        //     });
+        //   })
+        //   .catch((error) => {
+        //     console.log("error of profile batch", error);
+        //   });
+        let csc_data = sessionStorage.getItem('users') ? (sessionStorage.getItem('users')) : "";
+        if(csc_data && sessionStorage.getItem('csc_id')) {
+            const formData = new FormData();
+        formData.append("csc_id",sessionStorage.getItem('csc_id'));
+          axios.post(`profiling-csc-user/profile_batch_name`,formData).then(response=>{
+            console.log("response of profile batch", response);
+                const val = response.data;
+                 this.setState({
+                   profileBatch: val.msg,
+                 });
+          }).catch(err=>{
+            
+          })
+        }
+       
+      };
 
       
     render() {
@@ -87,6 +124,46 @@ class HeaderTop extends Component {
 		// console.log('user_data', user_data)
 
         let phrases = localStorage.getItem("phrases") ? JSON.parse(localStorage.getItem("phrases")) : null
+
+        const profileBatch = this.state.profileBatch;
+
+        const profile_batch_styles = {
+            padding: "2px 10px",
+            borderRadius: "2px",
+            border: "1px solid #aaa",
+            boxShadow: `${
+                profileBatch === "Gold"
+                ? "#ff80007a"
+                : profileBatch === "Platinum"
+                ? "#630f687a"
+                : "#aaaaaa9c"
+            } 0px 2px 10px, inset ${
+                profileBatch === "Gold"
+                ? "#ff80007a"
+                : profileBatch === "Platinum"
+                ? "#630f687a"
+                : "#aaaaaa9c"
+            } 1px 1px 3px`,
+            borderColor:
+                profileBatch === "Gold"
+                ? "#ff8000"
+                : profileBatch === "Platinum"
+                ? "#630f68"
+                : "#aaa",
+            };
+
+        const profile_batch_name_styles = {
+            fontFamily: "'Open Sans', sans-serif",
+            textTransform: "uppercase",
+            fontWeight: "500",
+            fontSize: "1rem",
+            color:
+                profileBatch === "Gold"
+                ? "#ff8000"
+                : profileBatch === "Platinum"
+                ? "#630f68"
+                : "#aaa",
+        };
         
         return (
             <>
@@ -121,6 +198,21 @@ class HeaderTop extends Component {
                                 </a>
                             </li>
                         </ul> : null }
+
+                        {profileBatch && profileBatch !== "" ? (
+                            <div
+                              className="profile_batch mx-auto"
+                              style={profile_batch_styles}
+                            >
+                              {/* <div class="_left">SBI</div> */}
+                              <div
+                                className="profile_batch_name"
+                                style={profile_batch_name_styles}
+                              >
+                                {profileBatch}
+                              </div>
+                            </div>
+                          ) : null}
                         
                     
                         <ul className="navbar-nav">

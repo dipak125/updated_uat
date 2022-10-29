@@ -254,8 +254,15 @@ class TwoWheelerVehicleDetails extends Component {
     }
 
     getAllAddress() {
-        axios.get(`location-list/${localStorage.getItem("policyHolder_id")}`)
+        const post_data = {
+            'menumaster_id' : '3'
+        }
+        const formData = new FormData();
+        //formData.append('menumaster_id', encryption.encrypt(JSON.stringify('3'))
+        formData.append('enc_data',encryption.encrypt(JSON.stringify(post_data)))
+        axios.post(`location-list/${localStorage.getItem("policyHolder_id")}`,formData)
           .then(res => {
+              console.log("new State",res)
             this.setState({
               customerDetails: res.data.data
             });

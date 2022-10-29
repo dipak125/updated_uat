@@ -288,7 +288,7 @@ class dailycash_FullQuote extends Component {
             'deductible': parseInt(deductibleSliderVal),
             'tenure_year': parseInt(tenureSliderVal),
         }
-        //console.log('post_data-----', post_data);
+        console.log('post_data-----', post_data);
 
         let encryption = new Encryption();
         formData.append('enc_data', encryption.encrypt(JSON.stringify(post_data)))
@@ -297,6 +297,7 @@ class dailycash_FullQuote extends Component {
             .then(res => {
                 let decryptResp = JSON.parse(encryption.decrypt(res.data))
                 //let decryptResp = res.data
+                console.log("yes0",(encryption.decrypt(res.data)))
                 console.log("decrypt---quote--service---", decryptResp)
 
                 if (!decryptResp.error) {
@@ -307,11 +308,14 @@ class dailycash_FullQuote extends Component {
                     })
                 }
                 else if (decryptResp.error) {
+                    console.log("hellooo", decryptResp.msg)
                     this.setState({
                         fulQuoteResp: decryptResp.data,
                         serverResponse: [],
                         error: { "message": decryptResp.msg }
                     })
+                    let swal_msg=decryptResp.msg && decryptResp.msg.messages && decryptResp.msg.messages[0] && decryptResp.msg.messages[0].message && decryptResp.msg.messages[0].message ? decryptResp.msg.messages[0].message : decryptResp.msg.MessageList[0].Message
+                    swal(swal_msg);
                 }
                 else if (res.data.code && res.data.message && ((res.data.code == "validation failed" && res.data.message == "validation failed") || (res.data.code == "Policy Validation Error" && res.data.message == "Policy Validation Error"))) {
                     var validationErrors = []
@@ -324,10 +328,13 @@ class dailycash_FullQuote extends Component {
                       error: [],
                       serverResponse: []
                     });
-                    // swal(res.data.data.messages[0].message)
+                   
+                     
                     this.props.loadingStop();
+                    swal(res.data.data.messages[0].message)
                   }
                 else {
+                    
                     this.setState({
                         fulQuoteResp: [],
                         error: decryptResp.ValidateResult,
@@ -395,11 +402,12 @@ class dailycash_FullQuote extends Component {
 
             slider_tenure: tenureSliderVal ? tenureSliderVal : defaulttenureSliderValue,
         })
-
-        const errMsg = error && error.message ? (
-            <span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span>
+        let errMsg=error && error.message && error.message.MessageList && error.message.MessageList.length>0 && error.message.MessageList[0].Message ? (<span className="errorMsg"><h6><strong>{error.message.MessageList[0].Message}</strong></h6></span>) : null
+        if(!errMsg)
+         errMsg = error && error.message ? (
+            <span className="errorMsg"><span className="errorMsg"><h6><strong>Thank you for showing your interest for buying product.Due to some reasons, we are not able to issue the policy online.Please call 1800 22 1111</strong></h6></span><h6><strong></strong></h6></span>
         ) : null
-
+       
         const validationErrors = 
             validation_error ? (
                 validation_error.map((errors, qIndex) => (
@@ -496,7 +504,7 @@ class dailycash_FullQuote extends Component {
                                                                                 placeholderText="End Date"
                                                                                 disabled={true}
                                                                                 className="datePckr"
-                                                                                selected={addDays(new Date(values.polStartDate), (365 * values.slider_tenure) - 1)}
+                                                                                selected={addDays(new Date(values.polStartDate), (364))}
                                                                             />
                                                                             {errors.polEndDate && touched.polEndDate ? (
                                                                                 <span className="errorMsg">{errors.polEndDate}</span>

@@ -46,8 +46,14 @@ function productFormatter(cell, row) {
     {
         if(row && row.vehiclebrandmodel && row.vehiclebrandmodel.vehicletype && row.vehiclebrandmodel.vehicletype.name && row.vehiclebrandmodel.vehicletype.name == "Two Wheeler Insurance comprehensive")
             return "Motor Two Wheeler Short Term"
-        else
+        else if(row && row.vehiclebrandmodel && row.vehiclebrandmodel.vehicletype && row.vehiclebrandmodel.vehicletype.name && row.vehiclebrandmodel.vehicletype.name == "Four Wheeler Insurance comprehensive")
            return "Motor Four Wheeler Short Term"
+           else if(row && row.vehiclebrandmodel && row.vehiclebrandmodel.vehicletype && row.vehiclebrandmodel.vehicletype.name && row.vehiclebrandmodel.vehicletype.name == "Goods Carrying Vehicle Short Term")
+           return "Goods Carrying Vehicle Short Term"
+           else if(row && row.vehiclebrandmodel && row.vehiclebrandmodel.vehicletype && row.vehiclebrandmodel.vehicletype.name && row.vehiclebrandmodel.vehicletype.name == "Motor MISCD Insurance Short Term")
+           return "Motor MISCD Insurance Short Term"
+
+           
     }
 }
 
