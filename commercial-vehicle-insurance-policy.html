@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  th {
+    font-family: 'swis721_cn_btbold';
+    font-size: 7;
+    font-weight: 900;
+    text-align:center;
+  }
+  h1 {
+    font-family: Swiss721CondensedBT;
+    font-size: 7;
+    text-align:center;
+  }
+  .header-box {
+     font-family: 'swis721_cn_btbold';
+    font-size: 6;
+  }
+  .header-box-align {
+     font-family: 'swis721_cn_btbold';
+    font-size: 6;
+    text-align:left;
+  }
+  .header-line {
+     font-family: 'swis721_cn_btbold';
+    font-size: 10;
+    text-align:center;
+  }
+  .column-position {
+     font-family: 'swis721_cn_btbold';
+    font-size: 12px;
+    text-align:left;
+  }
+  .column-data {
+     font-family: 'swis721_cn_btbold';
+    font-size: 7;
+    text-align:left;
+  }
+  .column-data-small {
+     font-family: 'swis721_cn_btbold';
+    font-size: 6;
+    text-align:left;
+  }
+  .column-data1 {
+    font-family: 'swis721_cn_btbold';
+    font-size: 10;
+    text-align:left;
+  }
+  .column-limit {
+    font-family: Swiss721CondensedBT;
+    font-size: 7;
+    text-align:left;
+  }
+  .large-text {
+    font-family: Swiss721CondensedBT;
+    font-size: 10;
+    text-align:left;
+  }
+  #footer { 
+    position: fixed; 
+    width: 100%; 
+    bottom: 0; 
+    left: 0;
+    right: 0;
+  }
+  </style>
+</head>
+<body>
+  <div id="footer"> 
+   <table width="100%">
+      <tr>
+        <td style="text-align:center; font-size: 12px;" colspan="2"><span class="header-box-align"><strong>SBI General Insurance Company Limited</strong></span><br/>
+          <span class="column-data-small">Registered and Corporate office : 9th Floor, A & B Wing, Fulcrum Building, Sahar Road, Andheri East, Mumbai - 400099, IRDA of India Reg.No.144</span>
+        </td>
+      </tr>
+   </table>
+  </div>
+
+  <table cellspacing="0" width="100%">
+    <tr>
+      <td><img src="image/common/logo.png" align="left" style="margin-left:2px;" /></td>
+      <td style="font-size: 12px; font-weight:400;margin-right:2px; text-align: right; width: 70%;">Customer Care Number<br>
+        1800-22-1111 (MTNL/BSNL user)<br>
+        1800-102-1111 (for other users)<br>
+        customer.care@sbigeneral.in</td>
+    </tr>
+    <tr>
+      <td colspan="2" class="header-line" style="text-transform: uppercase;">{{product_name}}</td>
+    </tr>
+    <tr>
+      <td  colspan="2" style="text-align: center;font-size:11.2px; font-weight:200;">(Product UIIN: {{UIN_number}})</td>
+    </tr>
+  </table>
+
+  <table class="header-box" style="margin-bottom: 2px;border: 1px solid black;font-size:12px;" width="100%">
+    <tr>
+      <td style="font-size:12px;"><b>Important Note: 1) The Validity of this Certificate of Insurance cum Schedule is subject to realization of the premium cheque. 2) This Insurance Policy cover is valid subject to availability of Complete and Correct Registration Number within 15 days from the Date of Commencement of this Policy. 3) This insurance policy cover is valid subject to Warranties, Terms and Conditions of the policy.</b></td>
+    </tr>
+  </table>
+
+  <div style="height: 8px;"></div>
+
+  <table cellspacing="0" cellpadding="5" style="width: 100%;margin-top: 2px; border-collapse: collapse;font-size:12px;">
+    <tr>
+      <td style="width:50%;padding: 2px 2px 2px 0; border: 1px solid #000;"><table cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse; font-size:8px;">
+          <tbody>
+            <tr>
+              <td width="30%" style="vertical-align: middle; text-align: left; padding: 2px;font-size:12px;"><b>Name</b></td>
+              <td width="70%" style="font-family: Arial; font-size: 12px; vertical-align: middle; text-align: left;">: {{policy_holder_name}}</td>
+            </tr>
+            <tr>
+              <td  style="font-family: Arial; font-size: 12px; vertical-align: middle; text-align: left; padding: 2px;"><strong>Address</strong></td>
+              <td  style="font-family: Arial; word-wrap: break-word; font-size: 12px; vertical-align: middle; text-align: left;">: {{policy_holder_address}}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-family: Arial; font-size: 12px; vertical-align: middle; text-align: left; padding: 2px;"><strong>Contact Number</strong></td>
+              <td style="font-family: Arial; font-size: 12px; vertical-align: middle; text-align: left;">: +91 - {{policy_holder_mobile}}</td>
+            </tr>
+            <tr>
+              <td style="font-family: Arial; font-size: 12px;   vertical-align: middle; text-align: left; padding: 2px;"><strong>Email Id </strong></td>
+              <td style="font-family: Arial; font-size: 12px;   vertical-align: middle; text-align: left;">: {{policy_holder_email_id}}</td>
+            </tr>
+          </tbody>
+        </table></td>
+      <td style="width:50%; border: 1px solid #000;"><table cellspacing="0" cellpadding="0" border="0" style="width: 100%; border-collapse: collapse; font-size:12px;">
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; width:40%; font-weight: bold; padding:2px; vertical-align: top; text-align: left;">Policy / Certificate No :</td>
+            <td style="font-family:Arial; font-size: 12px; width:60%;  padding:2px; vertical-align: top; text-align: left;">: {{policy_number}}</td>
+          </tr>
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: top; text-align: left;">Policy Issue Date </td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: top; text-align: left;">: {{policy_issue_date}}</td>
+          </tr>
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Customer ID </td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: middle; text-align: left;">: {{customer_id}}</td>
+          </tr>
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Policy Effective Date</td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: middle; text-align: left;">: {{od_effeective_date}} To {{od_expire_date}} Midnight</td>
+          </tr>
+          <!-- <tr>
+            <td style="font-family: Arial; font-size: 8px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Geographical Area </td>
+            <td style="font-family:Arial; font-size:8px; padding:2px; vertical-align: middle; text-align: left;">: [geographicalArea]</td>
+          </tr> -->
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Policy Servicing Branch </td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: middle; text-align: left;">: HO</td>
+          </tr>
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Intermediary Name & Code </td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: middle; text-align: left;">: {{intermediry_name}} & {{intermediary_code}}</td>
+          </tr>
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Intermediary Contact Number </td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: middle; text-align: left;">: +91 - {{intermediary_mobile}}, {{intermediary_landline}}</td>
+          </tr>
+          <tr>
+            <td style="font-family: Arial; font-size: 12px; font-weight: bold; padding:2px; vertical-align: middle; text-align: left;">Previous Policy Number</td>
+            <td style="font-family:Arial; font-size: 12px; padding:2px; vertical-align: middle; text-align: left;">: {{renewal_previous_policy_number}}</td>
+          </tr>
+          <tr>
+            {{agent_details_html}}
+          </tr>
+        </table></td>
+    </tr>
+  </table>
+
+  <div style="height: 8px;"></div>
+
+  <table width="100%" cellspacing="0" cellpadding="1" border="0" style="border: 1px solid black;">
+    <tr>
+      <td align="left" colspan="2" style="background-color:#e0dfda; font-weight: 500; text-align:center; font-size: 12px;">Vehicle Details</td>
+    </tr>
+    <tr style="border: 1px solid black;">
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Make & Model</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_brand_name}} & {{vehicle_brand_model}} & {{vehicle_variant_name}}</td>
+    </tr>
+    <tr style="border: 1px solid black;">
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Year of Manufacturing</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_year_of_menufacture}}</td>
+    </tr>
+    <tr style="border: 1px solid black;">
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Registration Number</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_registration_number}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Engine Number</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_engine_number}}</td>
+    </tr>
+    <tr >
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Chassis Number</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_engine_chassis_number}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Fuel Type</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{fueltype}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Gross Vehicle Weight (GVW)/{{vehicle_engine_type_unit}}</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{gross_vehicle_weight}}/{{engine_capacity}}</td>
+    </tr>
+    <!-- <tr>
+      <td style="border: 1px solid black; width:50%" align="left" class="column-position">Cubic Capacity/kW</td>
+      <td style="border: 1px solid black; width:50%" align="left" class="column-position">{{engine_capacity}}</td>
+    </tr> -->
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Vehicle Body Type</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_body_type}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">RTO Location Name</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{rto_location}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Public/Private Carrier</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_sub_class}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Seating Capacity including driver</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{vehicle_seating_capacity}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Number of Trailers</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{trailer_count}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Trailer Registration No</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{od_trailer_regNo}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Trailer Type</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{trailer_type}}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">Trailer Chassis No</td>
+      <td style="border: 1px solid black; width:50%; font-size:12px;" align="left" class="column-position">{{od_trailer_chassisNo}}</td>
+    </tr>
+  </table>
+
+  <div style="height: 8px;"></div>
+
+  <table width="100%" cellspacing="0" cellpadding="1" border="0" style="border: 1px solid black;">
+    <tr>
+      <td align="left" colspan="7" style="background-color:#e0dfda; font-weight: 500;font-size:small; text-align:center">Insured&apos;s Declared Value (IDV)</td>
+    </tr>
+    <tr style="border: 1px solid black;">
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Vehicle - (Rs.)</td>
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Vehicle Body - (Rs.)</td>
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Trailer Value - (Rs.)</td>
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Non Electrical Accessories - (Rs.)</td>
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Electrical Accessories - (Rs.)</td>
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Bi fuel kit Value - (Rs.)</td>
+      <td style="border: 1px solid black; text-align:center;" align="center" class="column-position">Total IDV</td>
+    </tr>
+    <tr style="border: 1px solid black;">
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{od_basic_sumins}}</td>
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{vehicle_body_IDV}}</td>
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{od_trailer_sumins}}</td>
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{non_electrical_accessories_sumins}}</td>
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{electrical_accessories_sumins}}</td>
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{non_inbuilt_cng_lpg_accessories_sumins}}</td>
+      <td style="border: 1px solid black; text-align:center; font-size:12px;" align="center" class="column-position">{{total_idv_calculation}}</td>
+    </tr>
+  </table>
+
+  <div style="height: 4px;"></div>
+
+  <table class="column-data">
+    <tr>
+      <td style="font-size: 11.80px;"><b>LIMITATION AS TO USE :</b> As per Motor Vehicle Rules, 1989, The Policy covers use of the vehicle for any purpose other than : a) Organized racing, b) Pace Making, c) Reliability Trials, d) Speed Testing, e) Use whilst drawing a trailer except the towing (other than for reward) of any one disabled Mechanically propelled vehicle (only for Passenger Carrying Vehicles).</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.80px;"><B>PERSONS OR CLASSES OF PERSONS ENTITLED TO DRIVE:</B> Any person including Insured</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.80px;"><B>STAGE CARRIAGE/CONTRACT CARRIAGE/ PRIVATE SERVICE VEHICLE: </B> Provided that the person driving holds an effective driving license at the time of the accident and is not disqualified from holding or obtaining such a license.</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.80px;"><B>GOODS CARRIAGE: </B> Provided that the person driving holds an effective driving license at the time of the accident and is not disqualified from holding or obtaining such a license. Provided also that the person holding an effective learner&apos;s license may also drive the vehicle when not used for the transport of passengers at the time of the accident and that such a person satisfies the requirements of Rule 3 of The Central Motor Vehicles Rules, 1989.</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.80px;"><B>NON-TRANSPORT VEHICLES: </B> Provided that the person driving holds an effective driving license at the time of the accident and is not disqualified from holding or obtaining such a license. Provided also that the person holding an effective learner&apos;s license may also drive the vehicle and that such a person satisfies the requirements of Rule 3 of The Central Motor Vehicles Rules, 1989.</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.80px;"><B>LIMITS OF LIABILITY: </B> a. Under Section II-1 (i) of the Policy-Death of or bodily injury to any person so far as it is necessary to meet the requirements of the Motor Vehicle Act, 1988. b. Under Section II (1) (ii) of the Policy-Damage to property other than property belonging to the insured or held in trust or in the custody of control or the insured up to the limits specified Rs.750000/- (c) PA Cover for owner-driver under Section-III CSI - Rs.{{pa_owner_driver_sumins}}/-.</td>
+    </tr>
+    <tr>
+      <td style="font-size: 12px;"><B>Deductible under Section-I : </B>(i) Compulsory deductible Rs. {{compulsory_deductible}}/-(ii) Voluntary deductible Rs. /- (iii) Additional Compulsory deductible Rs. __/-.</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.60px;">{{ncb_declaration_html_one}}</td>
+    </tr>
+    <tr>
+      <td style="font-size: 11.60px;">{{ncb_declaration_html_two}}</td>
+    </tr>
+  </table>
+
+<!--   <div style="page-break-before: always;"></div> -->
+
+  <table width="100%" cellspacing="0" cellpadding="1" border="0" style="border: 1px solid black;">
+      <tr style="background-color:#e0dfda;">
+         <td colspan="7" style="padding: 2px; text-align: center; font-weight: 500;font-size:small;" align="left">Premium Computation Table</td>
+      </tr>
+      <tr style="background-color:#e0dfda;">
+        <td style="border: 1px solid black;padding: 2px; width:10%; font-size: 12px;" align="left" class="column-limit">Own Damage - Section I</td>
+        <td style="border: 1px solid black;padding: 2px; width:10%; font-size: 12px;" align="left" class="column-limit">SUM INSURED</td>
+        <td style="border: 1px solid black;padding: 2px; width:10%; font-size: 12px;" align="left" class="column-limit">PREMIUM (Rs.)</td>
+        <td style="border: 1px solid black;padding: 2px; width:10%; font-size: 12px;" align="left" class="column-limit">A. LIABILITY</td>
+      <td style="border: 1px solid black;padding: 2px; width:10%; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td colspan="2" style="border: 1px solid black;padding: 2px; width:20%; font-size: 12px;" align="left" class="column-limit">PREMIUM (Rs.)</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td rowspan="4" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;">Total Own Damage Premium (including all Tariff Add-on, Discount & Loadings)</td>
+        <td style="border: 1px solid black; border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Basic TP Premium</td>
+      <td style="border: 1px solid black; border-bottom:1px solid #fff; padding: 2px; text-align: right; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td colspan="2" style="border: 1px solid black; border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{liability_basic_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff;  padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{od_basic_sumins}}</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{od_basic_premium}}</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit"> Trailers</td>
+      <td style="border: 1px solid black; border-top:1px solid #fff;  border-bottom:1px solid #fff; padding: 2px; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td colspan="2" style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{tp_trailer_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black; border-top:1px solid #fff;  border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff;  padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit"> By fuel Kit (CNG/LPG) - TP</td>
+      <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff;  padding: 2px; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td colspan="2" style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{legal_liability_cng_lpg_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black; border-top:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff;  padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+      <td style="border: 1px solid black; border-top:1px solid #fff; padding: 2px; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td colspan="2" style="border: 1px solid black; border-top:1px solid #fff; padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+      </tr>
+      <tr style="background-color:#e0dfda;">
+        <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;">IMT Add on Covers</td>
+        <td colspan="4" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;">Additional Covers</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Non Electrical Accessories </td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{non_electrical_accessories_sumins}}</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{non_electrical_accessories_premium}}</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;" align="left" class="column-limit"><strong>Personal Accident Cover</strong></td>
+      <td style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;" align="left" class="column-limit"><strong>Sum Insured</strong></td>
+        <td style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;" align="left" class="column-limit"><strong>Nos of Persons</strong></td>
+        <td style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;" align="left" class="column-limit"><strong>Premium (RS)</strong></td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Electrical /Electronic Accessories</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{electrical_accessories_sumins}}</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{electrical_accessories_premium}}</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">PA to Owner Driver</td>
+        <td style="border: 1px solid black;padding: 2px; text-align: right; font-size: 12px;" align="left" class="column-limit">{{pa_owner_driver_sumins}}</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;" align="center" class="column-limit">{{pa_owner_driver_count}}</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{pa_owner_driver_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">CNG /LPG Kit - Own Damage</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{non_inbuilt_cng_lpg_accessories_sumins}}</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{non_inbuilt_cng_lpg_accessories_premium}}</td>
+        <td align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;">PA to Paid Driver, Cleaner Conductor and Coolies </td>
+        <td align="left" class="column-limit" style="border: 1px solid black;padding: 2px; text-align: right; font-size: 12px;">{{pa_cccp_sumins}}</td>
+        <td align="center" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;">{{pa_cccp_count}}</td>
+        <td align="right" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;">{{pa_cccp_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">In built - CNG /LPG Kit Own Damage</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{inbuit_cng_lpg_sumins}}</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{inbuit_cng_lpg_premium}}</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: left; font-size: 12px;" align="right" class="column-limit">Geographical Extension - Liability</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{geoextension_liability_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Trailer - OD</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit"></td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{od_trailer_premium}}</td>
+        <td colspan="4" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:center; background-color:#e0dfda; font-size: 12px;">Legal Liability Cover</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">IMT 23</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{od_imt23}}</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Legal Liability to Paid Driver</td>
+        <td style="border: 1px solid black; border-bottom:1px solid #fff; padding: 2px; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align:center; font-size: 12px;" align="center" class="column-limit">{{legal_liability_driver_count}}</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{legal_liability_paid_driver_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Geographical Extension - Own Damage</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right; font-size: 12px;" align="right" class="column-limit">{{geoextension_own_damage_premium}}</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">Legal Liability to Employees of the Insured</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff;  padding: 2px; font-size: 12px;" align="left" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px; text-align:center; font-size: 12px;" align="center" class="column-limit">{{legal_liability_employess_count}}</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{legal_liability_employess_premium}}</td>
+      </tr>
+      <!-- <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px;" align="left" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px" align="left" class="column-limit">Legal Liability to Cleaner Conductor Coolies</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px" align="left" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px; text-align:center;" align="center" class="column-limit">0</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right;" align="right" class="column-limit">0.00</td>
+      </tr> -->
+      <!-- <tr style="background-color:#fff;">
+        <td rowspan="2" align="left" class="column-limit" style="border: 1px solid black;padding: 2px;">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; text-align: right;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; border-bottom:1px solid #fff; border-top: 1px solid #fff; text-align: right;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px" align="left" class="column-limit">Legal Liability to Workmen</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px" align="left" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; border-bottom:1px solid #fff; padding: 2px; text-align:center;" align="center" class="column-limit">0</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right;" align="right" class="column-limit">0.00</td>
+      </tr> -->
+      <!-- <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px;text-align: right;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px;border-top: 1px solid #fff; text-align: right;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px" align="left" class="column-limit">Legal Liability to NFPP</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff;padding: 2px" align="left" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black; border-top:1px solid #fff; padding: 2px; text-align:center;" align="center" class="column-limit">0</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right;" align="right" class="column-limit">0</td>
+      </tr> -->
+      <tr style="background-color:#e0dfda;">
+        <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;">NCB Details</td>
+        <td colspan="4" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;">Less Discounts </td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">No Claim Bonus</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{ncb_percentage}}</td>
+        <td style="border: 1px solid black;padding: 2px; font-size: 12px;" align="left" class="column-limit">TPPD Discount Vehicle Restricted to Own Premises</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="left" class="column-limit">{{less_discount_sum_insured}}</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:center; font-size: 12px;" align="center" class="column-limit">&nbsp;</td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{less_discount_premium}}</td>
+      </tr>
+      <tr style="background-color:#fff;">
+        <td colspan="2" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;"><strong>(A) TOTAL OWN DAMAGE PREMIUM</strong></td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{own_damage_total_premium}}</td>
+        <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;"><strong>(B) TOTAL LIABILITY PREMIUM</strong></td>
+        <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{legal_liability_total_premium}}</td>
+      </tr>
+
+      <tr style="background-color:#fff;">
+         <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding:3px 2px; font-size: 12px;">Subject to IMT Nos: IMT28,IMT-39,IMT21</td>
+         <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;">Total Policy Premium (A+B)</td>
+         <td align="right" class="column-limit" style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;">{{od_lp_total_premium}}</td>
+       </tr>
+       <tr style="background-color:#fff;">
+         <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding:3px 2px; font-size: 12px;">SBIG Add Nos:</td>
+          <td colspan="3" align="left" class="column-limit" style="border: 1px solid black; border-top: 1px solid #fff; padding:3px 2px; font-size: 12px;">Taxes as applicable</td>
+           <td align="left" class="column-limit" style="border: 1px solid black; border-top: 1px solid #fff; padding:3px 2px; text-align: right; font-size: 12px;">{{tax_gst}}</td>
+       </tr>
+       <tr style="background-color:#fff;">
+         <td colspan="2" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;"></td>
+         <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit"></td>
+         <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding: 2px; font-size: 12px;">Total Premium Collected</td>
+         <td style="border: 1px solid black;padding: 2px; text-align:right; font-size: 12px;" align="right" class="column-limit">{{final_premium_collected}}</td>
+       </tr>
+       <!-- <tr style="background-color:#fff;">
+         <td colspan="3" align="left" class="column-limit" style="border: 1px solid black; padding: 10px;">&nbsp;</td>
+         <td colspan="3" align="left" class="column-limit" style="border: 1px solid black;padding: 10px">Total Premium Collected</td>
+         <td style="border: 1px solid black;padding: 10px; text-align:right;" align="right" class="column-limit">{{final_premium_collected}}</td>
+       </tr> -->
+  </table>
+
+  <div style="height: 8px;"></div>
+
+  <table width="100%">
+    <tr>
+      <td><span style="font-size: 12px;">Premium Collection details : Receipt No : {{transaction_no}}, Receipt Date: {{policy_issue_date}}</span><br>
+        <!-- <span class="header-box"><b>Add On Cover Opted :</b></span><span class="column-data"></span><br> -->
+        <span class="header-box">{{hypothecation_html}}</span>
+        <!-- <span class="header-box"><b>Subject to I.M.T Endorsement Nos. :</b> </span><span class="header-box">[sbEndorsement]</span><br /> -->
+        <!-- <span class="header-box"><b>Subject to SBIG Add-On Endorsement Nos. :</b></span><span class="column-data">[AddOnEnd]</span><br> -->
+        <span class="header-box" style="font-size: 12px;"><b>Nominee Details : Name :</b> {{nominee_name}}, <b>Date of Birth:</b> {{nominee_birthday}}, <b>Relation :</b> {{nominee_relationship_owner}}</span><br>
+        <span class="header-box" style="font-size: 12px;"><b>Appointee Details : Name :</b> {{appointee_name}} <b>Appointee Relation :</b> {{appointee_relation}}</span>
+      </td>
+    </tr>
+    <tr>
+       <td style="vertical-align: middle; text-align: left; padding: 2px;">{{qr_code}}</td>
+    </tr>
+    <tr>
+       <td style="vertical-align: middle; text-align: left; padding: 2px;"><img src="image/common/signature.png" style="margin:0px; display:block" /></td>
+    </tr>
+  </table>
+
+  {{gst_invoice_html}}
+
+  <table width="100%">
+    <tr>
+      <td style="font-size: 12px;"><span class="column-data1"><b>Warranty:</b> Warranted that the insured named herein/owner of the vehicle holds a valid Pollution Under Control (PUC) Certificate and/or valid fitness certificate, as applicable, on the date of commencement of the Policy and undertakes to renew and maintain a valid and effective PUC and/or fitness Certificate, as applicable, during the subsistence of the Policy. Further, the Company reserves the right to take appropriate action in case of any discrepancy in the PUC or fitness certificate.</span></td>
+    </tr>
+    <tr>
+      <td  width="100%" style="font-size: 12px;"><span class="column-data1"><b>For claims,</b></span><span class="column-data" style="font-size: 12px;"> Please contact us at Toll Free number</span><br>
+        <span class="column-data1"><b>MTNL/BSNL users</b></span><span class="column-data" style="font-size: 12px;"> - 1800</span><span class="header-box"><b>-22-1111, Other users </b></span><span class="column-data">- 1800-102-1111</span><span class="header-box"><b> For complete Coverage & Policy Wording, kindly visit our website - <a href="www.sbigeneral.in" target="_blank">www.sbigeneral.in</a></b></span><br>
+        <span class="column-data-small" style="font-size: 12px;">I/We hereby certify that the Policy to which this Certificate relates as well as this Certificate of Insurance are issued in accordance with the provisions of chapter X and Chapter XI of M.V. Act, 1988.</span><br>
+        <span class="column-limit" style="font-size: 12px;">Policy Servicing Office : SBI General Insurance Company Ltd. 9th Floor, A & B Wing, Fulcrum Building, Sahar Road, Andheri East, Mumbai - 400099</span></td>
+    </tr>
+    <tr>
+      <td width="100%" style="font-size: 12px;">
+        <span class="header-box-align" style="font-size: 12px;">
+          <b>Consolidated Stamp Duty Rs. 0.50 paid towards Insurance Policy Stamps vide Order No.CSD/293/2019andCSD/295/2019/176 Dated: 2019-01-25 11:00:52.0 of General Stamp Office, Mumbai</b>
+          <br>
+          <br>
+          <b>IMPORTANT NOTICE: The Insured is not indemnified if the vehicle is used or driven otherwise than in accordance with this schedule. Any payment made by the Company by reason of wider terms appearing in the certificate in order to comply with the Motor Vehicle Act, 1988 is recoverable from the Insured. See the clause headed &quot;AVOIDANCE OF CERTAIN TERMS AND RIGHT OF RECOVERY&quot;. For legal interpretation English version will be good.</b>
+        </span>
+        <br>
+        <span class="header-box-align" style="font-size: 12px;"><B>Disclaimer :</B></span><span class="column-limit" style="font-size: 12px;">&nbsp;&nbsp; Please examine this Policy including attached Schedules / Annexure if any. In the event of any discrepancy please contact the office of the Company immediately, it being noted that this Policy shall be otherwise considered as being entirely in order. Please find claims settlement & grievance redressal procedure available on www.sbigeneral.in</span></td>
+    </tr>
+    <tr class="header-box-align">
+      <td width="100%" style="font-size: 12px;"><span><B>Customer Service & Grievance Procedure :</B></span><br>
+        <span><b>The Grievance Redressal Cell of the Company looks into complaints from policyholders. If the Insured has a grievance that the Insured wishes the Company to redress, the Insured may approach the person nominated as
+        ‘Grievance Redressal Officer’ with the details of their grievance. Process of Service Registration * Call us at our Toll Free - 1800 22 1111 / 1800 102 1111 Monday to Saturday (8 am - 8 pm). * Fax us at 1800 22 7244 / 1800 102 7244 *
+        Email us at customer.care@sbigeneral.in * Visit us at any of our Branches. Process of Grievance Redressal Step 1: * Call us at our Toll Free - 1800 22 1111 / 1800 102 1111 Monday to Saturday (8 am - 8 pm). * Fax us at 1800 22 7244
+        / 1800 102 7244. * Email us at customer.care@sbigeneral.in * Visit us at any of our Branches. If you are not happy with the resolution provided, please follow step 2. Step 2: * Please email your concerns to Head - Customer Care at
+        head.customercare@sbigeneral.in Step 3: * If you are dissatisfied with the resolution provided in the Steps as indicated above on your Complaint, you may send your ‘Appeal’ addressed to the Chairman of the Grievance Redressal
+        Committee. The Committee will look into the appeal and decide the same expeditiously on merits. You can write to Head - Compliance, Legal & CS on the id - gro@sbigeneral.in Step 4: * If your issue remains unresolved you may
+        approach IRDA by calling on the Toll Free no. 155255 or you can register an online complaint on the website http://igms.irda.gov.in * If after having followed the above steps you are not happy with the resolution and your issue
+        remains unresolved, you may approach the Insurance Ombudsman for Redressal. List of Ombudsman offices with contact details are attached for ready reference. For updated status, Please refer to website www.irdaindia.gov.in</b></span></td>
+    </tr>
+  </table>
+
+  <table width="100%">
+    <tr>
+      <td width="100%" align="center">Names of Ombudsman and Addresses of Ombudsman Centers</td>
+    </tr>
+  </table>
+
+  <table style="font-size:8.2px; line-height:12px;" cellspacing="0" width="100%">
+    <tr style="border: 1px solid black;">
+      <td style="border: 1px solid black; font-size:12px;" width="50%" align="left">Gujarat, Dadra & Nagar Haveli,Daman and Diu<br>
+        AHMEDABAD - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        Jeevan Prakash Bldg, 6th Floor,<br>
+        Tilak Marg, Relief Road,<br>
+        Ahmedabad - 380 001.<br>
+        Tel.: 079 - 25501201 / 02 / 05 / 06<br>
+        Email: bimalokpal.ahmedabad@ecoi.co.in</td>
+      <td style="border: 1px solid black; font-size:12px;" width="50%" align="left">Rajasthan<br>
+        JAIPUR - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        Jeevan Nidhi - II Bldg., Gr. Floor,<br>
+        Bhawani Singh Marg,<br>
+        Jaipur - 302 005.<br>
+        Tel.: 0141 - 2740363<br>
+        Email: Bimalokpal.jaipur@ecoi.co.in</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left">Karnataka<br>
+        BENGALURU - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        Jeevan Soudha Building,PID No. 57-27-N-19<br>
+        Ground Floor, 19/19, 24th Main Road,<br>
+        JP Nagar, Ist Phase,<br>
+        Bengaluru - 560 078.<br>
+        Tel.: 080 - 26652048 / 26652049<br>
+        Email: bimalokpal.bengaluru@ecoi.co.in </td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Kerala,Lakshadweep,Mahe-a part of Pondicherry,<br>
+        ERNAKULAM - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        2nd Floor, Pulinat Bldg.,<br>
+        Opp. Cochin Shipyard, M. G. Road,<br>
+        Ernakulam - 682 015.<br>
+        Tel.: 0484 - 2358759 / 2359338<br>
+        Fax: 0484 - 2359336<br>
+        Email: bimalokpal.ernakulam@ecoi.co.in </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Madhya Pradesh Chattisgarh.<br>
+        BHOPAL - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        Janak Vihar Complex, 2nd Floor,<br>
+        6, Malviya Nagar, Opp. Airtel Office, Near New Market,<br>
+        Bhopal - 462 003.<br>
+        Tel.: 0755 - 2769201 / 2769202<br>
+        Fax: 0755 - 2769203<br>
+        Email: bimalokpal.bhopal@ecoi.co.in </td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> West Bengal,Sikkim,Andaman & Nicobar Islands.<br>
+        KOLKATA - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        Hindustan Bldg. Annexe, 4th Floor,<br>
+        4, C.R. Avenue,<br>
+        KOLKATA - 700 072.<br>
+        Tel.: 033 - 22124339 / 22124340<br>
+        Fax : 033 - 22124341<br>
+        Email: bimalokpal.kolkata@ecoi.co.in </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Orissa<br>
+        BHUBANESHWAR - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        62, Forest park,<br>
+        Bhubneshwar - 751 009.<br>
+        Tel.: 0674 - 2596461 /2596455<br>
+        Fax: 0674 - 2596429<br>
+        Email: bimalokpal.bhubaneswar@ecoi.co.in</td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Districts of Uttar Pradesh :Laitpur, Jhansi, Mahoba, Hamirpur, Banda, Chitrakoot, Allahabad, Mirzapur, Sonbhabdra, Fatehpur, Pratapgarh, Jaunpur,Varanasi, Gazipur, Jalaun, Kanpur, Lucknow, Unnao, Sitapur, Lakhimpur, Bahraich, Barabanki, Raebareli, Sravasti, Gonda, Faizabad, Amethi, Kaushambi, Balrampur, Basti, Ambedkarnagar, Sultanpur, Maharajgang, Santkabirnagar, Azamgarh, Kushinagar, Gorkhpur, Deoria, Mau, Ghazipur, Chandauli, Ballia, Sidharathnagar.<br>
+        LUCKNOW - Shri/Smt....<br>
+        Office of the Insurance Ombudsman,<br>
+        6th Floor, Jeevan Bhawan, Phase-II,<br>
+        Nawal Kishore Road, Hazratganj,<br>
+        Lucknow - 226 001.<br>
+        Tel.: 0522 - 2231330 / 2231331<br>
+        Fax: 0522 - 2231310<br>
+        Email: bimalokpal.lucknow@ecoi.co.in </td>
+    </tr>
+    <tr style="border: 1px solid black;font-size:12px;">
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left">Punjab,Haryana,Himachal Pradesh,Jammu & Kashmir,Chandigarh.<br>
+        CHANDIGARH - Shri/Smt...<br>
+        Office of the Insurance Ombudsman,<br>
+        S.C.O. No. 101, 102 & 103, 2nd Floor,<br>
+        Batra Building, Sector 17 - D,<br>
+        Chandigarh - 160 017.<br>
+        Tel.: 0172 - 2706196 / 2706468<br>
+        Fax: 0172 - 2708274<br>
+        Email: bimalokpal.chandigarh@ecoi.co.in</td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Goa, Mumbai Metropolitan Region excluding Navi Mumbai & Thane<br>
+        MUMBAI - Shri/Smt...<br>
+        Office of the Insurance Ombudsman,<br>
+        3rd Floor, Jeevan Seva Annexe,<br>
+        S. V. Road, Santacruz (W),<br>
+        Mumbai - 400 054.<br>
+        Tel.: 022 - 26106552 / 26106960<br>
+        Fax: 022 - 26106052<br>
+        Email: bimalokpal.mumbai@ecoi.co.in </td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Tamil Nadu,Pondicherry Town andKaraikal (which are part of Pondicherry).<Br>
+        CHENNAI - Shri/Smt...<Br>
+        Office of the Insurance Ombudsman,<Br>
+        Fatima Akhtar Court, 4th Floor, 453,<Br>
+        Anna Salai, Teynampet,<Br>
+        CHENNAI - 600 018.<Br>
+        Tel.: 044 - 24333668 / 24335284<Br>
+        Fax: 044 - 24333664<Br>
+        Email: bimalokpal.chennai@ecoi.co.in</td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left">State of Uttaranchal and the following Districts of Uttar Pradesh:Agra, Aligarh, Bagpat, Bareilly, Bijnor,
+        Budaun, Bulandshehar, Etah, Kanooj, Mainpuri, Mathura, Meerut, Moradabad, Muzaffarnagar, Oraiyya,
+        Pilibhit, Etawah, Farrukhabad, Firozbad, Gautambodhanagar, Ghaziabad, Hardoi, Shahjahanpur, Hapur,
+        Shamli, Rampur, Kashganj, Sambhal, Amroha, Hathras, Kanshiramnagar, Saharanpur.<Br>
+        NOIDA - Shri/Smt...<Br>
+        Office of the Insurance Ombudsman,<Br>
+        Bhagwan Sahai Palace<Br>
+        4th Floor, Main Road, Naya Bans, Sector 15,<Br>
+        Distt: Gautam Buddh Nagar,<Br>
+        U.P - 201 301.<Br>
+        Tel.: 0120-2514250 / 2514252 / 2514253<Br>
+        Email: bimalokpal.noida@ecoi.co.in</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> DELHI - Shri/Smt...<br>
+        Office of the Insurance Ombudsman,<br>
+        2/2 A, Universal Insurance Building,<br>
+        Asaf Ali Road,<br>
+        New Delhi - 110 002.<br>
+        Tel.: 011 - 2323481 / 23213504<br>
+        Email: bimalokpal.delhi@ecoi.co.in</td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Bihar,Jharkhand.<br>
+        PATNA - Shri/Smt...<br>
+        Office of the Insurance Ombudsman,<br>
+        1st Floor,Kalpana Arcade Building,,<br>
+        Bazar Samiti Road, Bahadurpur,<br>
+        Patna 800 006.<br>
+        Tel.: 0612-2680952<br>
+        Email: bimalokpal.patna@ecoi.co.in</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left">Assam,Meghalaya,Manipur,Mizoram,
+        Arunachal Pradesh,Nagaland and Tripura.
+        GUWAHATI - Shri/Smt...
+        Office of the Insurance Ombudsman,
+        Jeevan Nivesh, 5th Floor,<br>
+        Nr. Panbazar over bridge, S.S. Road,<br>
+        Guwahati - 781001(ASSAM).<br>
+        Tel.: 0361 - 2132204 / 2132205<br>
+        Fax: 0361 - 2732937<br>
+        Email: bimalokpal.guwahati@ecoi.co.in</td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Maharashtra,Area of Navi Mumbai and Thane,excluding Mumbai Metropolitan Region.
+        PUNE - Shri/Smt...<br>
+        Office of the Insurance Ombudsman,<br>
+        Jeevan Darshan Bldg., 3rd Floor,<br>
+        C.T.S. No.s. 195 to 198, N.C. Kelkar Road, Narayan Peth,<br>
+        Pune - 411 030.<br>
+        Tel.: 020-41312555<br>
+        Email: bimalokpal.pune@ecoi.co.in</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"> Andhra Pradesh,Telangana,Yanam and part of Territory of Pondicherry <br>
+        HYDERABAD - Shri/Smt...<br>
+        Office of the Insurance Ombudsman,<br>
+        6-2-46, 1st floor, "Moin Court",<br>
+        Lane Opp. Saleem Function Palace, A. C. Guards, Lakdi-Ka-Pool,<br>
+        Hyderabad - 500 004.<br>
+        Tel.: 040 - 65504123 / 23312122<br>
+        Fax: 040 - 23376599<br>
+        Email: bimalokpal.hyderabad@ecoi.co.in</td>
+      <td style="border: 1px solid black;font-size:12px;" width="50%" align="left"></td>
+    </tr>
+  </table>
+
+  <table>
+      <tr>
+        <td width="100%" class="column-limit" >
+          <span style="font-size:12px;"><br>Address and contact number of Governing Body of Insurance Council</span><br><br><span style="font-size:12px;">Secretary General Governing Body of Insurance Council,Jeevan Seva Annexe, 3rd
+          Floor (Above MTNL),S. V. Road, Santacruz (W), Mumbai â€“ 400 054,Tel: 022-6106889,Fax: 022-6106980, 6106052,Email: inscoun@vsnl.net</span><br><br><span style="font-size:12px;">Integrated Grievance Management System
+          <br><br>IRDA has launched the Integrated Grievance Management System (IGMS). IGMS is a grievance redress monitoring tool for IRDA. Policyholders who have grievances should register their complaints with the Grievance Redress
+          Channel of the Insurance Company first. If policyholders are not able to access the insurance company directly for any reason, IGMS provides a gateway to register complaints with insurance companies. Complaints shall be
+          registered with insurance companies first and only if need be, be escalated them to IRDA (Consumer Affairs Department). Website: http://www.policyholder.gov.in/Integrated_Grievance_Management.aspx Toll Free Number of IRDA
+          Grievance Call Centre: 155255, Timings: 8 AM to 8 PM -- (Monday to Saturday)</span>
+        </td>
+       <tr>
+  </table>
+
+</body>
+</html>
